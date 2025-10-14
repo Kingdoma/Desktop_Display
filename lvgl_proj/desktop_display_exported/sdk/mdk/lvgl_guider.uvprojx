@@ -1462,6 +1462,16 @@
       <FileType>1</FileType>
       <FilePath>..\..\generated\guider_fonts\lv_font_montserratMedium_18.c</FilePath>
     </File>
+    <File>
+      <FileName>lv_font_montserratMedium_20.c</FileName>
+      <FileType>1</FileType>
+      <FilePath>..\..\generated\guider_fonts\lv_font_montserratMedium_20.c</FilePath>
+    </File>
+    <File>
+      <FileName>lv_font_montserratMedium_35.c</FileName>
+      <FileType>1</FileType>
+      <FilePath>..\..\generated\guider_fonts\lv_font_montserratMedium_35.c</FilePath>
+    </File>
   </Files>
 </Group>
 <Group>
@@ -5496,6 +5506,16 @@
       <FileName>lv_font_montserratMedium_18.c</FileName>
       <FileType>1</FileType>
       <FilePath>..\..\generated\guider_fonts\lv_font_montserratMedium_18.c</FilePath>
+    </File>
+    <File>
+      <FileName>lv_font_montserratMedium_20.c</FileName>
+      <FileType>1</FileType>
+      <FilePath>..\..\generated\guider_fonts\lv_font_montserratMedium_20.c</FilePath>
+    </File>
+    <File>
+      <FileName>lv_font_montserratMedium_35.c</FileName>
+      <FileType>1</FileType>
+      <FilePath>..\..\generated\guider_fonts\lv_font_montserratMedium_35.c</FilePath>
     </File>
   </Files>
 </Group>

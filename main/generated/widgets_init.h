@@ -27,10 +27,6 @@ void Home_digital_clock_time_timer(lv_timer_t *timer);
 void Home_datetext_date_event_handler(lv_event_t *e);
 void Home_datetext_date_calendar_event_handler(lv_event_t *e);
 void Home_datetext_date_init_calendar(lv_obj_t *obj, char * s);
-void Home_digital_clock_2_timer(lv_timer_t *timer);
-void Home_datetext_2_event_handler(lv_event_t *e);
-void Home_datetext_2_calendar_event_handler(lv_event_t *e);
-void Home_datetext_2_init_calendar(lv_obj_t *obj, char * s);
 
 #ifdef __cplusplus
 }

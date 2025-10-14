@@ -4812,6 +4812,12 @@
     <file>
       <name>$PROJ_DIR$\..\..\generated\guider_fonts\lv_font_montserratMedium_18.c</name>
     </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\generated\guider_fonts\lv_font_montserratMedium_20.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\generated\guider_fonts\lv_font_montserratMedium_35.c</name>
+    </file>
   </group>
   <file>
     <name>$PROJ_DIR$\..\..\generated\gui_guider.c</name>

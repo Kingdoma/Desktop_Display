@@ -37,27 +37,40 @@ typedef struct
 	lv_obj_t *Home_ip_label;
 	lv_obj_t *Home_ping_data;
 	lv_obj_t *Home_Ping_label;
-	lv_obj_t *Home_label_temp_tit;
+	lv_obj_t *Home_net_monitor_tit;
 	lv_obj_t *Home_ping_unit;
-	lv_obj_t *Home_cont_electricity;
-	lv_obj_t *Home_cont_total_normal;
-	lv_obj_t *Home_line_1;
-	lv_obj_t *Home_label_total;
-	lv_obj_t *Home_label_normal;
-	lv_obj_t *Home_label_total_value;
-	lv_obj_t *Home_label_normal_value;
-	lv_obj_t *Home_label_total_num;
-	lv_obj_t *Home_label_normal_num;
-	lv_obj_t *Home_label_ele_monitor_title;
-	lv_obj_t *Home_cont_3;
-	lv_obj_t *Home_digital_clock_2;
-	lv_obj_t *Home_datetext_2;
-	lv_obj_t *Home_label_5;
-	lv_obj_t *Home_cont_4;
-	lv_obj_t *Home_label_7;
-	lv_obj_t *Home_label_6;
-	lv_obj_t *Home_img_6;
-	lv_obj_t *Home_img_5;
+	lv_obj_t *Home_cont_cpu_monitor;
+	lv_obj_t *Home_cpu_usage;
+	lv_obj_t *Home_arc_1;
+	lv_obj_t *Home_cpu_percent_label;
+	lv_obj_t *Home_cpu_percent;
+	lv_obj_t *Home_cpu_monitor_title;
+	lv_obj_t *Home_cpu_fequency_label;
+	lv_obj_t *Home_ram_label;
+	lv_obj_t *Home_ram_slider;
+	lv_obj_t *Home_cpu_temp_label;
+	lv_obj_t *Home_cpu_fequency_data;
+	lv_obj_t *Home_cpu_fequency_unit;
+	lv_obj_t *Home_cpu_temp_unit;
+	lv_obj_t *Home_cpu_temp_data;
+	lv_obj_t *Home_ram_unit;
+	lv_obj_t *Home_ram_data;
+	lv_obj_t *Home_cont_gpu_monitor;
+	lv_obj_t *Home_cont_2;
+	lv_obj_t *Home_arc_2;
+	lv_obj_t *Home_label_20;
+	lv_obj_t *Home_label_19;
+	lv_obj_t *Home_label_18;
+	lv_obj_t *Home_label_17;
+	lv_obj_t *Home_label_16;
+	lv_obj_t *Home_slider_1;
+	lv_obj_t *Home_label_15;
+	lv_obj_t *Home_label_14;
+	lv_obj_t *Home_label_13;
+	lv_obj_t *Home_label_12;
+	lv_obj_t *Home_label_11;
+	lv_obj_t *Home_label_10;
+	lv_obj_t *Home_label_9;
 	lv_obj_t *Home_label_home_title;
 	lv_obj_t *Home_btn_menu;
 	lv_obj_t *Home_btn_menu_label;
@@ -104,8 +117,6 @@ extern lv_ui guider_ui;
 void setup_scr_Home(lv_ui *ui);
 LV_IMG_DECLARE(_download_alpha_13x13);
 LV_IMG_DECLARE(_upload_alpha_13x13);
-LV_IMG_DECLARE(_upload_alpha_12x12);
-LV_IMG_DECLARE(_download_alpha_12x12);
 
 LV_IMG_DECLARE(_home_bak_27x56);
 
@@ -130,8 +141,10 @@ LV_FONT_DECLARE(lv_font_montserratMedium_17)
 LV_FONT_DECLARE(lv_font_montserratMedium_15)
 LV_FONT_DECLARE(lv_font_montserratMedium_13)
 LV_FONT_DECLARE(lv_font_montserratMedium_14)
-LV_FONT_DECLARE(lv_font_montserratMedium_10)
+LV_FONT_DECLARE(lv_font_montserratMedium_35)
+LV_FONT_DECLARE(lv_font_montserratMedium_20)
 LV_FONT_DECLARE(lv_font_montserratMedium_18)
+LV_FONT_DECLARE(lv_font_montserratMedium_10)
 
 
 #ifdef __cplusplus
