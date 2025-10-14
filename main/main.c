@@ -16,6 +16,8 @@
 #include "esp_lcd_touch.h"
 #include "esp_lcd_touch_ft5x06.h"
 #include "lvgl.h"
+#include "generated/gui_guider.h"
+#include "custom/custom.h"
 
 #define TAG "st7796_lvgl"
 
@@ -62,6 +64,8 @@
 #define EXAMPLE_PIN_NUM_LCD_RST        (GPIO_NUM_NC)
 #define EXAMPLE_PIN_NUM_BK_LIGHT       (-1)
 #define EXAMPLE_BK_LIGHT_ON_LEVEL      (1)
+
+lv_ui guider_ui;
 
 static SemaphoreHandle_t lvgl_flush_ready = NULL;
 static lv_disp_draw_buf_t lvgl_draw_buf;
@@ -208,13 +212,6 @@ static void example_init_touch(void)
     ESP_ERROR_CHECK(esp_lcd_touch_new_i2c_ft5x06(touch_io, &touch_cfg, &lvgl_touch_handle));
 }
 
-static void lvgl_button_event_cb(lv_event_t *e)
-{
-    if (lv_event_get_code(e) == LV_EVENT_CLICKED) {
-        ESP_LOGI(TAG, "LVGL test button clicked");
-    }
-}
-
 void app_main(void)
 {
     ESP_LOGI(TAG, "Initialize Intel 8080 bus (8-bit)");
@@ -301,35 +298,8 @@ void app_main(void)
     ESP_ERROR_CHECK(esp_timer_create(&tick_timer_args, &tick_timer));
     ESP_ERROR_CHECK(esp_timer_start_periodic(tick_timer, 1000)); // 1 ms tick
 
-    // lv_obj_t *box_red = lv_obj_create(lv_scr_act());
-    // lv_obj_set_size(box_red, 50, 50);
-    // lv_obj_set_style_bg_color(box_red, lv_palette_main(LV_PALETTE_RED), 0);
-    // lv_obj_set_style_bg_opa(box_red, LV_OPA_COVER, 0);
-    // lv_obj_set_style_border_width(box_red, 0, 0);
-    // lv_obj_align(box_red, LV_ALIGN_CENTER, -110, 0);
-
-    // lv_obj_t *box_green = lv_obj_create(lv_scr_act());
-    // lv_obj_set_size(box_green, 70, 70);
-    // lv_obj_set_style_bg_color(box_green, lv_palette_main(LV_PALETTE_GREEN), 0);
-    // lv_obj_set_style_bg_opa(box_green, LV_OPA_COVER, 0);
-    // lv_obj_set_style_border_width(box_green, 0, 0);
-    // lv_obj_align(box_green, LV_ALIGN_CENTER, 0, 0);
-
-    // lv_obj_t *box_blue = lv_obj_create(lv_scr_act());
-    // lv_obj_set_size(box_blue, 90, 90);
-    // lv_obj_set_style_bg_color(box_blue, lv_palette_main(LV_PALETTE_BLUE), 0);
-    // lv_obj_set_style_bg_opa(box_blue, LV_OPA_COVER, 0);
-    // lv_obj_set_style_border_width(box_blue, 0, 0);
-    // lv_obj_align(box_blue, LV_ALIGN_CENTER, 110, 0);
-
-    lv_obj_t *test_button = lv_btn_create(lv_scr_act());
-    lv_obj_set_size(test_button, 140, 60);
-    lv_obj_align(test_button, LV_ALIGN_BOTTOM_MID, -100, -30);
-    lv_obj_add_event_cb(test_button, lvgl_button_event_cb, LV_EVENT_CLICKED, NULL);
-
-    lv_obj_t *btn_label = lv_label_create(test_button);
-    lv_label_set_text(btn_label, "Touch Test");
-    lv_obj_center(btn_label);
+    setup_ui(&guider_ui);
+    custom_init(&guider_ui);
 
     xTaskCreate(lvgl_task, "lvgl_task", 4096, NULL, 2, NULL);
 
