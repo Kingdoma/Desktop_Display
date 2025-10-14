@@ -38,8 +38,8 @@ void setup_scr_Home(lv_ui *ui)
 
     //Write codes Home_cont_time
     ui->Home_cont_time = lv_obj_create(ui->Home);
-    lv_obj_set_pos(ui->Home_cont_time, 335, 39);
-    lv_obj_set_size(ui->Home_cont_time, 130, 112);
+    lv_obj_set_pos(ui->Home_cont_time, 335, 31);
+    lv_obj_set_size(ui->Home_cont_time, 130, 121);
     lv_obj_set_scrollbar_mode(ui->Home_cont_time, LV_SCROLLBAR_MODE_OFF);
 
     //Write style for Home_cont_time, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -61,13 +61,13 @@ void setup_scr_Home(lv_ui *ui)
         lv_timer_create(Home_digital_clock_time_timer, 1000, NULL);
         Home_digital_clock_time_timer_enabled = true;
     }
-    lv_obj_set_pos(ui->Home_digital_clock_time, 15, 55);
+    lv_obj_set_pos(ui->Home_digital_clock_time, 13, 57);
     lv_obj_set_size(ui->Home_digital_clock_time, 98, 20);
 
     //Write style for Home_digital_clock_time, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_radius(ui->Home_digital_clock_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->Home_digital_clock_time, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->Home_digital_clock_time, &lv_font_montserratMedium_16, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->Home_digital_clock_time, &lv_font_montserratMedium_17, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->Home_digital_clock_time, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->Home_digital_clock_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->Home_digital_clock_time, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -89,7 +89,7 @@ void setup_scr_Home(lv_ui *ui)
 
     //Write style for Home_datetext_date, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_text_color(ui->Home_datetext_date, lv_color_hex(0xe2e2e2), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->Home_datetext_date, &lv_font_montserratMedium_14, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->Home_datetext_date, &lv_font_montserratMedium_15, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->Home_datetext_date, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->Home_datetext_date, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->Home_datetext_date, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -112,7 +112,7 @@ void setup_scr_Home(lv_ui *ui)
     lv_obj_set_style_border_width(ui->Home_time_title, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->Home_time_title, 3, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->Home_time_title, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->Home_time_title, &lv_font_montserratMedium_13, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->Home_time_title, &lv_font_montserratMedium_15, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->Home_time_title, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->Home_time_title, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ui->Home_time_title, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -120,8 +120,8 @@ void setup_scr_Home(lv_ui *ui)
     lv_obj_set_style_bg_opa(ui->Home_time_title, 59, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui->Home_time_title, lv_color_hex(0x1e1e1e), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->Home_time_title, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui->Home_time_title, 9, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui->Home_time_title, 10, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui->Home_time_title, 8, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui->Home_time_title, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui->Home_time_title, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui->Home_time_title, 4, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->Home_time_title, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -130,14 +130,14 @@ void setup_scr_Home(lv_ui *ui)
     ui->Home_weekday = lv_label_create(ui->Home_cont_time);
     lv_label_set_text(ui->Home_weekday, "Tuesday");
     lv_label_set_long_mode(ui->Home_weekday, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->Home_weekday, 27, 83);
-    lv_obj_set_size(ui->Home_weekday, 71, 22);
+    lv_obj_set_pos(ui->Home_weekday, 9, 87);
+    lv_obj_set_size(ui->Home_weekday, 103, 22);
 
     //Write style for Home_weekday, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->Home_weekday, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->Home_weekday, 3, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->Home_weekday, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->Home_weekday, &lv_font_montserratMedium_15, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->Home_weekday, lv_color_hex(0xe2e2e2), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->Home_weekday, &lv_font_montserratMedium_17, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->Home_weekday, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->Home_weekday, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ui->Home_weekday, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -169,7 +169,7 @@ void setup_scr_Home(lv_ui *ui)
 
     //Write codes Home_speed_info
     ui->Home_speed_info = lv_obj_create(ui->Home_cont_net);
-    lv_obj_set_pos(ui->Home_speed_info, 4, 28);
+    lv_obj_set_pos(ui->Home_speed_info, 1, 33);
     lv_obj_set_size(ui->Home_speed_info, 120, 59);
     lv_obj_set_scrollbar_mode(ui->Home_speed_info, LV_SCROLLBAR_MODE_OFF);
 
@@ -186,36 +186,13 @@ void setup_scr_Home(lv_ui *ui)
     lv_obj_set_style_pad_right(ui->Home_speed_info, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->Home_speed_info, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
-    //Write codes Home_updown_label
-    ui->Home_updown_label = lv_label_create(ui->Home_speed_info);
-    lv_label_set_text(ui->Home_updown_label, "Up:\nDn:");
-    lv_label_set_long_mode(ui->Home_updown_label, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->Home_updown_label, 10, -3);
-    lv_obj_set_size(ui->Home_updown_label, 59, 46);
-
-    //Write style for Home_updown_label, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_border_width(ui->Home_updown_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->Home_updown_label, 3, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->Home_updown_label, lv_color_hex(0xe2e2e2), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->Home_updown_label, &lv_font_montserratMedium_13, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui->Home_updown_label, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_letter_space(ui->Home_updown_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_line_space(ui->Home_updown_label, 12, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_align(ui->Home_updown_label, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui->Home_updown_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui->Home_updown_label, 1, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui->Home_updown_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui->Home_updown_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_left(ui->Home_updown_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->Home_updown_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-
     //Write codes Home_download_icon
     ui->Home_download_icon = lv_img_create(ui->Home_speed_info);
     lv_obj_add_flag(ui->Home_download_icon, LV_OBJ_FLAG_CLICKABLE);
     lv_img_set_src(ui->Home_download_icon, &_download_alpha_13x13);
     lv_img_set_pivot(ui->Home_download_icon, 50,50);
     lv_img_set_angle(ui->Home_download_icon, 0);
-    lv_obj_set_pos(ui->Home_download_icon, -4, 27);
+    lv_obj_set_pos(ui->Home_download_icon, 2, 25);
     lv_obj_set_size(ui->Home_download_icon, 13, 13);
 
     //Write style for Home_download_icon, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -230,7 +207,7 @@ void setup_scr_Home(lv_ui *ui)
     lv_img_set_src(ui->Home_upload_icon, &_upload_alpha_13x13);
     lv_img_set_pivot(ui->Home_upload_icon, 50,50);
     lv_img_set_angle(ui->Home_upload_icon, 0);
-    lv_obj_set_pos(ui->Home_upload_icon, -4, 4);
+    lv_obj_set_pos(ui->Home_upload_icon, 2, 3);
     lv_obj_set_size(ui->Home_upload_icon, 13, 13);
 
     //Write style for Home_upload_icon, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -241,19 +218,19 @@ void setup_scr_Home(lv_ui *ui)
 
     //Write codes Home_speed_label
     ui->Home_speed_label = lv_label_create(ui->Home_speed_info);
-    lv_label_set_text(ui->Home_speed_label, "Mbps\nMbps");
+    lv_label_set_text(ui->Home_speed_label, "Mbps\n");
     lv_label_set_long_mode(ui->Home_speed_label, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->Home_speed_label, 89, -2);
-    lv_obj_set_size(ui->Home_speed_label, 41, 48);
+    lv_obj_set_pos(ui->Home_speed_label, 79, 1);
+    lv_obj_set_size(ui->Home_speed_label, 41, 24);
 
     //Write style for Home_speed_label, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->Home_speed_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->Home_speed_label, 3, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->Home_speed_label, lv_color_hex(0xe3e3e3), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->Home_speed_label, &lv_font_montserratMedium_11, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->Home_speed_label, &lv_font_montserratMedium_13, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->Home_speed_label, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->Home_speed_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_line_space(ui->Home_speed_label, 14, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_line_space(ui->Home_speed_label, 11, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->Home_speed_label, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui->Home_speed_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui->Home_speed_label, 1, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -266,14 +243,14 @@ void setup_scr_Home(lv_ui *ui)
     ui->Home_upload_data = lv_label_create(ui->Home_speed_info);
     lv_label_set_text(ui->Home_upload_data, "2200.50");
     lv_label_set_long_mode(ui->Home_upload_data, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->Home_upload_data, 32, 0);
-    lv_obj_set_size(ui->Home_upload_data, 55, 16);
+    lv_obj_set_pos(ui->Home_upload_data, 7, 1);
+    lv_obj_set_size(ui->Home_upload_data, 67, 16);
 
     //Write style for Home_upload_data, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->Home_upload_data, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->Home_upload_data, 3, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->Home_upload_data, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->Home_upload_data, &lv_font_montserratMedium_13, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->Home_upload_data, &lv_font_montserratMedium_14, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->Home_upload_data, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->Home_upload_data, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ui->Home_upload_data, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -289,14 +266,14 @@ void setup_scr_Home(lv_ui *ui)
     ui->Home_download_data = lv_label_create(ui->Home_speed_info);
     lv_label_set_text(ui->Home_download_data, "1200.50");
     lv_label_set_long_mode(ui->Home_download_data, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->Home_download_data, 32, 25);
-    lv_obj_set_size(ui->Home_download_data, 53, 16);
+    lv_obj_set_pos(ui->Home_download_data, 6, 24);
+    lv_obj_set_size(ui->Home_download_data, 68, 16);
 
     //Write style for Home_download_data, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->Home_download_data, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->Home_download_data, 3, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->Home_download_data, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->Home_download_data, &lv_font_montserratMedium_13, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->Home_download_data, &lv_font_montserratMedium_14, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->Home_download_data, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->Home_download_data, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ui->Home_download_data, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -308,18 +285,41 @@ void setup_scr_Home(lv_ui *ui)
     lv_obj_set_style_pad_left(ui->Home_download_data, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->Home_download_data, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
+    //Write codes Home_label_8
+    ui->Home_label_8 = lv_label_create(ui->Home_speed_info);
+    lv_label_set_text(ui->Home_label_8, "Mbps\n");
+    lv_label_set_long_mode(ui->Home_label_8, LV_LABEL_LONG_WRAP);
+    lv_obj_set_pos(ui->Home_label_8, 79, 24);
+    lv_obj_set_size(ui->Home_label_8, 41, 27);
+
+    //Write style for Home_label_8, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_border_width(ui->Home_label_8, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->Home_label_8, 3, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->Home_label_8, lv_color_hex(0xe3e3e3), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->Home_label_8, &lv_font_montserratMedium_13, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui->Home_label_8, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_letter_space(ui->Home_label_8, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_line_space(ui->Home_label_8, 11, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui->Home_label_8, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui->Home_label_8, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui->Home_label_8, 1, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui->Home_label_8, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui->Home_label_8, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui->Home_label_8, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->Home_label_8, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+
     //Write codes Home_ip_data
     ui->Home_ip_data = lv_label_create(ui->Home_cont_net);
     lv_label_set_text(ui->Home_ip_data, "China");
     lv_label_set_long_mode(ui->Home_ip_data, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->Home_ip_data, 44, 106);
+    lv_obj_set_pos(ui->Home_ip_data, 44, 110);
     lv_obj_set_size(ui->Home_ip_data, 81, 16);
 
     //Write style for Home_ip_data, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->Home_ip_data, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->Home_ip_data, 3, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->Home_ip_data, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->Home_ip_data, &lv_font_montserratMedium_13, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->Home_ip_data, &lv_font_montserratMedium_15, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->Home_ip_data, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->Home_ip_data, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ui->Home_ip_data, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -335,14 +335,14 @@ void setup_scr_Home(lv_ui *ui)
     ui->Home_ip_label = lv_label_create(ui->Home_cont_net);
     lv_label_set_text(ui->Home_ip_label, "IPloc:");
     lv_label_set_long_mode(ui->Home_ip_label, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->Home_ip_label, 3, 106);
+    lv_obj_set_pos(ui->Home_ip_label, 7, 110);
     lv_obj_set_size(ui->Home_ip_label, 41, 22);
 
     //Write style for Home_ip_label, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->Home_ip_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->Home_ip_label, 3, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->Home_ip_label, lv_color_hex(0xe3e3e3), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->Home_ip_label, &lv_font_montserratMedium_13, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->Home_ip_label, &lv_font_montserratMedium_14, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->Home_ip_label, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->Home_ip_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ui->Home_ip_label, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -358,14 +358,14 @@ void setup_scr_Home(lv_ui *ui)
     ui->Home_ping_data = lv_label_create(ui->Home_cont_net);
     lv_label_set_text(ui->Home_ping_data, "200");
     lv_label_set_long_mode(ui->Home_ping_data, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->Home_ping_data, 40, 80);
-    lv_obj_set_size(ui->Home_ping_data, 38, 16);
+    lv_obj_set_pos(ui->Home_ping_data, 47, 86);
+    lv_obj_set_size(ui->Home_ping_data, 38, 22);
 
     //Write style for Home_ping_data, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->Home_ping_data, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->Home_ping_data, 3, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->Home_ping_data, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->Home_ping_data, &lv_font_montserratMedium_13, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->Home_ping_data, &lv_font_montserratMedium_14, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->Home_ping_data, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->Home_ping_data, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ui->Home_ping_data, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -381,14 +381,14 @@ void setup_scr_Home(lv_ui *ui)
     ui->Home_Ping_label = lv_label_create(ui->Home_cont_net);
     lv_label_set_text(ui->Home_Ping_label, "Ping:");
     lv_label_set_long_mode(ui->Home_Ping_label, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->Home_Ping_label, 5, 79);
-    lv_obj_set_size(ui->Home_Ping_label, 36, 22);
+    lv_obj_set_pos(ui->Home_Ping_label, 7, 85);
+    lv_obj_set_size(ui->Home_Ping_label, 46, 22);
 
     //Write style for Home_Ping_label, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->Home_Ping_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->Home_Ping_label, 3, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->Home_Ping_label, lv_color_hex(0xe3e3e3), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->Home_Ping_label, &lv_font_montserratMedium_13, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->Home_Ping_label, &lv_font_montserratMedium_15, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->Home_Ping_label, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->Home_Ping_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ui->Home_Ping_label, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -411,7 +411,7 @@ void setup_scr_Home(lv_ui *ui)
     lv_obj_set_style_border_width(ui->Home_label_temp_tit, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->Home_label_temp_tit, 3, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->Home_label_temp_tit, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->Home_label_temp_tit, &lv_font_montserratMedium_13, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->Home_label_temp_tit, &lv_font_montserratMedium_14, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->Home_label_temp_tit, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->Home_label_temp_tit, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ui->Home_label_temp_tit, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -422,21 +422,21 @@ void setup_scr_Home(lv_ui *ui)
     lv_obj_set_style_pad_top(ui->Home_label_temp_tit, 8, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui->Home_label_temp_tit, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui->Home_label_temp_tit, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_left(ui->Home_label_temp_tit, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui->Home_label_temp_tit, 4, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->Home_label_temp_tit, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes Home_ping_unit
     ui->Home_ping_unit = lv_label_create(ui->Home_cont_net);
     lv_label_set_text(ui->Home_ping_unit, "ms");
     lv_label_set_long_mode(ui->Home_ping_unit, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->Home_ping_unit, 83, 81);
-    lv_obj_set_size(ui->Home_ping_unit, 38, 16);
+    lv_obj_set_pos(ui->Home_ping_unit, 87, 86);
+    lv_obj_set_size(ui->Home_ping_unit, 38, 22);
 
     //Write style for Home_ping_unit, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->Home_ping_unit, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->Home_ping_unit, 3, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->Home_ping_unit, lv_color_hex(0xe3e3e3), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->Home_ping_unit, &lv_font_montserratMedium_11, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->Home_ping_unit, &lv_font_montserratMedium_13, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->Home_ping_unit, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->Home_ping_unit, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ui->Home_ping_unit, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -643,7 +643,7 @@ void setup_scr_Home(lv_ui *ui)
     lv_label_set_text(ui->Home_label_ele_monitor_title, "Electricity Monitor");
     lv_label_set_long_mode(ui->Home_label_ele_monitor_title, LV_LABEL_LONG_WRAP);
     lv_obj_set_pos(ui->Home_label_ele_monitor_title, 0, 0);
-    lv_obj_set_size(ui->Home_label_ele_monitor_title, 144, 26);
+    lv_obj_set_size(ui->Home_label_ele_monitor_title, 170, 26);
 
     //Write style for Home_label_ele_monitor_title, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->Home_label_ele_monitor_title, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -853,7 +853,7 @@ void setup_scr_Home(lv_ui *ui)
     ui->Home_label_home_title = lv_label_create(ui->Home);
     lv_label_set_text(ui->Home_label_home_title, "Monitoring");
     lv_label_set_long_mode(ui->Home_label_home_title, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->Home_label_home_title, 124, 12);
+    lv_obj_set_pos(ui->Home_label_home_title, 123, 11);
     lv_obj_set_size(ui->Home_label_home_title, 210, 20);
 
     //Write style for Home_label_home_title, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -901,6 +901,7 @@ void setup_scr_Home(lv_ui *ui)
     lv_obj_set_pos(ui->Home_cont_menu, 0, 0);
     lv_obj_set_size(ui->Home_cont_menu, 480, 320);
     lv_obj_set_scrollbar_mode(ui->Home_cont_menu, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_add_flag(ui->Home_cont_menu, LV_OBJ_FLAG_HIDDEN);
 
     //Write style for Home_cont_menu, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->Home_cont_menu, 0, LV_PART_MAIN|LV_STATE_DEFAULT);

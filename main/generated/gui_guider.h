@@ -27,12 +27,12 @@ typedef struct
 	lv_obj_t *Home_weekday;
 	lv_obj_t *Home_cont_net;
 	lv_obj_t *Home_speed_info;
-	lv_obj_t *Home_updown_label;
 	lv_obj_t *Home_download_icon;
 	lv_obj_t *Home_upload_icon;
 	lv_obj_t *Home_speed_label;
 	lv_obj_t *Home_upload_data;
 	lv_obj_t *Home_download_data;
+	lv_obj_t *Home_label_8;
 	lv_obj_t *Home_ip_data;
 	lv_obj_t *Home_ip_label;
 	lv_obj_t *Home_ping_data;
@@ -126,14 +126,12 @@ LV_IMG_DECLARE(_menu_electricity_54x54);
 
 LV_IMG_DECLARE(_menu_light_54x54);
 
-LV_FONT_DECLARE(lv_font_montserratMedium_16)
-LV_FONT_DECLARE(lv_font_montserratMedium_14)
-LV_FONT_DECLARE(lv_font_montserratMedium_13)
+LV_FONT_DECLARE(lv_font_montserratMedium_17)
 LV_FONT_DECLARE(lv_font_montserratMedium_15)
-LV_FONT_DECLARE(lv_font_montserratMedium_11)
+LV_FONT_DECLARE(lv_font_montserratMedium_13)
+LV_FONT_DECLARE(lv_font_montserratMedium_14)
 LV_FONT_DECLARE(lv_font_montserratMedium_10)
 LV_FONT_DECLARE(lv_font_montserratMedium_18)
-LV_FONT_DECLARE(lv_font_montserratMedium_17)
 
 
 #ifdef __cplusplus
