@@ -1,5 +1,4 @@
 .devcontainer/
-.vscode/
 build/
 managed_components/
 dependencies.lock   
