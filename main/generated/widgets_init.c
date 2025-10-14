@@ -12,7 +12,6 @@
 #include "widgets_init.h"
 #include <stdlib.h>
 #include <string.h>
-#include "custom.h"
 
 
 __attribute__((unused)) void kb_event_cb (lv_event_t *e) {
@@ -77,6 +76,20 @@ void clock_count(int *hour, int *min, int *sec)
 }
 #endif
 
+
+extern int Home_digital_clock_time_hour_value;
+extern int Home_digital_clock_time_min_value;
+extern int Home_digital_clock_time_sec_value;
+extern char Home_digital_clock_time_meridiem[];
+
+void Home_digital_clock_time_timer(lv_timer_t *timer)
+{
+    clock_count_12(&Home_digital_clock_time_hour_value, &Home_digital_clock_time_min_value, &Home_digital_clock_time_sec_value, Home_digital_clock_time_meridiem);
+    if (lv_obj_is_valid(guider_ui.Home_digital_clock_time))
+    {
+        lv_dclock_set_text_fmt(guider_ui.Home_digital_clock_time, "%d:%02d:%02d %s", Home_digital_clock_time_hour_value, Home_digital_clock_time_min_value, Home_digital_clock_time_sec_value, Home_digital_clock_time_meridiem);
+    }
+}
 static lv_obj_t * Home_datetext_date_calendar;
 
 void Home_datetext_date_event_handler(lv_event_t *e)
@@ -136,72 +149,60 @@ void Home_datetext_date_calendar_event_handler(lv_event_t *e)
 }
 
 
-extern int Home_digital_clock_time_hour_value;
-extern int Home_digital_clock_time_min_value;
-extern int Home_digital_clock_time_sec_value;
+extern int Home_digital_clock_2_hour_value;
+extern int Home_digital_clock_2_min_value;
+extern int Home_digital_clock_2_sec_value;
+extern char Home_digital_clock_2_meridiem[];
 
-void Home_digital_clock_time_timer(lv_timer_t *timer)
+void Home_digital_clock_2_timer(lv_timer_t *timer)
 {
-    clock_count_24(&Home_digital_clock_time_hour_value, &Home_digital_clock_time_min_value, &Home_digital_clock_time_sec_value);
-    if (lv_obj_is_valid(guider_ui.Home_digital_clock_time))
+    clock_count_12(&Home_digital_clock_2_hour_value, &Home_digital_clock_2_min_value, &Home_digital_clock_2_sec_value, Home_digital_clock_2_meridiem);
+    if (lv_obj_is_valid(guider_ui.Home_digital_clock_2))
     {
-        lv_dclock_set_text_fmt(guider_ui.Home_digital_clock_time, "%d:%02d:%02d", Home_digital_clock_time_hour_value, Home_digital_clock_time_min_value, Home_digital_clock_time_sec_value);
+        lv_dclock_set_text_fmt(guider_ui.Home_digital_clock_2, "%d:%02d:%02d %s", Home_digital_clock_2_hour_value, Home_digital_clock_2_min_value, Home_digital_clock_2_sec_value, Home_digital_clock_2_meridiem);
     }
 }
+static lv_obj_t * Home_datetext_2_calendar;
 
-extern int Firefighting_digital_clock_time_hour_value;
-extern int Firefighting_digital_clock_time_min_value;
-extern int Firefighting_digital_clock_time_sec_value;
-
-void Firefighting_digital_clock_time_timer(lv_timer_t *timer)
-{
-    clock_count_24(&Firefighting_digital_clock_time_hour_value, &Firefighting_digital_clock_time_min_value, &Firefighting_digital_clock_time_sec_value);
-    if (lv_obj_is_valid(guider_ui.Firefighting_digital_clock_time))
-    {
-        lv_dclock_set_text_fmt(guider_ui.Firefighting_digital_clock_time, "%d:%02d:%02d", Firefighting_digital_clock_time_hour_value, Firefighting_digital_clock_time_min_value, Firefighting_digital_clock_time_sec_value);
-    }
-}
-static lv_obj_t * Firefighting_datetext_date_calendar;
-
-void Firefighting_datetext_date_event_handler(lv_event_t *e)
+void Home_datetext_2_event_handler(lv_event_t *e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * btn = lv_event_get_target(e);
     if(code == LV_EVENT_FOCUSED) {
         char * s = lv_label_get_text(btn);
-        if(Firefighting_datetext_date_calendar == NULL) {
-            Firefighting_datetext_date_init_calendar(btn, s);
+        if(Home_datetext_2_calendar == NULL) {
+            Home_datetext_2_init_calendar(btn, s);
         }
     }
 }
 
-void Firefighting_datetext_date_init_calendar(lv_obj_t *obj, char * s)
+void Home_datetext_2_init_calendar(lv_obj_t *obj, char * s)
 {
-    if (Firefighting_datetext_date_calendar == NULL) {
+    if (Home_datetext_2_calendar == NULL) {
         lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
-        Firefighting_datetext_date_calendar = lv_calendar_create(lv_layer_top());
+        Home_datetext_2_calendar = lv_calendar_create(lv_layer_top());
         lv_obj_t * scr = lv_obj_get_screen(obj);
         lv_coord_t scr_height = lv_obj_get_height(scr);
         lv_coord_t scr_width = lv_obj_get_width(scr);
-        lv_obj_set_size(Firefighting_datetext_date_calendar, scr_width * 0.8, scr_height * 0.8);
+        lv_obj_set_size(Home_datetext_2_calendar, scr_width * 0.8, scr_height * 0.8);
         char * year = strtok(s, "/");
         char * month = strtok(NULL, "/");
         char * day = strtok(NULL, "/");
-        lv_calendar_set_showed_date(Firefighting_datetext_date_calendar, atoi(year), atoi(month));
+        lv_calendar_set_showed_date(Home_datetext_2_calendar, atoi(year), atoi(month));
         lv_calendar_date_t highlighted_days[1];       /*Only its pointer will be saved so should be static*/
         highlighted_days[0].year = atoi(year);
         highlighted_days[0].month = atoi(month);
         highlighted_days[0].day = atoi(day);
-        lv_calendar_set_highlighted_dates(Firefighting_datetext_date_calendar, highlighted_days, 1);
-        lv_obj_align(Firefighting_datetext_date_calendar,LV_ALIGN_CENTER, 0, 0);
+        lv_calendar_set_highlighted_dates(Home_datetext_2_calendar, highlighted_days, 1);
+        lv_obj_align(Home_datetext_2_calendar,LV_ALIGN_CENTER, 0, 0);
 
-        lv_obj_add_event_cb(Firefighting_datetext_date_calendar, Firefighting_datetext_date_calendar_event_handler, LV_EVENT_ALL,NULL);
-        lv_calendar_header_arrow_create(Firefighting_datetext_date_calendar);
+        lv_obj_add_event_cb(Home_datetext_2_calendar, Home_datetext_2_calendar_event_handler, LV_EVENT_ALL,NULL);
+        lv_calendar_header_arrow_create(Home_datetext_2_calendar);
         lv_obj_update_layout(scr);
     }
 }
 
-void Firefighting_datetext_date_calendar_event_handler(lv_event_t *e)
+void Home_datetext_2_calendar_event_handler(lv_event_t *e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_current_target(e);
@@ -211,82 +212,12 @@ void Firefighting_datetext_date_calendar_event_handler(lv_event_t *e)
         lv_calendar_get_pressed_date(obj,&date);
         char buf[16];
         lv_snprintf(buf,sizeof(buf),"%d/%02d/%02d", date.year, date.month,date.day);
-        lv_label_set_text(guider_ui.Firefighting_datetext_date, buf);
+        lv_label_set_text(guider_ui.Home_datetext_2, buf);
         lv_obj_clear_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
         lv_obj_set_style_bg_opa(lv_layer_top(), LV_OPA_TRANSP, 0);
-        lv_obj_del(Firefighting_datetext_date_calendar);
-        Firefighting_datetext_date_calendar = NULL;
+        lv_obj_del(Home_datetext_2_calendar);
+        Home_datetext_2_calendar = NULL;
     }
 }
 
-
-extern int Electricity_digital_clock_time_hour_value;
-extern int Electricity_digital_clock_time_min_value;
-extern int Electricity_digital_clock_time_sec_value;
-
-void Electricity_digital_clock_time_timer(lv_timer_t *timer)
-{
-    clock_count_24(&Electricity_digital_clock_time_hour_value, &Electricity_digital_clock_time_min_value, &Electricity_digital_clock_time_sec_value);
-    if (lv_obj_is_valid(guider_ui.Electricity_digital_clock_time))
-    {
-        lv_dclock_set_text_fmt(guider_ui.Electricity_digital_clock_time, "%d:%02d:%02d", Electricity_digital_clock_time_hour_value, Electricity_digital_clock_time_min_value, Electricity_digital_clock_time_sec_value);
-    }
-}
-static lv_obj_t * Electricity_datetext_date_calendar;
-
-void Electricity_datetext_date_event_handler(lv_event_t *e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * btn = lv_event_get_target(e);
-    if(code == LV_EVENT_FOCUSED) {
-        char * s = lv_label_get_text(btn);
-        if(Electricity_datetext_date_calendar == NULL) {
-            Electricity_datetext_date_init_calendar(btn, s);
-        }
-    }
-}
-
-void Electricity_datetext_date_init_calendar(lv_obj_t *obj, char * s)
-{
-    if (Electricity_datetext_date_calendar == NULL) {
-        lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
-        Electricity_datetext_date_calendar = lv_calendar_create(lv_layer_top());
-        lv_obj_t * scr = lv_obj_get_screen(obj);
-        lv_coord_t scr_height = lv_obj_get_height(scr);
-        lv_coord_t scr_width = lv_obj_get_width(scr);
-        lv_obj_set_size(Electricity_datetext_date_calendar, scr_width * 0.8, scr_height * 0.8);
-        char * year = strtok(s, "/");
-        char * month = strtok(NULL, "/");
-        char * day = strtok(NULL, "/");
-        lv_calendar_set_showed_date(Electricity_datetext_date_calendar, atoi(year), atoi(month));
-        lv_calendar_date_t highlighted_days[1];       /*Only its pointer will be saved so should be static*/
-        highlighted_days[0].year = atoi(year);
-        highlighted_days[0].month = atoi(month);
-        highlighted_days[0].day = atoi(day);
-        lv_calendar_set_highlighted_dates(Electricity_datetext_date_calendar, highlighted_days, 1);
-        lv_obj_align(Electricity_datetext_date_calendar,LV_ALIGN_CENTER, 0, 0);
-
-        lv_obj_add_event_cb(Electricity_datetext_date_calendar, Electricity_datetext_date_calendar_event_handler, LV_EVENT_ALL,NULL);
-        lv_calendar_header_arrow_create(Electricity_datetext_date_calendar);
-        lv_obj_update_layout(scr);
-    }
-}
-
-void Electricity_datetext_date_calendar_event_handler(lv_event_t *e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_current_target(e);
-
-    if (code == LV_EVENT_VALUE_CHANGED) {
-        lv_calendar_date_t date;
-        lv_calendar_get_pressed_date(obj,&date);
-        char buf[16];
-        lv_snprintf(buf,sizeof(buf),"%d/%02d/%02d", date.year, date.month,date.day);
-        lv_label_set_text(guider_ui.Electricity_datetext_date, buf);
-        lv_obj_clear_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
-        lv_obj_set_style_bg_opa(lv_layer_top(), LV_OPA_TRANSP, 0);
-        lv_obj_del(Electricity_datetext_date_calendar);
-        Electricity_datetext_date_calendar = NULL;
-    }
-}
 

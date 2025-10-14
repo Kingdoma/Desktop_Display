@@ -5,6 +5,7 @@ file(GLOB_RECURSE GUI_GUIDER_SOURCES
 idf_component_register(
     SRCS
         "main.c"
+        "gui_guider_support.c"
         ${GUI_GUIDER_SOURCES}
     INCLUDE_DIRS
         "."
@@ -15,3 +16,4 @@ idf_component_register(
         "generated/guider_customer_fonts")
 
 target_compile_definitions(${COMPONENT_LIB} PRIVATE LV_LVGL_H_INCLUDE_SIMPLE=1)
+target_compile_options(${COMPONENT_LIB} PRIVATE -include "${CMAKE_CURRENT_SOURCE_DIR}/gui_guider_support.h")
