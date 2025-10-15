@@ -88,12 +88,6 @@ esp_err_t tinyusb_cdc_driver_init(void){
 
     ESP_ERROR_CHECK(tusb_cdc_acm_init(&acm_cfg));
 
-    // /* the second way to register a callback */
-    // ESP_ERROR_CHECK(tinyusb_cdcacm_register_callback(
-    //                     TINYUSB_CDC_ACM_0,
-    //                     CDC_EVENT_LINE_STATE_CHANGED,
-    //                     &tinyusb_cdc_line_state_changed_callback));
-
 #if (CONFIG_TINYUSB_CDC_COUNT > 1)
     acm_cfg.cdc_port = TINYUSB_CDC_ACM_1;
     ESP_ERROR_CHECK(tusb_cdc_acm_init(&acm_cfg));
