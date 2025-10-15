@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <string.h>
 
 lv_obj_t * lv_dclock_create(lv_obj_t * parent, const char * init_text)
 {

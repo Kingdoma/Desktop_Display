@@ -6,6 +6,7 @@ idf_component_register(
     SRCS
         "main.c"
         "gui_guider_support.c"
+        "display_driver.c"
         ${GUI_GUIDER_SOURCES}
     INCLUDE_DIRS
         "."
