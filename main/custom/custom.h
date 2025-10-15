@@ -14,9 +14,11 @@ extern "C" {
 #endif
 
 #include "gui_guider.h"
+#include "metrics.h"
 
 void custom_init(lv_ui *ui);
-
+void custom_update_metrics(lv_ui *ui, const system_metrics_t *metrics);
+void scrollable_disable(lv_obj_t *obj);
 
 #ifdef __cplusplus
 }

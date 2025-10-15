@@ -1,4 +1,7 @@
+#include <string.h>
+
 #include "tinyusb_cdc.h"
+#include "metrics.h"
 
 app_message_t g_msg_recv;
 
@@ -61,6 +64,8 @@ esp_err_t tinyusb_cdc_driver_init(void){
         return ESP_OK;
     }
 
+    metrics_queue_init();
+
     const tinyusb_config_t tusb_cfg = {
         .device_descriptor = NULL,
         .string_descriptor = NULL,
@@ -109,6 +114,24 @@ esp_err_t tinyusb_cdc_driver_init(void){
 esp_err_t tinyusb_cdc_rec(void){
     if (xQueueReceive(app_queue, &g_msg_recv, portMAX_DELAY)) {
         if (g_msg_recv.buf_len) {
+
+            system_metrics_t metrics;
+            if (metrics_decode_packet(g_msg_recv.buf, g_msg_recv.buf_len, &metrics)) {
+                ESP_LOGD(TAG,
+                         "Metrics update: CPU %.1f%% %.1fC @ %.0fMHz, GPU %.1f%% %.1fC @ %.0fMHz, GRAM %.1f%%, RAM %.1f%%",
+                         metrics.cpu_usage_percent,
+                         metrics.cpu_temp_c,
+                         metrics.cpu_freq_mhz,
+                         metrics.gpu_usage_percent,
+                         metrics.gpu_temp_c,
+                         metrics.gpu_freq_mhz,
+                         metrics.gram_usage_percent,
+                         metrics.ram_usage_percent);
+                if (!metrics_queue_push(&metrics)) {
+                    ESP_LOGW(TAG, "Failed to queue decoded metrics packet");
+                }
+                return ESP_OK;
+            }
 
             /* Print received data*/
             ESP_LOGI(TAG, "Data from channel %d:", g_msg_recv.itf);

@@ -8,6 +8,7 @@ idf_component_register(
         "gui_guider_support.c"
         "display_driver.c"
         "tinyusb_cdc.c"
+        "metrics.c"
         ${GUI_GUIDER_SOURCES}
     INCLUDE_DIRS
         "."

@@ -1473,7 +1473,14 @@ void setup_scr_Home(lv_ui *ui)
     lv_obj_set_style_shadow_width(ui->Home_label_monitor, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //The custom code of Home.
-
+    lv_obj_clear_flag(ui->Home, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_clear_flag(ui->Home_cont_time, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_clear_flag(ui->Home_cont_net, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_clear_flag(ui->Home_speed_info, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_clear_flag(ui->Home_cont_cpu_monitor, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_clear_flag(ui->Home_cpu_usage, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_clear_flag(ui->Home_cont_gpu_monitor, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_clear_flag(ui->Home_cont_2, LV_OBJ_FLAG_SCROLLABLE);
 
     //Update current screen layout.
     lv_obj_update_layout(ui->Home);

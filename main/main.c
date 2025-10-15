@@ -10,6 +10,7 @@
 #include "custom/custom.h"
 #include "display_driver.h"
 #include "tinyusb_cdc.h"
+#include "metrics.h"
 #include "app_main.h"
 
 #define TAG "app_main"
@@ -36,13 +37,23 @@ static void lvgl_task(void *arg)
     ESP_ERROR_CHECK(esp_timer_create(&tick_timer_args, &tick_timer));
     ESP_ERROR_CHECK(esp_timer_start_periodic(tick_timer, 1000)); // 1 ms tick
 
+    vTaskDelay(pdMS_TO_TICKS(20));
+
     setup_ui(&guider_ui);
     custom_init(&guider_ui);
 
-    const TickType_t delay = pdMS_TO_TICKS(10);
+    vTaskDelay(pdMS_TO_TICKS(20));
+
+    metrics_queue_init();
+
+    system_metrics_t latest_metrics;
+
     while (1) {
+        while (metrics_queue_pop(&latest_metrics)) {
+            custom_update_metrics(&guider_ui, &latest_metrics);
+        }
         lv_timer_handler();
-        vTaskDelay(delay);
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
 
