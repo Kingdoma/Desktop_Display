@@ -9,7 +9,7 @@
 #define EXAMPLE_LCD_V_RES              (320)
 #define EXAMPLE_LCD_BIT_PER_PIXEL      (16)
 #define EXAMPLE_LCD_DATA_WIDTH         (8)
-#define EXAMPLE_LCD_BUFFER_LINES       (40)
+#define EXAMPLE_LCD_BUFFER_LINES       (100)
 #define EXAMPLE_LCD_MIRROR_X           false
 #define EXAMPLE_LCD_MIRROR_Y           false
 
@@ -46,8 +46,8 @@
 #define EXAMPLE_PIN_NUM_LCD_DATA13     (GPIO_NUM_NC)
 #define EXAMPLE_PIN_NUM_LCD_DATA14     (GPIO_NUM_NC)
 #define EXAMPLE_PIN_NUM_LCD_DATA15     (GPIO_NUM_NC)
-#define EXAMPLE_PIN_NUM_LCD_RST        (GPIO_NUM_NC)
-#define EXAMPLE_PIN_NUM_BK_LIGHT       (-1)
-#define EXAMPLE_BK_LIGHT_ON_LEVEL      (1)
+#define EXAMPLE_PIN_NUM_LCD_RST        (GPIO_NUM_NC)  
+#define EXAMPLE_PIN_NUM_BK_LIGHT       (GPIO_NUM_48)
+#define EXAMPLE_BK_LIGHT_ON_LEVEL      (1)                         
 
 #endif /* DISPLAY_CONFIG_H */
