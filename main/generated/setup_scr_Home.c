@@ -590,7 +590,7 @@ void setup_scr_Home(lv_ui *ui)
     ui->Home_cpu_fequency_label = lv_label_create(ui->Home_cont_cpu_monitor);
     lv_label_set_text(ui->Home_cpu_fequency_label, "Freq:");
     lv_label_set_long_mode(ui->Home_cpu_fequency_label, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->Home_cpu_fequency_label, 10, 167);
+    lv_obj_set_pos(ui->Home_cpu_fequency_label, 9, 167);
     lv_obj_set_size(ui->Home_cpu_fequency_label, 46, 23);
 
     //Write style for Home_cpu_fequency_label, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -685,10 +685,10 @@ void setup_scr_Home(lv_ui *ui)
 
     //Write codes Home_cpu_fequency_data
     ui->Home_cpu_fequency_data = lv_label_create(ui->Home_cont_cpu_monitor);
-    lv_label_set_text(ui->Home_cpu_fequency_data, "3.91");
+    lv_label_set_text(ui->Home_cpu_fequency_data, "0.90");
     lv_label_set_long_mode(ui->Home_cpu_fequency_data, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->Home_cpu_fequency_data, 59, 168);
-    lv_obj_set_size(ui->Home_cpu_fequency_data, 32, 23);
+    lv_obj_set_pos(ui->Home_cpu_fequency_data, 54, 168);
+    lv_obj_set_size(ui->Home_cpu_fequency_data, 41, 23);
 
     //Write style for Home_cpu_fequency_data, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->Home_cpu_fequency_data, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -757,7 +757,7 @@ void setup_scr_Home(lv_ui *ui)
     lv_label_set_text(ui->Home_cpu_temp_data, "60");
     lv_label_set_long_mode(ui->Home_cpu_temp_data, LV_LABEL_LONG_WRAP);
     lv_obj_set_pos(ui->Home_cpu_temp_data, 69, 196);
-    lv_obj_set_size(ui->Home_cpu_temp_data, 32, 23);
+    lv_obj_set_size(ui->Home_cpu_temp_data, 32, 20);
 
     //Write style for Home_cpu_temp_data, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->Home_cpu_temp_data, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -1134,7 +1134,7 @@ void setup_scr_Home(lv_ui *ui)
     lv_label_set_text(ui->Home_gpu_temp_data, "75");
     lv_label_set_long_mode(ui->Home_gpu_temp_data, LV_LABEL_LONG_WRAP);
     lv_obj_set_pos(ui->Home_gpu_temp_data, 69, 196);
-    lv_obj_set_size(ui->Home_gpu_temp_data, 32, 23);
+    lv_obj_set_size(ui->Home_gpu_temp_data, 32, 19);
 
     //Write style for Home_gpu_temp_data, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->Home_gpu_temp_data, 0, LV_PART_MAIN|LV_STATE_DEFAULT);

@@ -69,7 +69,7 @@ void custom_update_metrics(lv_ui *ui, const system_metrics_t *metrics)
         lv_label_set_text_fmt(ui->Home_cpu_fequency_data, "%.2f", metrics->cpu_freq_ghz);
     }
     if (ui->Home_cpu_temp_data) {
-        lv_label_set_text_fmt(ui->Home_cpu_temp_data, "%.1f", metrics->cpu_temp_c);
+        lv_label_set_text_fmt(ui->Home_cpu_temp_data, "%.0f", metrics->cpu_temp_c);
     }
 
     const int16_t ram_usage = clamp_percent(metrics->ram_usage_percent);
@@ -92,7 +92,7 @@ void custom_update_metrics(lv_ui *ui, const system_metrics_t *metrics)
         lv_label_set_text_fmt(ui->Home_gpu_frequency_data, "%.0f", metrics->gpu_freq_mhz);
     }
     if (ui->Home_gpu_temp_data) {
-        lv_label_set_text_fmt(ui->Home_gpu_temp_data, "%.1f", metrics->gpu_temp_c);
+        lv_label_set_text_fmt(ui->Home_gpu_temp_data, "%.0f", metrics->gpu_temp_c);
     }
 
     const int16_t gram_usage = clamp_percent(metrics->gram_usage_percent);
