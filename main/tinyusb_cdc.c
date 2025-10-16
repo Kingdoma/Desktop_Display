@@ -118,10 +118,10 @@ esp_err_t tinyusb_cdc_rec(void){
             system_metrics_t metrics;
             if (metrics_decode_packet(g_msg_recv.buf, g_msg_recv.buf_len, &metrics)) {
                 ESP_LOGD(TAG,
-                         "Metrics update: CPU %.1f%% %.1fC @ %.0fMHz, GPU %.1f%% %.1fC @ %.0fMHz, GRAM %.1f%%, RAM %.1f%%",
+                         "Metrics update: CPU %.1f%% %.1fC @ %.2fGHz, GPU %.1f%% %.1fC @ %.0fMHz, GRAM %.1f%%, RAM %.1f%%",
                          metrics.cpu_usage_percent,
                          metrics.cpu_temp_c,
-                         metrics.cpu_freq_mhz,
+                         metrics.cpu_freq_ghz,
                          metrics.gpu_usage_percent,
                          metrics.gpu_temp_c,
                          metrics.gpu_freq_mhz,

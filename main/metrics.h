@@ -28,7 +28,7 @@ typedef struct __attribute__((packed)) {
 typedef struct {
     float cpu_usage_percent;
     float cpu_temp_c;
-    float cpu_freq_mhz;
+    float cpu_freq_ghz;
     float gpu_usage_percent;
     float gpu_temp_c;
     float gpu_freq_mhz;

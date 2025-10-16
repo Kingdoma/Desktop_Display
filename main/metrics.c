@@ -27,7 +27,7 @@ bool metrics_decode_packet(const uint8_t *data, size_t len, system_metrics_t *ou
         return false;
     }
 
-    if (len < sizeof(pc_metrics_packet_t)) {
+    if (len != sizeof(pc_metrics_packet_t)) {
         return false;
     }
 
@@ -41,7 +41,7 @@ bool metrics_decode_packet(const uint8_t *data, size_t len, system_metrics_t *ou
 
     out->cpu_usage_percent = (float)packet->cpu_usage_tenths / 10.0f;
     out->cpu_temp_c = tenths_to_float(packet->cpu_temp_tenths);
-    out->cpu_freq_mhz = (float)packet->cpu_freq_mhz;
+    out->cpu_freq_ghz = (float)packet->cpu_freq_mhz / 1000.0f;
     out->gpu_usage_percent = (float)packet->gpu_usage_tenths / 10.0f;
     out->gpu_temp_c = tenths_to_float(packet->gpu_temp_tenths);
     out->gpu_freq_mhz = (float)packet->gpu_freq_mhz;

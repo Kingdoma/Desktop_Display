@@ -16,6 +16,27 @@
 #endif
 
 
+static void Home_event_handler (lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    switch (code) {
+    case LV_EVENT_SCREEN_LOADED:
+    {
+        lv_obj_clear_flag(guider_ui.Home, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_clear_flag(guider_ui.Home_cont_time, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_clear_flag(guider_ui.Home_cont_net, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_clear_flag(guider_ui.Home_speed_info, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_clear_flag(guider_ui.Home_cont_cpu_monitor, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_clear_flag(guider_ui.Home_cpu_usage, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_clear_flag(guider_ui.Home_cont_gpu_monitor, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_clear_flag(guider_ui.Home_gpu_usage, LV_OBJ_FLAG_SCROLLABLE);
+        break;
+    }
+    default:
+        break;
+    }
+}
+
 static void Home_btn_menu_event_handler (lv_event_t *e)
 {
     lv_event_code_t code = lv_event_get_code(e);
@@ -137,6 +158,7 @@ static void Home_btn_light_event_handler (lv_event_t *e)
 
 void events_init_Home (lv_ui *ui)
 {
+    lv_obj_add_event_cb(ui->Home, Home_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->Home_btn_menu, Home_btn_menu_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->Home_cont_menu, Home_cont_menu_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->Home_btn_phone, Home_btn_phone_event_handler, LV_EVENT_ALL, ui);
