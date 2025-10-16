@@ -61,10 +61,10 @@ Metrics are delivered as an 18-byte little-endian packet that matches `pc_metric
 | 0              | `magic`                    | `uint8`   | Must be `0xA5`                     |
 | 1              | `version`                  | `uint8`   | Currently `0x01`                   |
 | 2-3            | `cpu_usage_tenths`         | `uint16`  | CPU utilisation in 0.1% steps    |
-| 4-5            | `cpu_temp_tenths`          | `int16`   | CPU temperature in 0.1 °C steps   |
+| 4-5            | `cpu_temp_tenths`          | `int16`   | CPU temperature in 1°C steps   |
 | 6-7            | `cpu_freq_mhz`             | `uint16`  | CPU frequency in MHz              |
 | 8-9            | `gpu_usage_tenths`         | `uint16`  | GPU utilisation in 0.1% steps    |
-| 10-11          | `gpu_temp_tenths`          | `int16`   | GPU temperature in 0.1 °C steps   |
+| 10-11          | `gpu_temp_tenths`          | `int16`   | GPU temperature in 1°C steps   |
 | 12-13          | `gpu_freq_mhz`             | `uint16`  | GPU frequency in MHz              |
 | 14-15          | `gram_usage_tenths`        | `uint16`  | Graphics RAM usage in 0.1% steps |
 | 16-17          | `ram_usage_tenths`         | `uint16`  | System RAM usage in 0.1% steps   |
