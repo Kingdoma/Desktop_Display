@@ -8,6 +8,7 @@
 #include "esp_lcd_st7796.h"
 #include "esp_lcd_touch_ft5x06.h"
 #include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "freertos/semphr.h"
 
 static const char *TAG = "display_driver";
@@ -26,7 +27,7 @@ static lv_color_t s_buf1[EXAMPLE_LCD_H_RES * EXAMPLE_LCD_BUFFER_LINES];
 static lv_color_t s_buf2[EXAMPLE_LCD_H_RES * EXAMPLE_LCD_BUFFER_LINES];
 static bool s_initialized;
 
-static void display_enable_backlight(void);
+static void display_wait_for_power(uint32_t delay_ms);
 static esp_err_t display_init_touch(void);
 IRAM_ATTR static bool display_panel_trans_done(esp_lcd_panel_io_handle_t panel_io,
                                                esp_lcd_panel_io_event_data_t *edata,
@@ -49,6 +50,10 @@ esp_err_t display_driver_init(display_driver_handles_t *out_handles)
     if(s_flush_ready == NULL) {
         return ESP_ERR_NO_MEM;
     }
+
+    /* On a cold boot the panel power rails rise slower than the MCU.
+     * Give the ST7796 controller time to exit reset before sending commands. */
+    // display_wait_for_power(200);
 
     esp_lcd_i80_bus_config_t bus_config = ST7796_PANEL_BUS_I80_CONFIG(
             EXAMPLE_LCD_H_RES * EXAMPLE_LCD_BUFFER_LINES * EXAMPLE_LCD_BIT_PER_PIXEL / 8,
@@ -89,13 +94,13 @@ esp_err_t display_driver_init(display_driver_handles_t *out_handles)
                         "install st7796 panel failed");
 
     ESP_RETURN_ON_ERROR(esp_lcd_panel_reset(s_panel_handle), TAG, "panel reset failed");
+    display_wait_for_power(120);
     ESP_RETURN_ON_ERROR(esp_lcd_panel_init(s_panel_handle), TAG, "panel init failed");
+    display_wait_for_power(20);
     ESP_RETURN_ON_ERROR(esp_lcd_panel_swap_xy(s_panel_handle, true), TAG, "panel swap xy failed");
     ESP_RETURN_ON_ERROR(esp_lcd_panel_mirror(s_panel_handle, EXAMPLE_LCD_MIRROR_X, EXAMPLE_LCD_MIRROR_Y), TAG,
                         "panel mirror failed");
     ESP_RETURN_ON_ERROR(esp_lcd_panel_disp_on_off(s_panel_handle, true), TAG, "panel on failed");
-
-    display_enable_backlight();
 
     ESP_RETURN_ON_ERROR(display_init_touch(), TAG, "touch init failed");
 
@@ -129,7 +134,16 @@ esp_err_t display_driver_init(display_driver_handles_t *out_handles)
     return ESP_OK;
 }
 
-static void display_enable_backlight(void)
+static void display_wait_for_power(uint32_t delay_ms)
+{
+    if(delay_ms == 0) {
+        return;
+    }
+
+    vTaskDelay(pdMS_TO_TICKS(delay_ms));
+}
+
+esp_err_t display_enable_backlight(void)
 {
 #if EXAMPLE_PIN_NUM_BK_LIGHT >= 0
     gpio_config_t bk_gpio_config = {
@@ -138,6 +152,8 @@ static void display_enable_backlight(void)
     };
     ESP_ERROR_CHECK(gpio_config(&bk_gpio_config));
     ESP_ERROR_CHECK(gpio_set_level(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_BK_LIGHT_ON_LEVEL));
+
+    return ESP_OK;
 #endif
 }
 

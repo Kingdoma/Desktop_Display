@@ -15,4 +15,6 @@ typedef struct {
 
 esp_err_t display_driver_init(display_driver_handles_t *out_handles);
 
+esp_err_t display_enable_backlight(void);
+
 #endif /* DISPLAY_DRIVER_H */

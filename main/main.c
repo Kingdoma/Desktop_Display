@@ -37,12 +37,12 @@ static void lvgl_task(void *arg)
     ESP_ERROR_CHECK(esp_timer_create(&tick_timer_args, &tick_timer));
     ESP_ERROR_CHECK(esp_timer_start_periodic(tick_timer, 1000)); // 1 ms tick
 
-    vTaskDelay(pdMS_TO_TICKS(20));
-
     setup_ui(&guider_ui);
     custom_init(&guider_ui);
 
     vTaskDelay(pdMS_TO_TICKS(20));
+
+    ESP_ERROR_CHECK(display_enable_backlight());
 
     metrics_queue_init();
 
@@ -86,6 +86,8 @@ void app_main(void)
 
     // setup_ui(&guider_ui);
     // custom_init(&guider_ui);
+
+    // vTaskDelay(pdMS_TO_TICKS(100));
 
     xTaskCreate(lvgl_task, "lvgl_task", 4096, NULL, 2, NULL);
 
