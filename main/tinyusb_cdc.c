@@ -127,6 +127,25 @@ esp_err_t tinyusb_cdc_rec(void){
                          metrics.gpu_freq_mhz,
                          metrics.gram_usage_percent,
                          metrics.ram_usage_percent);
+                if (metrics.has_date || metrics.has_time) {
+                    static const char *const day_names[] = {
+                        "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
+                    };
+                    const char *dow = "?";
+                    if (metrics.has_day_of_week && metrics.day_of_week >= 0 && metrics.day_of_week <= 6) {
+                        dow = day_names[metrics.day_of_week];
+                    }
+                    ESP_LOGD(TAG,
+                             "            Wall time: %s%04u-%02u-%02u %02u:%02u:%02u (%s)",
+                             metrics.has_date ? "" : "(date missing) ",
+                             (unsigned)metrics.year,
+                             (unsigned)metrics.month,
+                             (unsigned)metrics.day,
+                             (unsigned)metrics.hour,
+                             (unsigned)metrics.minute,
+                             (unsigned)metrics.second,
+                             dow);
+                }
                 if (!metrics_queue_push(&metrics)) {
                     ESP_LOGW(TAG, "Failed to queue decoded metrics packet");
                 }
