@@ -53,25 +53,33 @@ Below is short explanation of remaining files in the project folder.
 
 ## Metrics structure
 
-Metrics are delivered as an 18-byte little-endian packet that matches `pc_metrics_packet_t` in
-`main/metrics.h`. The fields appear in the following order:
+Metrics are delivered as a 26-byte little-endian packet that matches `pc_metrics_packet_t` in
+`main/metrics.h`. Packet version `0x02` adds wall-clock data to the original metrics payload.
 
-| Offset (bytes) | Field                      | Type      | Units / Notes                      |
-| -------------- | -------------------------- | --------- | ---------------------------------- |
-| 0              | `magic`                    | `uint8`   | Must be `0xA5`                     |
-| 1              | `version`                  | `uint8`   | Currently `0x01`                   |
-| 2-3            | `cpu_usage_tenths`         | `uint16`  | CPU utilisation in 0.1% steps    |
-| 4-5            | `cpu_temp_tenths`          | `int16`   | CPU temperature in 1°C steps   |
-| 6-7            | `cpu_freq_mhz`             | `uint16`  | CPU frequency in MHz              |
-| 8-9            | `gpu_usage_tenths`         | `uint16`  | GPU utilisation in 0.1% steps    |
-| 10-11          | `gpu_temp_tenths`          | `int16`   | GPU temperature in 1°C steps   |
-| 12-13          | `gpu_freq_mhz`             | `uint16`  | GPU frequency in MHz              |
-| 14-15          | `gram_usage_tenths`        | `uint16`  | Graphics RAM usage in 0.1% steps |
-| 16-17          | `ram_usage_tenths`         | `uint16`  | System RAM usage in 0.1% steps   |
+| Offset (bytes) | Field                      | Type      | Units / Notes                                   |
+| -------------- | -------------------------- | --------- | ----------------------------------------------- |
+| 0              | `magic`                    | `uint8`   | Must be `0xA5`                                  |
+| 1              | `version`                  | `uint8`   | Currently `0x02`                                |
+| 2-3            | `cpu_usage_tenths`         | `uint16`  | CPU utilisation in 0.1% steps                   |
+| 4-5            | `cpu_temp_tenths`          | `int16`   | CPU temperature in 0.1 °C steps                 |
+| 6-7            | `cpu_freq_mhz`             | `uint16`  | CPU frequency in MHz                            |
+| 8-9            | `gpu_usage_tenths`         | `uint16`  | GPU utilisation in 0.1% steps                   |
+| 10-11          | `gpu_temp_tenths`          | `int16`   | GPU temperature in 0.1 °C steps                 |
+| 12-13          | `gpu_freq_mhz`             | `uint16`  | GPU frequency in MHz                            |
+| 14-15          | `gram_usage_tenths`        | `uint16`  | Graphics RAM usage in 0.1% steps                |
+| 16-17          | `ram_usage_tenths`         | `uint16`  | System RAM usage in 0.1% steps                  |
+| 18-19          | `year`                     | `uint16`  | Gregorian calendar year (0 if missing)          |
+| 20             | `month`                    | `uint8`   | Month number (1–12, 0 if missing)               |
+| 21             | `day`                      | `uint8`   | Day of month (1–31, 0 if missing)               |
+| 22             | `day_of_week`              | `uint8`   | Day-of-week index (0–7, 0 if missing)           |
+| 23             | `hour`                     | `uint8`   | Hour (0–23, 0 if missing)                       |
+| 24             | `minute`                   | `uint8`   | Minute (0–59, 0 if missing)                     |
+| 25             | `second`                   | `uint8`   | Second (0–59, 0 if missing)                     |
 
-Example packet (`0xA5 0x01 0x78 0x00 0x2D 0x01 0xB0 0x04 0x0A 0x00 0x96 0x00 0xD0 0x07 0x64 0x00 0xB1 0x00`) decodes to:
+Example packet (`A5 02 78 00 C2 01 10 0E 30 02 8A 02 DC 05 A4 01 26 02 E9 07 0A 12 06 0D 0C 2D`) decodes to:
 
-- CPU: 12.0% @ 1.20 GHz, 29.3 °C  
-- GPU: 1.0% @ 2.00 GHz, 15.0 °C  
-- Graphics RAM usage: 10.0%  
-- System RAM usage: 17.7%
+- CPU: 12.0% @ 3.60 GHz, 45.0 °C  
+- GPU: 56.0% @ 1.50 GHz, 65.0 °C  
+- Graphics RAM usage: 42.0%  
+- System RAM usage: 55.0%  
+- Date/time: 2025-10-18 (weekday index 6) 13:12:45

@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include "lvgl.h"
 #include "custom.h"
+#include "gui_guider_support.h"
 
 /*********************
  *      DEFINES
@@ -30,6 +31,11 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+extern int Home_digital_clock_time_hour_value;
+extern int Home_digital_clock_time_min_value;
+extern int Home_digital_clock_time_sec_value;
+extern char Home_digital_clock_time_meridiem[];
 
 /**
  * Create a demo application
@@ -101,6 +107,49 @@ void custom_update_metrics(lv_ui *ui, const system_metrics_t *metrics)
     }
     if (ui->Home_gram_data) {
         lv_label_set_text_fmt(ui->Home_gram_data, "%d", gram_usage);
+    }
+
+    if (metrics->has_date && ui->Home_datetext_date) {
+        lv_label_set_text_fmt(ui->Home_datetext_date, "%04u/%02u/%02u",
+                              (unsigned)metrics->year,
+                              (unsigned)metrics->month,
+                              (unsigned)metrics->day);
+    }
+
+    if (metrics->has_day_of_week && ui->Home_weekday) {
+        static const char *const day_names[] = {
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+        };
+        if (metrics->day_of_week >= 0 && metrics->day_of_week <= 6) {
+            lv_label_set_text(ui->Home_weekday, day_names[metrics->day_of_week]);
+        }
+    }
+
+    if (metrics->has_time && ui->Home_digital_clock_time) {
+        const bool is_pm = metrics->hour >= 12;
+        uint8_t hour12 = metrics->hour % 12;
+        if (hour12 == 0) {
+            hour12 = 12;
+        }
+        const char *suffix = is_pm ? "PM" : "AM";
+        lv_dclock_set_text_fmt(ui->Home_digital_clock_time, "%u:%02u:%02u %s",
+                               (unsigned)hour12,
+                               (unsigned)metrics->minute,
+                               (unsigned)metrics->second,
+                               suffix);
+
+        Home_digital_clock_time_hour_value = hour12;
+        Home_digital_clock_time_min_value = metrics->minute;
+        Home_digital_clock_time_sec_value = metrics->second;
+        Home_digital_clock_time_meridiem[0] = suffix[0];
+        Home_digital_clock_time_meridiem[1] = suffix[1];
+        Home_digital_clock_time_meridiem[2] = '\0';
     }
 }
 
