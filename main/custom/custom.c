@@ -134,9 +134,10 @@ void custom_update_metrics(lv_ui *ui, const system_metrics_t *metrics)
     if (metrics->has_time && ui->Home_digital_clock_time) {
         const bool is_pm = metrics->hour >= 12;
         uint8_t hour12 = metrics->hour % 12;
-        if (hour12 == 0) {
+        if(metrics->hour && hour12 == 0) {
             hour12 = 12;
         }
+        
         const char *suffix = is_pm ? "PM" : "AM";
         lv_dclock_set_text_fmt(ui->Home_digital_clock_time, "%u:%02u:%02u %s",
                                (unsigned)hour12,
