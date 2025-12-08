@@ -904,11 +904,13 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_style_set_text_color(&ui->HA_dark_spangroup_2_span->style, lv_color_hex(0xe6e6e6));
     lv_style_set_text_decor(&ui->HA_dark_spangroup_2_span->style, LV_TEXT_DECOR_NONE);
     lv_style_set_text_font(&ui->HA_dark_spangroup_2_span->style, &lv_font_montserratMedium_17);
+    UI_YIELD();
     ui->HA_dark_spangroup_2_span = lv_spangroup_new_span(ui->HA_dark_spangroup_2);
     lv_span_set_text(ui->HA_dark_spangroup_2_span, " - ");
     lv_style_set_text_color(&ui->HA_dark_spangroup_2_span->style, lv_color_hex(0xe0e0e0));
     lv_style_set_text_decor(&ui->HA_dark_spangroup_2_span->style, LV_TEXT_DECOR_NONE);
     lv_style_set_text_font(&ui->HA_dark_spangroup_2_span->style, &lv_font_montserratMedium_17);
+    UI_YIELD();
     ui->HA_dark_spangroup_2_span = lv_spangroup_new_span(ui->HA_dark_spangroup_2);
     lv_span_set_text(ui->HA_dark_spangroup_2_span, "2025/12/8");
     lv_style_set_text_color(&ui->HA_dark_spangroup_2_span->style, lv_color_hex(0xe6e6e6));
@@ -971,6 +973,7 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_style_set_text_color(&ui->HA_dark_spangroup_1_span->style, lv_color_hex(0xebebeb));
     lv_style_set_text_decor(&ui->HA_dark_spangroup_1_span->style, LV_TEXT_DECOR_NONE);
     lv_style_set_text_font(&ui->HA_dark_spangroup_1_span->style, &lv_font_montserratMedium_30);
+    UI_YIELD();
     ui->HA_dark_spangroup_1_span = lv_spangroup_new_span(ui->HA_dark_spangroup_1);
     lv_span_set_text(ui->HA_dark_spangroup_1_span, "°C");
     lv_style_set_text_color(&ui->HA_dark_spangroup_1_span->style, lv_color_hex(0xe6e6e6));
@@ -978,11 +981,11 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_style_set_text_font(&ui->HA_dark_spangroup_1_span->style, &lv_font_montserratMedium_22);
     lv_obj_set_pos(ui->HA_dark_spangroup_1, 176, 68);
     lv_obj_set_size(ui->HA_dark_spangroup_1, 77, 27);
-
+    UI_YIELD();
     //Write style state: LV_STATE_DEFAULT for &style_HA_dark_spangroup_1_main_main_default
     static lv_style_t style_HA_dark_spangroup_1_main_main_default;
     ui_init_style(&style_HA_dark_spangroup_1_main_main_default);
-
+    UI_YIELD();
     lv_style_set_border_width(&style_HA_dark_spangroup_1_main_main_default, 0);
     lv_style_set_radius(&style_HA_dark_spangroup_1_main_main_default, 0);
     lv_style_set_bg_opa(&style_HA_dark_spangroup_1_main_main_default, 0);
@@ -1004,7 +1007,7 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_img_set_angle(ui->HA_dark_img_1, 0);
     lv_obj_set_pos(ui->HA_dark_img_1, 176, 2);
     lv_obj_set_size(ui->HA_dark_img_1, 60, 60);
-
+    UI_YIELD();
     //Write style for HA_dark_img_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_img_recolor_opa(ui->HA_dark_img_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_img_opa(ui->HA_dark_img_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -1018,7 +1021,7 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_dropdown_set_options(ui->HA_dark_menu, "HA\nPC");
     lv_obj_set_pos(ui->HA_dark_menu, 27, 32);
     lv_obj_set_size(ui->HA_dark_menu, 59, 30);
-
+    UI_YIELD();
     //Write style for HA_dark_menu, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_text_color(ui->HA_dark_menu, lv_color_hex(0xd2d2d2), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->HA_dark_menu, &lv_font_montserratMedium_15, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -1032,22 +1035,22 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_obj_set_style_bg_color(ui->HA_dark_menu, lv_color_hex(0x3E3F43), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->HA_dark_menu, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->HA_dark_menu, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-
+    UI_YIELD();
     //Write style state: LV_STATE_CHECKED for &style_HA_dark_menu_extra_list_selected_checked
     static lv_style_t style_HA_dark_menu_extra_list_selected_checked;
     ui_init_style(&style_HA_dark_menu_extra_list_selected_checked);
-
+    UI_YIELD();
     lv_style_set_border_width(&style_HA_dark_menu_extra_list_selected_checked, 0);
     lv_style_set_radius(&style_HA_dark_menu_extra_list_selected_checked, 3);
     lv_style_set_bg_opa(&style_HA_dark_menu_extra_list_selected_checked, 255);
     lv_style_set_bg_color(&style_HA_dark_menu_extra_list_selected_checked, lv_color_hex(0x4F5159));
     lv_style_set_bg_grad_dir(&style_HA_dark_menu_extra_list_selected_checked, LV_GRAD_DIR_NONE);
     lv_obj_add_style(lv_dropdown_get_list(ui->HA_dark_menu), &style_HA_dark_menu_extra_list_selected_checked, LV_PART_SELECTED|LV_STATE_CHECKED);
-
+    UI_YIELD();
     //Write style state: LV_STATE_DEFAULT for &style_HA_dark_menu_extra_list_main_default
     static lv_style_t style_HA_dark_menu_extra_list_main_default;
     ui_init_style(&style_HA_dark_menu_extra_list_main_default);
-
+    UI_YIELD();
     lv_style_set_max_height(&style_HA_dark_menu_extra_list_main_default, 80);
     lv_style_set_text_color(&style_HA_dark_menu_extra_list_main_default, lv_color_hex(0xebebeb));
     lv_style_set_text_font(&style_HA_dark_menu_extra_list_main_default, &lv_font_montserratMedium_15);
@@ -1064,7 +1067,7 @@ void setup_scr_HA_dark(lv_ui *ui)
 
     //Update current screen layout.
     lv_obj_update_layout(ui->HA_dark);
-
+    UI_YIELD();
     //Init events for screen.
     events_init_HA_dark(ui);
 }

@@ -99,6 +99,10 @@ void setup_ui(lv_ui *ui)
     ui->Monitor_dark_del = false;
 
     esp_task_wdt_reset();
+    
+    setup_scr_HA_dark(ui);
+    ui->HA_dark_del = false;
+    esp_task_wdt_reset();
 
     lv_scr_load(ui->Monitor_dark);
     esp_task_wdt_reset();

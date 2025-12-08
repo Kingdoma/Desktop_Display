@@ -140,12 +140,12 @@ void custom_update_metrics(lv_ui *ui, const system_metrics_t *metrics)
                                (unsigned)metrics->second,
                                suffix);
 
-        Monitor_dark_digital_clock_time_hour_value = hour12;
-        Monitor_dark_digital_clock_time_min_value = metrics->minute;
-        Monitor_dark_digital_clock_time_sec_value = metrics->second;
-        Monitor_dark_digital_clock_time_meridiem[0] = suffix[0];
-        Monitor_dark_digital_clock_time_meridiem[1] = suffix[1];
-        Monitor_dark_digital_clock_time_meridiem[2] = '\0';
+        // Monitor_dark_digital_clock_time_hour_value = hour12;
+        // Monitor_dark_digital_clock_time_min_value = metrics->minute;
+        // Monitor_dark_digital_clock_time_sec_value = metrics->second;
+        // Monitor_dark_digital_clock_time_meridiem[0] = suffix[0];
+        // Monitor_dark_digital_clock_time_meridiem[1] = suffix[1];
+        // Monitor_dark_digital_clock_time_meridiem[2] = '\0';
     }
 }
 
