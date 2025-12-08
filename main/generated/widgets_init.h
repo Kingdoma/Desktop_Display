@@ -24,9 +24,15 @@ void clock_count(int *hour, int *min, int *sec);
 
 
 void Home_digital_clock_time_timer(lv_timer_t *timer);
-void Home_datetext_date_event_handler(lv_event_t *e);
-void Home_datetext_date_calendar_event_handler(lv_event_t *e);
-void Home_datetext_date_init_calendar(lv_obj_t *obj, char * s);
+void Home_date_event_handler(lv_event_t *e);
+void Home_date_calendar_event_handler(lv_event_t *e);
+void Home_date_init_calendar(lv_obj_t *obj, char * s);
+void Home_digital_clock_2_timer(lv_timer_t *timer);
+void Monitor_dark_digital_clock_time_timer(lv_timer_t *timer);
+void Monitor_dark_datetext_date_event_handler(lv_event_t *e);
+void Monitor_dark_datetext_date_calendar_event_handler(lv_event_t *e);
+void Monitor_dark_datetext_date_init_calendar(lv_obj_t *obj, char * s);
+void HA_dark_digital_clock_1_timer(lv_timer_t *timer);
 
 #ifdef __cplusplus
 }

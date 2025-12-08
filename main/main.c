@@ -12,6 +12,7 @@
 #include "tinyusb_cdc.h"
 #include "metrics.h"
 #include "app_main.h"
+#include "esp_task_wdt.h"
 
 #define TAG "app_main"
 
@@ -25,6 +26,7 @@ static void lvgl_tick_cb(void *arg)
 static void lvgl_task(void *arg)
 {
     ESP_LOGI(TAG, "Initialize LVGL");
+    esp_task_wdt_add(NULL);
     lv_init();
 
     ESP_ERROR_CHECK(display_driver_init(NULL));
@@ -53,6 +55,7 @@ static void lvgl_task(void *arg)
             custom_update_metrics(&guider_ui, &latest_metrics);
         }
         lv_timer_handler();
+        esp_task_wdt_reset();
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 }

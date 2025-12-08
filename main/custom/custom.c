@@ -14,7 +14,6 @@
 #include <stdio.h>
 #include "lvgl.h"
 #include "custom.h"
-#include "gui_guider_support.h"
 
 /*********************
  *      DEFINES
@@ -31,11 +30,6 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-extern int Home_digital_clock_time_hour_value;
-extern int Home_digital_clock_time_min_value;
-extern int Home_digital_clock_time_sec_value;
-extern char Home_digital_clock_time_meridiem[];
 
 /**
  * Create a demo application
@@ -64,92 +58,49 @@ void custom_update_metrics(lv_ui *ui, const system_metrics_t *metrics)
     }
 
     const int16_t cpu_usage = clamp_percent(metrics->cpu_usage_percent);
-    if (ui->Home_arc_1) {
-        lv_arc_set_value(ui->Home_arc_1, cpu_usage);
+    if (ui->Monitor_dark_arc_1) {
+        lv_arc_set_value(ui->Monitor_dark_arc_1, cpu_usage);
     }
-    if (ui->Home_cpu_percent) {
-        lv_label_set_text_fmt(ui->Home_cpu_percent, "%d", cpu_usage);
+    if (ui->Monitor_dark_cpu_percent) {
+        lv_label_set_text_fmt(ui->Monitor_dark_cpu_percent, "%d", cpu_usage);
     }
 
-    if (ui->Home_cpu_fequency_data) {
-        lv_label_set_text_fmt(ui->Home_cpu_fequency_data, "%.2f", metrics->cpu_freq_ghz);
+    if (ui->Monitor_dark_cpu_frequency_data) {
+        lv_label_set_text_fmt(ui->Monitor_dark_cpu_frequency_data, "%.2f", metrics->cpu_freq_ghz);
     }
-    if (ui->Home_cpu_temp_data) {
-        lv_label_set_text_fmt(ui->Home_cpu_temp_data, "%.0f", metrics->cpu_temp_c);
+    if (ui->Monitor_dark_cpu_temp_data) {
+        lv_label_set_text_fmt(ui->Monitor_dark_cpu_temp_data, "%.1f", metrics->cpu_temp_c);
     }
 
     const int16_t ram_usage = clamp_percent(metrics->ram_usage_percent);
-    if (ui->Home_ram_slider) {
-        lv_slider_set_value(ui->Home_ram_slider, ram_usage, LV_ANIM_OFF);
+    if (ui->Monitor_dark_ram_slider) {
+        lv_slider_set_value(ui->Monitor_dark_ram_slider, ram_usage, LV_ANIM_OFF);
     }
-    if (ui->Home_ram_data) {
-        lv_label_set_text_fmt(ui->Home_ram_data, "%d", ram_usage);
+    if (ui->Monitor_dark_ram_data) {
+        lv_label_set_text_fmt(ui->Monitor_dark_ram_data, "%d", ram_usage);
     }
 
     const int16_t gpu_usage = clamp_percent(metrics->gpu_usage_percent);
-    if (ui->Home_arc_2) {
-        lv_arc_set_value(ui->Home_arc_2, gpu_usage);
+    if (ui->Monitor_dark_arc_2) {
+        lv_arc_set_value(ui->Monitor_dark_arc_2, gpu_usage);
     }
-    if (ui->Home_gpu_percent) {
-        lv_label_set_text_fmt(ui->Home_gpu_percent, "%d", gpu_usage);
+    if (ui->Monitor_dark_gpu_percent) {
+        lv_label_set_text_fmt(ui->Monitor_dark_gpu_percent, "%d", gpu_usage);
     }
 
-    if (ui->Home_gpu_frequency_data) {
-        lv_label_set_text_fmt(ui->Home_gpu_frequency_data, "%.0f", metrics->gpu_freq_mhz);
+    if (ui->Monitor_dark_gpu_frequency_data) {
+        lv_label_set_text_fmt(ui->Monitor_dark_gpu_frequency_data, "%d", (int)metrics->gpu_freq_mhz);
     }
-    if (ui->Home_gpu_temp_data) {
-        lv_label_set_text_fmt(ui->Home_gpu_temp_data, "%.0f", metrics->gpu_temp_c);
+    if (ui->Monitor_dark_gpu_temp_data) {
+        lv_label_set_text_fmt(ui->Monitor_dark_gpu_temp_data, "%.1f", metrics->gpu_temp_c);
     }
 
     const int16_t gram_usage = clamp_percent(metrics->gram_usage_percent);
-    if (ui->Home_gram_slider) {
-        lv_slider_set_value(ui->Home_gram_slider, gram_usage, LV_ANIM_OFF);
+    if (ui->Monitor_dark_gram_slider) {
+        lv_slider_set_value(ui->Monitor_dark_gram_slider, gram_usage, LV_ANIM_OFF);
     }
-    if (ui->Home_gram_data) {
-        lv_label_set_text_fmt(ui->Home_gram_data, "%d", gram_usage);
-    }
-
-    if (metrics->has_date && ui->Home_datetext_date) {
-        lv_label_set_text_fmt(ui->Home_datetext_date, "%04u/%02u/%02u",
-                              (unsigned)metrics->year,
-                              (unsigned)metrics->month,
-                              (unsigned)metrics->day);
-    }
-
-    if (metrics->has_day_of_week && ui->Home_weekday) {
-        static const char *const day_names[] = {
-            "Sunday",
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-        };
-        if (metrics->day_of_week >= 0 && metrics->day_of_week <= 6) {
-            lv_label_set_text(ui->Home_weekday, day_names[metrics->day_of_week]);
-        }
-    }
-
-    if (metrics->has_time && ui->Home_digital_clock_time) {
-        const bool is_pm = metrics->hour >= 12;
-        uint8_t hour12 = metrics->hour % 12;
-        if (hour12 == 0) {
-            hour12 = 12;
-        }
-        const char *suffix = is_pm ? "PM" : "AM";
-        lv_dclock_set_text_fmt(ui->Home_digital_clock_time, "%u:%02u:%02u %s",
-                               (unsigned)hour12,
-                               (unsigned)metrics->minute,
-                               (unsigned)metrics->second,
-                               suffix);
-
-        Home_digital_clock_time_hour_value = hour12;
-        Home_digital_clock_time_min_value = metrics->minute;
-        Home_digital_clock_time_sec_value = metrics->second;
-        Home_digital_clock_time_meridiem[0] = suffix[0];
-        Home_digital_clock_time_meridiem[1] = suffix[1];
-        Home_digital_clock_time_meridiem[2] = '\0';
+    if (ui->Monitor_dark_gram_data) {
+        lv_label_set_text_fmt(ui->Monitor_dark_gram_data, "%d", gram_usage);
     }
 }
 

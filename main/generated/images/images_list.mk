@@ -1,1 +1,1 @@
-GEN_CSRCS += _download_alpha_13x13.c _upload_alpha_13x13.c _home_bak_27x56.c _menu_bak_480x320.c _menu_bal_alpha_192x192.c _menu_air_54x54.c _menu_anfang_54x54.c _menu_elevator_54x54.c _menu_tem_54x54.c _menu_xiaofang_54x54.c _menu_electricity_54x54.c _menu_light_54x54.c
+GEN_CSRCS += _download_alpha_13x13.c _upload_alpha_13x13.c _temperature_35x35.c _humidity_35x35.c _cloudy_alpha_60x60.c

@@ -11,6 +11,9 @@
 #include <stdio.h>
 #include "gui_guider.h"
 #include "widgets_init.h"
+#include "esp_task_wdt.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 #if LV_USE_GUIDER_SIMULATOR && LV_USE_FREEMASTER
 #include "gg_external_data.h"
@@ -28,6 +31,7 @@ void ui_load_scr_animation(lv_ui *ui, lv_obj_t ** new_scr, bool new_scr_del, boo
                            lv_scr_load_anim_t anim_type, uint32_t time, uint32_t delay, bool is_clean, bool auto_del)
 {
     lv_obj_t * act_scr = lv_scr_act();
+    esp_task_wdt_reset();
 
 #if LV_USE_GUIDER_SIMULATOR && LV_USE_FREEMASTER
     if(auto_del) {
@@ -40,8 +44,10 @@ void ui_load_scr_animation(lv_ui *ui, lv_obj_t ** new_scr, bool new_scr_del, boo
     if (new_scr_del) {
         setup_scr(ui);
     }
+    esp_task_wdt_reset();
     lv_scr_load_anim(*new_scr, anim_type, time, delay, auto_del);
     *old_scr_del = auto_del;
+    esp_task_wdt_reset();
 }
 
 void ui_animation(void * var, int32_t duration, int32_t delay, int32_t start_value, int32_t end_value, lv_anim_path_cb_t path_cb,
@@ -76,14 +82,26 @@ void init_scr_del_flag(lv_ui *ui)
 {
 
     ui->Home_del = true;
+    ui->Monitor_dark_del = true;
+    ui->HA_dark_del = true;
 }
 
 void setup_ui(lv_ui *ui)
 {
     init_scr_del_flag(ui);
     init_keyboard(ui);
-    setup_scr_Home(ui);
-    lv_scr_load(ui->Home);
+
+    /* Yield to keep idle/WDT happy while building large screens */
+    vTaskDelay(pdMS_TO_TICKS(1));
+
+    /* Create initial screen only; other screens will be built on demand */
+    setup_scr_Monitor_dark(ui);
+    ui->Monitor_dark_del = false;
+
+    esp_task_wdt_reset();
+
+    lv_scr_load(ui->Monitor_dark);
+    esp_task_wdt_reset();
 }
 
 void init_keyboard(lv_ui *ui)
