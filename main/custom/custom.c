@@ -99,8 +99,53 @@ void custom_update_metrics(lv_ui *ui, const system_metrics_t *metrics)
     if (ui->Monitor_dark_gram_slider) {
         lv_slider_set_value(ui->Monitor_dark_gram_slider, gram_usage, LV_ANIM_OFF);
     }
+    
     if (ui->Monitor_dark_gram_data) {
         lv_label_set_text_fmt(ui->Monitor_dark_gram_data, "%d", gram_usage);
+    }
+
+    if (metrics->has_date && ui->Monitor_dark_datetext_date) {
+        lv_label_set_text_fmt(ui->Monitor_dark_datetext_date, "%04u/%02u/%02u",
+                              (unsigned)metrics->year,
+                              (unsigned)metrics->month,
+                              (unsigned)metrics->day);
+    }
+
+    if (metrics->has_day_of_week && ui->Monitor_dark_weekday) {
+        static const char *const day_names[] = {
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+        };
+        if (metrics->day_of_week >= 0 && metrics->day_of_week <= 6) {
+            lv_label_set_text(ui->Monitor_dark_weekday, day_names[metrics->day_of_week]);
+        }
+    }
+
+    if (metrics->has_time && ui->Monitor_dark_digital_clock_time) {
+        const bool is_pm = metrics->hour >= 12;
+        uint8_t hour12 = metrics->hour % 12;
+        if(metrics->hour && hour12 == 0) {
+            hour12 = 12;
+        }
+        
+        const char *suffix = is_pm ? "PM" : "AM";
+        lv_dclock_set_text_fmt(ui->Monitor_dark_digital_clock_time, "%u:%02u:%02u %s",
+                               (unsigned)hour12,
+                               (unsigned)metrics->minute,
+                               (unsigned)metrics->second,
+                               suffix);
+
+        Monitor_dark_digital_clock_time_hour_value = hour12;
+        Monitor_dark_digital_clock_time_min_value = metrics->minute;
+        Monitor_dark_digital_clock_time_sec_value = metrics->second;
+        Monitor_dark_digital_clock_time_meridiem[0] = suffix[0];
+        Monitor_dark_digital_clock_time_meridiem[1] = suffix[1];
+        Monitor_dark_digital_clock_time_meridiem[2] = '\0';
     }
 }
 
