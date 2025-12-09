@@ -10,6 +10,8 @@
 #include "esp_event.h"
 #include "esp_netif.h"
 #include "esp_sntp.h"
+#include "protocol_examples_common.h"
+#include "nvs_flash.h"
 #include "lvgl.h"
 #include "generated/gui_guider.h"
 #include "custom/custom.h"
@@ -37,6 +39,8 @@ static void initialize_sntp(void)
 {
     ESP_LOGI(TAG, "Initializing SNTP");
 
+    ESP_ERROR_CHECK(nvs_flash_init());
+
     esp_err_t err = esp_netif_init();
     if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
         ESP_LOGE(TAG, "esp_netif_init failed: %s", esp_err_to_name(err));
@@ -46,6 +50,13 @@ static void initialize_sntp(void)
     err = esp_event_loop_create_default();
     if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
         ESP_LOGE(TAG, "esp_event_loop_create_default failed: %s", esp_err_to_name(err));
+        return;
+    }
+
+    // connect to internet
+    err = example_connect();
+    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
+        ESP_LOGE(TAG, "esp_wifi_connect failed: %s", esp_err_to_name(err));
         return;
     }
 
@@ -174,24 +185,6 @@ static void cdc_task(void *arg)
 void app_main(void)
 {
     initialize_sntp();
-
-    // ESP_LOGI(TAG, "Initialize LVGL");
-    // lv_init();
-
-    // ESP_ERROR_CHECK(display_driver_init(NULL));
-
-    // const esp_timer_create_args_t tick_timer_args = {
-    //     .callback = lvgl_tick_cb,
-    //     .name = "lvgl_tick",
-    // };
-    // esp_timer_handle_t tick_timer = NULL;
-    // ESP_ERROR_CHECK(esp_timer_create(&tick_timer_args, &tick_timer));
-    // ESP_ERROR_CHECK(esp_timer_start_periodic(tick_timer, 1000)); // 1 ms tick
-
-    // setup_ui(&guider_ui);
-    // custom_init(&guider_ui);
-
-    // vTaskDelay(pdMS_TO_TICKS(100));
 
     xTaskCreate(lvgl_task, "lvgl_task", 4096, NULL, 2, NULL);
 
