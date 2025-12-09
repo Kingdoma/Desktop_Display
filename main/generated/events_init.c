@@ -15,6 +15,8 @@
 #include "freemaster_client.h"
 #endif
 
+uint8_t idx;
+uint8_t idx;
 
 static void Home_event_handler (lv_event_t *e)
 {
@@ -23,132 +25,18 @@ static void Home_event_handler (lv_event_t *e)
     case LV_EVENT_SCREEN_LOADED:
     {
         lv_obj_clear_flag(guider_ui.Home, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_clear_flag(guider_ui.Home_cont_time, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_clear_flag(guider_ui.Home_cont_net, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_clear_flag(guider_ui.Home_speed_info, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_clear_flag(guider_ui.Home_cont_cpu_monitor, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_clear_flag(guider_ui.Home_time_monitor, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_clear_flag(guider_ui.Home_net_monitor, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_clear_flag(guider_ui.Home_net_speed, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_clear_flag(guider_ui.Home_cpu_monitor, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_clear_flag(guider_ui.Home_cpu_usage, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_clear_flag(guider_ui.Home_cont_gpu_monitor, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_clear_flag(guider_ui.Home_gpu_monitor, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_clear_flag(guider_ui.Home_gpu_usage, LV_OBJ_FLAG_SCROLLABLE);
-        break;
-    }
-    default:
-        break;
-    }
-}
 
-static void Home_btn_menu_event_handler (lv_event_t *e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    switch (code) {
-    case LV_EVENT_CLICKED:
-    {
-        lv_obj_clear_flag(guider_ui.Home_cont_menu, LV_OBJ_FLAG_HIDDEN);
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-static void Home_cont_menu_event_handler (lv_event_t *e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    switch (code) {
-    case LV_EVENT_CLICKED:
-    {
-        lv_obj_add_flag(guider_ui.Home_cont_menu, LV_OBJ_FLAG_HIDDEN);
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-static void Home_btn_phone_event_handler (lv_event_t *e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    switch (code) {
-    case LV_EVENT_CLICKED:
-    {
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-static void Home_btn_warning_event_handler (lv_event_t *e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    switch (code) {
-    case LV_EVENT_CLICKED:
-    {
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-static void Home_btn_power_event_handler (lv_event_t *e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    switch (code) {
-    case LV_EVENT_CLICKED:
-    {
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-static void Home_btn_temp_event_handler (lv_event_t *e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    switch (code) {
-    case LV_EVENT_CLICKED:
-    {
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-static void Home_btn_link_event_handler (lv_event_t *e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    switch (code) {
-    case LV_EVENT_CLICKED:
-    {
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-static void Home_btn_safe_event_handler (lv_event_t *e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    switch (code) {
-    case LV_EVENT_CLICKED:
-    {
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-static void Home_btn_light_event_handler (lv_event_t *e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    switch (code) {
-    case LV_EVENT_CLICKED:
-    {
+        lv_obj_add_state(guider_ui.Home_arc_1, LV_STATE_DISABLED);
+        lv_obj_add_state(guider_ui.Home_gram_slider, LV_STATE_DISABLED);
+        lv_obj_add_state(guider_ui.Home_arc_2, LV_STATE_DISABLED);
+        lv_obj_add_state(guider_ui.Home_ram_slider, LV_STATE_DISABLED);
         break;
     }
     default:
@@ -159,15 +47,52 @@ static void Home_btn_light_event_handler (lv_event_t *e)
 void events_init_Home (lv_ui *ui)
 {
     lv_obj_add_event_cb(ui->Home, Home_event_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->Home_btn_menu, Home_btn_menu_event_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->Home_cont_menu, Home_cont_menu_event_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->Home_btn_phone, Home_btn_phone_event_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->Home_btn_warning, Home_btn_warning_event_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->Home_btn_power, Home_btn_power_event_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->Home_btn_temp, Home_btn_temp_event_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->Home_btn_link, Home_btn_link_event_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->Home_btn_safe, Home_btn_safe_event_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->Home_btn_light, Home_btn_light_event_handler, LV_EVENT_ALL, ui);
+}
+
+static void Monitor_dark_menu_event_handler (lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    switch (code) {
+    case LV_EVENT_VALUE_CHANGED:
+    {
+        uint16_t id = lv_dropdown_get_selected(guider_ui.Monitor_dark_menu);
+        idx = lv_dropdown_get_selected(guider_ui.Monitor_dark_menu);
+        if(idx == 1) {
+            ui_load_scr_animation(&guider_ui, &guider_ui.HA_dark, guider_ui.HA_dark_del, &guider_ui.Monitor_dark_del, setup_scr_HA_dark, LV_SCR_LOAD_ANIM_NONE, 200, 200, false, true);
+        }
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void events_init_Monitor_dark (lv_ui *ui)
+{
+    lv_obj_add_event_cb(ui->Monitor_dark_menu, Monitor_dark_menu_event_handler, LV_EVENT_ALL, ui);
+}
+
+static void HA_dark_menu_event_handler (lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    switch (code) {
+    case LV_EVENT_VALUE_CHANGED:
+    {
+        uint16_t id = lv_dropdown_get_selected(guider_ui.HA_dark_menu);
+        idx = lv_dropdown_get_selected(guider_ui.HA_dark_menu);
+        if(idx == 1) {
+            ui_load_scr_animation(&guider_ui, &guider_ui.Monitor_dark, guider_ui.Monitor_dark_del, &guider_ui.HA_dark_del, setup_scr_Monitor_dark, LV_SCR_LOAD_ANIM_NONE, 200, 200, false, true);
+        }
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void events_init_HA_dark (lv_ui *ui)
+{
+    // lv_obj_add_event_cb(ui->HA_dark_menu, HA_dark_menu_event_handler, LV_EVENT_ALL, ui);
 }
 
 
