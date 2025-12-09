@@ -18,37 +18,6 @@
 uint8_t idx;
 uint8_t idx;
 
-static void Home_event_handler (lv_event_t *e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    switch (code) {
-    case LV_EVENT_SCREEN_LOADED:
-    {
-        lv_obj_clear_flag(guider_ui.Home, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_clear_flag(guider_ui.Home_time_monitor, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_clear_flag(guider_ui.Home_net_monitor, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_clear_flag(guider_ui.Home_net_speed, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_clear_flag(guider_ui.Home_cpu_monitor, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_clear_flag(guider_ui.Home_cpu_usage, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_clear_flag(guider_ui.Home_gpu_monitor, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_clear_flag(guider_ui.Home_gpu_usage, LV_OBJ_FLAG_SCROLLABLE);
-
-        lv_obj_add_state(guider_ui.Home_arc_1, LV_STATE_DISABLED);
-        lv_obj_add_state(guider_ui.Home_gram_slider, LV_STATE_DISABLED);
-        lv_obj_add_state(guider_ui.Home_arc_2, LV_STATE_DISABLED);
-        lv_obj_add_state(guider_ui.Home_ram_slider, LV_STATE_DISABLED);
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-void events_init_Home (lv_ui *ui)
-{
-    lv_obj_add_event_cb(ui->Home, Home_event_handler, LV_EVENT_ALL, ui);
-}
-
 static void Monitor_dark_menu_event_handler (lv_event_t *e)
 {
     lv_event_code_t code = lv_event_get_code(e);
@@ -92,7 +61,7 @@ static void HA_dark_menu_event_handler (lv_event_t *e)
 
 void events_init_HA_dark (lv_ui *ui)
 {
-    // lv_obj_add_event_cb(ui->HA_dark_menu, HA_dark_menu_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->HA_dark_menu, HA_dark_menu_event_handler, LV_EVENT_ALL, ui);
 }
 
 

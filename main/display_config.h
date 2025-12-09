@@ -9,7 +9,7 @@
 #define EXAMPLE_LCD_V_RES              (320)
 #define EXAMPLE_LCD_BIT_PER_PIXEL      (16)
 #define EXAMPLE_LCD_DATA_WIDTH         (8)
-#define EXAMPLE_LCD_BUFFER_LINES       (100)
+#define EXAMPLE_LCD_BUFFER_LINES       (50)
 #define EXAMPLE_LCD_MIRROR_X           false
 #define EXAMPLE_LCD_MIRROR_Y           false
 

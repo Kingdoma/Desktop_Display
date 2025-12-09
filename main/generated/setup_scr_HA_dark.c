@@ -13,15 +13,7 @@
 #include "events_init.h"
 #include "widgets_init.h"
 #include "custom.h"
-#include "esp_task_wdt.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 
-#define UI_YIELD()        \
-    do {                  \
-        esp_task_wdt_reset(); \
-        vTaskDelay(pdMS_TO_TICKS(1)); \
-    } while (0)
 
 
 int HA_dark_digital_clock_1_min_value = 25;
@@ -62,30 +54,6 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_obj_set_style_shadow_ofs_x(ui->HA_dark_printer_card, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_ofs_y(ui->HA_dark_printer_card, 2, LV_PART_MAIN|LV_STATE_DEFAULT);
 
-    UI_YIELD();
-
-    //Write codes HA_dark_bar_1
-    ui->HA_dark_bar_1 = lv_bar_create(ui->HA_dark_printer_card);
-    lv_obj_set_style_anim_time(ui->HA_dark_bar_1, 1000, 0);
-    lv_bar_set_mode(ui->HA_dark_bar_1, LV_BAR_MODE_NORMAL);
-    lv_bar_set_range(ui->HA_dark_bar_1, 0, 100);
-    lv_bar_set_value(ui->HA_dark_bar_1, 50, LV_ANIM_OFF);
-    lv_obj_set_pos(ui->HA_dark_bar_1, 103, 12);
-    lv_obj_set_size(ui->HA_dark_bar_1, 335, 28);
-
-    //Write style for HA_dark_bar_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->HA_dark_bar_1, 111, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->HA_dark_bar_1, lv_color_hex(0xb1b1b1), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->HA_dark_bar_1, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->HA_dark_bar_1, 10, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->HA_dark_bar_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-
-    //Write style for HA_dark_bar_1, Part: LV_PART_INDICATOR, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->HA_dark_bar_1, 255, LV_PART_INDICATOR|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->HA_dark_bar_1, lv_color_hex(0xf5bb0d), LV_PART_INDICATOR|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->HA_dark_bar_1, LV_GRAD_DIR_NONE, LV_PART_INDICATOR|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->HA_dark_bar_1, 10, LV_PART_INDICATOR|LV_STATE_DEFAULT);
-
     //Write codes HA_dark_label_10
     ui->HA_dark_label_10 = lv_label_create(ui->HA_dark_printer_card);
     lv_label_set_text(ui->HA_dark_label_10, "3D Printer\n");
@@ -96,18 +64,18 @@ void setup_scr_HA_dark(lv_ui *ui)
     //Write style for HA_dark_label_10, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->HA_dark_label_10, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->HA_dark_label_10, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->HA_dark_label_10, lv_color_hex(0xebebeb), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->HA_dark_label_10, &lv_font_montserratMedium_16, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui->HA_dark_label_10, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_letter_space(ui->HA_dark_label_10, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_line_space(ui->HA_dark_label_10, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_align(ui->HA_dark_label_10, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui->HA_dark_label_10, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui->HA_dark_label_10, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui->HA_dark_label_10, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui->HA_dark_label_10, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui->HA_dark_label_10, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->HA_dark_label_10, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->HA_dark_label_10, lv_color_hex(0xebebeb), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->HA_dark_label_10, &lv_font_montserratMedium_16, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui->HA_dark_label_10, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_letter_space(ui->HA_dark_label_10, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_line_space(ui->HA_dark_label_10, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui->HA_dark_label_10, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes HA_dark_spangroup_8
     ui->HA_dark_spangroup_8 = lv_spangroup_create(ui->HA_dark_printer_card);
@@ -137,16 +105,42 @@ void setup_scr_HA_dark(lv_ui *ui)
     static lv_style_t style_HA_dark_spangroup_8_main_main_default;
     ui_init_style(&style_HA_dark_spangroup_8_main_main_default);
 
-    lv_style_set_border_width(&style_HA_dark_spangroup_8_main_main_default, 0);
-    lv_style_set_radius(&style_HA_dark_spangroup_8_main_main_default, 0);
     lv_style_set_bg_opa(&style_HA_dark_spangroup_8_main_main_default, 0);
+    lv_style_set_radius(&style_HA_dark_spangroup_8_main_main_default, 0);
+    lv_style_set_shadow_width(&style_HA_dark_spangroup_8_main_main_default, 0);
+    lv_style_set_border_width(&style_HA_dark_spangroup_8_main_main_default, 0);
     lv_style_set_pad_top(&style_HA_dark_spangroup_8_main_main_default, 0);
     lv_style_set_pad_right(&style_HA_dark_spangroup_8_main_main_default, 0);
     lv_style_set_pad_bottom(&style_HA_dark_spangroup_8_main_main_default, 0);
     lv_style_set_pad_left(&style_HA_dark_spangroup_8_main_main_default, 0);
-    lv_style_set_shadow_width(&style_HA_dark_spangroup_8_main_main_default, 0);
     lv_obj_add_style(ui->HA_dark_spangroup_8, &style_HA_dark_spangroup_8_main_main_default, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_spangroup_refr_mode(ui->HA_dark_spangroup_8);
+
+    //Write codes HA_dark_slider_2
+    ui->HA_dark_slider_2 = lv_slider_create(ui->HA_dark_printer_card);
+    lv_slider_set_range(ui->HA_dark_slider_2, 15, 35);
+    lv_slider_set_mode(ui->HA_dark_slider_2, LV_SLIDER_MODE_NORMAL);
+    lv_slider_set_value(ui->HA_dark_slider_2, 26, LV_ANIM_OFF);
+    lv_obj_set_pos(ui->HA_dark_slider_2, 103, 14);
+    lv_obj_set_size(ui->HA_dark_slider_2, 336, 23);
+
+    //Write style for HA_dark_slider_2, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_bg_opa(ui->HA_dark_slider_2, 60, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->HA_dark_slider_2, lv_color_hex(0x717171), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_dir(ui->HA_dark_slider_2, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->HA_dark_slider_2, 10, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->HA_dark_slider_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_width(ui->HA_dark_slider_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+
+    //Write style for HA_dark_slider_2, Part: LV_PART_INDICATOR, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_bg_opa(ui->HA_dark_slider_2, 255, LV_PART_INDICATOR|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->HA_dark_slider_2, lv_color_hex(0xf5bb0d), LV_PART_INDICATOR|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_dir(ui->HA_dark_slider_2, LV_GRAD_DIR_NONE, LV_PART_INDICATOR|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->HA_dark_slider_2, 10, LV_PART_INDICATOR|LV_STATE_DEFAULT);
+
+    //Write style for HA_dark_slider_2, Part: LV_PART_KNOB, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_bg_opa(ui->HA_dark_slider_2, 0, LV_PART_KNOB|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->HA_dark_slider_2, 5, LV_PART_KNOB|LV_STATE_DEFAULT);
 
     //Write codes HA_dark_temperature_card
     ui->HA_dark_temperature_card = lv_obj_create(ui->HA_dark);
@@ -260,8 +254,6 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_obj_set_style_bg_img_opa(ui->HA_dark_label_8, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_img_recolor_opa(ui->HA_dark_label_8, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->HA_dark_label_8, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-
-    UI_YIELD();
 
     //Write codes HA_dark_humidity_card
     ui->HA_dark_humidity_card = lv_obj_create(ui->HA_dark);
@@ -379,8 +371,6 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_obj_set_style_bg_img_recolor_opa(ui->HA_dark_label_6, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->HA_dark_label_6, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
-    UI_YIELD();
-
     //Write codes HA_dark_switch_card_2
     ui->HA_dark_switch_card_2 = lv_obj_create(ui->HA_dark);
     lv_obj_set_pos(ui->HA_dark_switch_card_2, 290, 76);
@@ -491,8 +481,6 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_style_set_shadow_width(&style_HA_dark_spangroup_5_main_main_default, 0);
     lv_obj_add_style(ui->HA_dark_spangroup_5, &style_HA_dark_spangroup_5_main_main_default, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_spangroup_refr_mode(ui->HA_dark_spangroup_5);
-
-    UI_YIELD();
 
     //Write codes HA_dark_switch_card_1
     ui->HA_dark_switch_card_1 = lv_obj_create(ui->HA_dark);
@@ -605,8 +593,6 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_obj_add_style(ui->HA_dark_spangroup_4, &style_HA_dark_spangroup_4_main_main_default, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_spangroup_refr_mode(ui->HA_dark_spangroup_4);
 
-    UI_YIELD();
-
     //Write codes HA_dark_ac_card
     ui->HA_dark_ac_card = lv_obj_create(ui->HA_dark);
     lv_obj_set_pos(ui->HA_dark_ac_card, 205, 131);
@@ -701,12 +687,12 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_obj_set_size(ui->HA_dark_slider_1, 240, 23);
 
     //Write style for HA_dark_slider_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_radius(ui->HA_dark_slider_1, 10, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui->HA_dark_slider_1, 60, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui->HA_dark_slider_1, lv_color_hex(0x717171), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->HA_dark_slider_1, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->HA_dark_slider_1, 10, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_width(ui->HA_dark_slider_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->HA_dark_slider_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_width(ui->HA_dark_slider_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write style for HA_dark_slider_1, Part: LV_PART_INDICATOR, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->HA_dark_slider_1, 255, LV_PART_INDICATOR|LV_STATE_DEFAULT);
@@ -726,20 +712,20 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_obj_set_size(ui->HA_dark_label_2, 65, 24);
 
     //Write style for HA_dark_label_2, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_border_width(ui->HA_dark_label_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui->HA_dark_label_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->HA_dark_label_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->HA_dark_label_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui->HA_dark_label_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->HA_dark_label_2, lv_color_hex(0xebebeb), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->HA_dark_label_2, &lv_font_montserratMedium_20, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->HA_dark_label_2, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->HA_dark_label_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ui->HA_dark_label_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->HA_dark_label_2, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui->HA_dark_label_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui->HA_dark_label_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui->HA_dark_label_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui->HA_dark_label_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui->HA_dark_label_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->HA_dark_label_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes HA_dark_label_1
     ui->HA_dark_label_1 = lv_label_create(ui->HA_dark_ac_card);
@@ -776,16 +762,16 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_obj_set_size(ui->HA_dark_btn_3, 75, 28);
 
     //Write style for HA_dark_btn_3, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->HA_dark_btn_3, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->HA_dark_btn_3, lv_color_hex(0x4F5159), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->HA_dark_btn_3, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui->HA_dark_btn_3, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->HA_dark_btn_3, 9, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->HA_dark_btn_3, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->HA_dark_btn_3, lv_color_hex(0xCBCBCD), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->HA_dark_btn_3, &lv_font_montserratMedium_16, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->HA_dark_btn_3, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->HA_dark_btn_3, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui->HA_dark_btn_3, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->HA_dark_btn_3, lv_color_hex(0x4F5159), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_dir(ui->HA_dark_btn_3, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->HA_dark_btn_3, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write style for HA_dark_btn_3, Part: LV_PART_MAIN, State: LV_STATE_PRESSED.
     lv_obj_set_style_bg_opa(ui->HA_dark_btn_3, 255, LV_PART_MAIN|LV_STATE_PRESSED);
@@ -866,8 +852,6 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_obj_set_style_text_font(ui->HA_dark_btn_1, &lv_font_montserratMedium_16, LV_PART_MAIN|LV_STATE_PRESSED);
     lv_obj_set_style_text_opa(ui->HA_dark_btn_1, 255, LV_PART_MAIN|LV_STATE_PRESSED);
 
-    UI_YIELD();
-
     //Write codes HA_dark_time_card
     ui->HA_dark_time_card = lv_obj_create(ui->HA_dark);
     lv_obj_set_pos(ui->HA_dark_time_card, 15, 21);
@@ -891,8 +875,6 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_obj_set_style_shadow_ofs_x(ui->HA_dark_time_card, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_ofs_y(ui->HA_dark_time_card, 2, LV_PART_MAIN|LV_STATE_DEFAULT);
 
-    UI_YIELD();
-
     //Write codes HA_dark_spangroup_2
     ui->HA_dark_spangroup_2 = lv_spangroup_create(ui->HA_dark_time_card);
     lv_spangroup_set_align(ui->HA_dark_spangroup_2, LV_TEXT_ALIGN_LEFT);
@@ -904,13 +886,11 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_style_set_text_color(&ui->HA_dark_spangroup_2_span->style, lv_color_hex(0xe6e6e6));
     lv_style_set_text_decor(&ui->HA_dark_spangroup_2_span->style, LV_TEXT_DECOR_NONE);
     lv_style_set_text_font(&ui->HA_dark_spangroup_2_span->style, &lv_font_montserratMedium_17);
-    UI_YIELD();
     ui->HA_dark_spangroup_2_span = lv_spangroup_new_span(ui->HA_dark_spangroup_2);
     lv_span_set_text(ui->HA_dark_spangroup_2_span, " - ");
     lv_style_set_text_color(&ui->HA_dark_spangroup_2_span->style, lv_color_hex(0xe0e0e0));
     lv_style_set_text_decor(&ui->HA_dark_spangroup_2_span->style, LV_TEXT_DECOR_NONE);
     lv_style_set_text_font(&ui->HA_dark_spangroup_2_span->style, &lv_font_montserratMedium_17);
-    UI_YIELD();
     ui->HA_dark_spangroup_2_span = lv_spangroup_new_span(ui->HA_dark_spangroup_2);
     lv_span_set_text(ui->HA_dark_spangroup_2_span, "2025/12/8");
     lv_style_set_text_color(&ui->HA_dark_spangroup_2_span->style, lv_color_hex(0xe6e6e6));
@@ -934,8 +914,6 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_obj_add_style(ui->HA_dark_spangroup_2, &style_HA_dark_spangroup_2_main_main_default, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_spangroup_refr_mode(ui->HA_dark_spangroup_2);
 
-    UI_YIELD();
-
     //Write codes HA_dark_digital_clock_1
     static bool HA_dark_digital_clock_1_timer_enabled = false;
     ui->HA_dark_digital_clock_1 = lv_dclock_create(ui->HA_dark_time_card, "11:25:50");
@@ -948,19 +926,17 @@ void setup_scr_HA_dark(lv_ui *ui)
 
     //Write style for HA_dark_digital_clock_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_radius(ui->HA_dark_digital_clock_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->HA_dark_digital_clock_1, lv_color_hex(0xebebeb), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->HA_dark_digital_clock_1, &lv_font_montserratMedium_25, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui->HA_dark_digital_clock_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_letter_space(ui->HA_dark_digital_clock_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_align(ui->HA_dark_digital_clock_1, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui->HA_dark_digital_clock_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui->HA_dark_digital_clock_1, 7, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui->HA_dark_digital_clock_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui->HA_dark_digital_clock_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui->HA_dark_digital_clock_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->HA_dark_digital_clock_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-
-    UI_YIELD();
+    lv_obj_set_style_text_color(ui->HA_dark_digital_clock_1, lv_color_hex(0xebebeb), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->HA_dark_digital_clock_1, &lv_font_montserratMedium_25, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui->HA_dark_digital_clock_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_letter_space(ui->HA_dark_digital_clock_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui->HA_dark_digital_clock_1, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes HA_dark_spangroup_1
     ui->HA_dark_spangroup_1 = lv_spangroup_create(ui->HA_dark_time_card);
@@ -973,7 +949,6 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_style_set_text_color(&ui->HA_dark_spangroup_1_span->style, lv_color_hex(0xebebeb));
     lv_style_set_text_decor(&ui->HA_dark_spangroup_1_span->style, LV_TEXT_DECOR_NONE);
     lv_style_set_text_font(&ui->HA_dark_spangroup_1_span->style, &lv_font_montserratMedium_30);
-    UI_YIELD();
     ui->HA_dark_spangroup_1_span = lv_spangroup_new_span(ui->HA_dark_spangroup_1);
     lv_span_set_text(ui->HA_dark_spangroup_1_span, "°C");
     lv_style_set_text_color(&ui->HA_dark_spangroup_1_span->style, lv_color_hex(0xe6e6e6));
@@ -981,12 +956,11 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_style_set_text_font(&ui->HA_dark_spangroup_1_span->style, &lv_font_montserratMedium_22);
     lv_obj_set_pos(ui->HA_dark_spangroup_1, 176, 68);
     lv_obj_set_size(ui->HA_dark_spangroup_1, 77, 27);
-    UI_YIELD();
+
     //Write style state: LV_STATE_DEFAULT for &style_HA_dark_spangroup_1_main_main_default
     static lv_style_t style_HA_dark_spangroup_1_main_main_default;
     ui_init_style(&style_HA_dark_spangroup_1_main_main_default);
-    UI_YIELD();
-    lv_style_set_border_width(&style_HA_dark_spangroup_1_main_main_default, 0);
+
     lv_style_set_radius(&style_HA_dark_spangroup_1_main_main_default, 0);
     lv_style_set_bg_opa(&style_HA_dark_spangroup_1_main_main_default, 0);
     lv_style_set_pad_top(&style_HA_dark_spangroup_1_main_main_default, 0);
@@ -994,10 +968,9 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_style_set_pad_bottom(&style_HA_dark_spangroup_1_main_main_default, 0);
     lv_style_set_pad_left(&style_HA_dark_spangroup_1_main_main_default, 0);
     lv_style_set_shadow_width(&style_HA_dark_spangroup_1_main_main_default, 0);
+    lv_style_set_border_width(&style_HA_dark_spangroup_1_main_main_default, 0);
     lv_obj_add_style(ui->HA_dark_spangroup_1, &style_HA_dark_spangroup_1_main_main_default, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_spangroup_refr_mode(ui->HA_dark_spangroup_1);
-
-    UI_YIELD();
 
     //Write codes HA_dark_img_1
     ui->HA_dark_img_1 = lv_img_create(ui->HA_dark_time_card);
@@ -1007,21 +980,19 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_img_set_angle(ui->HA_dark_img_1, 0);
     lv_obj_set_pos(ui->HA_dark_img_1, 176, 2);
     lv_obj_set_size(ui->HA_dark_img_1, 60, 60);
-    UI_YIELD();
+
     //Write style for HA_dark_img_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_img_recolor_opa(ui->HA_dark_img_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_img_opa(ui->HA_dark_img_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->HA_dark_img_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_clip_corner(ui->HA_dark_img_1, true, LV_PART_MAIN|LV_STATE_DEFAULT);
-
-    UI_YIELD();
+    lv_obj_set_style_img_recolor_opa(ui->HA_dark_img_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(ui->HA_dark_img_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes HA_dark_menu
     ui->HA_dark_menu = lv_dropdown_create(ui->HA_dark);
     lv_dropdown_set_options(ui->HA_dark_menu, "HA\nPC");
     lv_obj_set_pos(ui->HA_dark_menu, 27, 32);
     lv_obj_set_size(ui->HA_dark_menu, 59, 30);
-    UI_YIELD();
+
     //Write style for HA_dark_menu, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_text_color(ui->HA_dark_menu, lv_color_hex(0xd2d2d2), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->HA_dark_menu, &lv_font_montserratMedium_15, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -1035,22 +1006,22 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_obj_set_style_bg_color(ui->HA_dark_menu, lv_color_hex(0x3E3F43), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->HA_dark_menu, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->HA_dark_menu, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    UI_YIELD();
+
     //Write style state: LV_STATE_CHECKED for &style_HA_dark_menu_extra_list_selected_checked
     static lv_style_t style_HA_dark_menu_extra_list_selected_checked;
     ui_init_style(&style_HA_dark_menu_extra_list_selected_checked);
-    UI_YIELD();
+
     lv_style_set_border_width(&style_HA_dark_menu_extra_list_selected_checked, 0);
     lv_style_set_radius(&style_HA_dark_menu_extra_list_selected_checked, 3);
     lv_style_set_bg_opa(&style_HA_dark_menu_extra_list_selected_checked, 255);
     lv_style_set_bg_color(&style_HA_dark_menu_extra_list_selected_checked, lv_color_hex(0x4F5159));
     lv_style_set_bg_grad_dir(&style_HA_dark_menu_extra_list_selected_checked, LV_GRAD_DIR_NONE);
     lv_obj_add_style(lv_dropdown_get_list(ui->HA_dark_menu), &style_HA_dark_menu_extra_list_selected_checked, LV_PART_SELECTED|LV_STATE_CHECKED);
-    UI_YIELD();
+
     //Write style state: LV_STATE_DEFAULT for &style_HA_dark_menu_extra_list_main_default
     static lv_style_t style_HA_dark_menu_extra_list_main_default;
     ui_init_style(&style_HA_dark_menu_extra_list_main_default);
-    UI_YIELD();
+
     lv_style_set_max_height(&style_HA_dark_menu_extra_list_main_default, 80);
     lv_style_set_text_color(&style_HA_dark_menu_extra_list_main_default, lv_color_hex(0xebebeb));
     lv_style_set_text_font(&style_HA_dark_menu_extra_list_main_default, &lv_font_montserratMedium_15);
@@ -1067,7 +1038,7 @@ void setup_scr_HA_dark(lv_ui *ui)
 
     //Update current screen layout.
     lv_obj_update_layout(ui->HA_dark);
-    UI_YIELD();
+
     //Init events for screen.
     events_init_HA_dark(ui);
 }

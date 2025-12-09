@@ -104,7 +104,6 @@ static bool update_wall_clock(system_metrics_t *metrics)
 static void lvgl_task(void *arg)
 {
     ESP_LOGI(TAG, "Initialize LVGL");
-    esp_task_wdt_add(NULL);
     lv_init();
 
     ESP_ERROR_CHECK(display_driver_init(NULL));

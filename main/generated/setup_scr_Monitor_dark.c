@@ -13,15 +13,6 @@
 #include "events_init.h"
 #include "widgets_init.h"
 #include "custom.h"
-#include "esp_task_wdt.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
-#define UI_YIELD()        \
-    do {                  \
-        esp_task_wdt_reset(); \
-        vTaskDelay(pdMS_TO_TICKS(1)); \
-    } while (0)
 
 
 
@@ -40,8 +31,6 @@ void setup_scr_Monitor_dark(lv_ui *ui)
     lv_obj_set_style_bg_opa(ui->Monitor_dark, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui->Monitor_dark, lv_color_hex(0x232429), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->Monitor_dark, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
-
-    UI_YIELD();
 
     //Write codes Monitor_dark_cont_time
     ui->Monitor_dark_cont_time = lv_obj_create(ui->Monitor_dark);
@@ -155,8 +144,6 @@ void setup_scr_Monitor_dark(lv_ui *ui)
     lv_obj_set_style_pad_bottom(ui->Monitor_dark_weekday, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui->Monitor_dark_weekday, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->Monitor_dark_weekday, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-
-    UI_YIELD();
 
     //Write codes Monitor_dark_cont_net
     ui->Monitor_dark_cont_net = lv_obj_create(ui->Monitor_dark);
@@ -1137,8 +1124,6 @@ void setup_scr_Monitor_dark(lv_ui *ui)
     lv_obj_set_style_pad_bottom(ui->Monitor_dark_gpu_temp_unit, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui->Monitor_dark_gpu_temp_unit, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->Monitor_dark_gpu_temp_unit, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-
-    UI_YIELD();
 
     //Write codes Monitor_dark_gpu_temp_data
     ui->Monitor_dark_gpu_temp_data = lv_label_create(ui->Monitor_dark_cont_gpu_monitor);
