@@ -129,6 +129,10 @@ static void lvgl_task(void *arg)
     latest_metrics.day_of_week = -1;
     TickType_t last_time_update = xTaskGetTickCount();
     bool needs_ui_update = update_wall_clock(&latest_metrics);
+    esp_err_t wdt_err = esp_task_wdt_add(NULL);
+    if (wdt_err != ESP_OK) {
+        ESP_LOGW(TAG, "Failed to add LVGL task to WDT (%s)", esp_err_to_name(wdt_err));
+    }
 
     while (1) {
         while (metrics_queue_pop(&latest_metrics)) {
@@ -148,7 +152,9 @@ static void lvgl_task(void *arg)
             needs_ui_update = false;
         }
         lv_timer_handler();
-        esp_task_wdt_reset();
+        if (wdt_err == ESP_OK) {
+            esp_task_wdt_reset();
+        }
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
