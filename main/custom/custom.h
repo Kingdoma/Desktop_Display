@@ -16,6 +16,14 @@ extern "C" {
 #include "gui_guider.h"
 #include "metrics.h"
 
+extern int Monitor_dark_digital_clock_time_hour_value;
+extern int Monitor_dark_digital_clock_time_min_value;
+extern int Monitor_dark_digital_clock_time_sec_value;
+extern char Monitor_dark_digital_clock_time_meridiem[3];
+extern int HA_dark_digital_clock_time_min_value;
+extern int HA_dark_digital_clock_time_hour_value;
+extern int HA_dark_digital_clock_time_sec_value;
+
 void custom_init(lv_ui *ui);
 void custom_update_metrics(lv_ui *ui, const system_metrics_t *metrics);
 void scrollable_disable(lv_obj_t *obj);

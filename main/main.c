@@ -10,6 +10,7 @@
 #include "esp_event.h"
 #include "esp_netif.h"
 #include "esp_sntp.h"
+#include "esp_netif_sntp.h"
 #include "protocol_examples_common.h"
 #include "nvs_flash.h"
 #include "lvgl.h"
@@ -35,7 +36,7 @@ static void time_sync_notification_cb(struct timeval *tv)
     ESP_LOGI(TAG, "SNTP time synchronized");
 }
 
-static void initialize_sntp(void)
+static void sntp_time_sync(void)
 {
     ESP_LOGI(TAG, "Initializing SNTP");
 
@@ -60,10 +61,18 @@ static void initialize_sntp(void)
         return;
     }
 
-    esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
-    esp_sntp_setservername(0, "pool.ntp.org");
-    esp_sntp_set_time_sync_notification_cb(time_sync_notification_cb);
-    esp_sntp_init();
+    esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG("pool.ntp.org");
+    config.sync_cb = time_sync_notification_cb;
+    esp_netif_sntp_init(&config);
+
+    // wait for time to be set
+    int retry = 0;
+    const int retry_count = 15;
+    while (esp_netif_sntp_sync_wait(2000 / portTICK_PERIOD_MS) == ESP_ERR_TIMEOUT && ++retry < retry_count) {
+        ESP_LOGI(TAG, "Waiting for system time to be set... (%d/%d)", retry, retry_count);
+    }
+
+    esp_netif_sntp_deinit();
 }
 
 static bool update_wall_clock(system_metrics_t *metrics)
@@ -108,6 +117,9 @@ static bool update_wall_clock(system_metrics_t *metrics)
     metrics->has_date = true;
     metrics->has_time = true;
     metrics->has_day_of_week = true;
+
+    ESP_LOGD(TAG, "Y:%d,M:%d,D:%d,H:%d,M:%d,S:%d,WD:%d,HD:%d,HT:%d,HWD:%d",
+        year, month, day, hour, minute, second, day_of_week, metrics->has_date, metrics->has_time, metrics->has_day_of_week);
 
     return changed;
 }
@@ -184,7 +196,10 @@ static void cdc_task(void *arg)
 
 void app_main(void)
 {
-    initialize_sntp();
+    // set time zone and perform a sync
+    setenv("TZ", "CST-8", 1);
+    tzset();
+    sntp_time_sync();
 
     xTaskCreate(lvgl_task, "lvgl_task", 4096, NULL, 2, NULL);
 

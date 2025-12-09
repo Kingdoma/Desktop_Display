@@ -49,17 +49,6 @@ bool metrics_decode_packet(const uint8_t *data, size_t len, system_metrics_t *ou
     out->gram_usage_percent = (float)packet->gram_usage_tenths / 10.0f;
     out->ram_usage_percent = (float)packet->ram_usage_tenths / 10.0f;
 
-    /* Time is now sourced from SNTP; ignore any wall-clock fields sent over CDC */
-    out->has_date = false;
-    out->has_time = false;
-    out->has_day_of_week = false;
-    out->year = 0;
-    out->month = 0;
-    out->day = 0;
-    out->hour = 0;
-    out->minute = 0;
-    out->second = 0;
-
     return true;
 }
 

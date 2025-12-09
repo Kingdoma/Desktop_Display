@@ -149,16 +149,16 @@ void Monitor_dark_datetext_date_calendar_event_handler(lv_event_t *e)
 }
 
 
-extern int HA_dark_digital_clock_1_hour_value;
-extern int HA_dark_digital_clock_1_min_value;
-extern int HA_dark_digital_clock_1_sec_value;
+extern int HA_dark_digital_clock_time_hour_value;
+extern int HA_dark_digital_clock_time_min_value;
+extern int HA_dark_digital_clock_time_sec_value;
 
-void HA_dark_digital_clock_1_timer(lv_timer_t *timer)
+void HA_dark_digital_clock_time_timer(lv_timer_t *timer)
 {
-    clock_count_24(&HA_dark_digital_clock_1_hour_value, &HA_dark_digital_clock_1_min_value, &HA_dark_digital_clock_1_sec_value);
-    if (lv_obj_is_valid(guider_ui.HA_dark_digital_clock_1))
+    clock_count_24(&HA_dark_digital_clock_time_hour_value, &HA_dark_digital_clock_time_min_value, &HA_dark_digital_clock_time_sec_value);
+    if (lv_obj_is_valid(guider_ui.HA_dark_digital_clock_time))
     {
-        lv_dclock_set_text_fmt(guider_ui.HA_dark_digital_clock_1, "%d:%02d:%02d", HA_dark_digital_clock_1_hour_value, HA_dark_digital_clock_1_min_value, HA_dark_digital_clock_1_sec_value);
+        lv_dclock_set_text_fmt(guider_ui.HA_dark_digital_clock_time, "%d:%02d:%02d", HA_dark_digital_clock_time_hour_value, HA_dark_digital_clock_time_min_value, HA_dark_digital_clock_time_sec_value);
     }
 }
 
