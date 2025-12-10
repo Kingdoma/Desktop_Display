@@ -9,6 +9,7 @@ idf_component_register(
         "display_driver.c"
         "tinyusb_cdc.c"
         "metrics.c"
+        "ha_sync.c"
         ${GUI_GUIDER_SOURCES}
     INCLUDE_DIRS
         "."

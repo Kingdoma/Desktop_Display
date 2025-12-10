@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 #include <time.h>
 #include <sys/time.h>
 #include "freertos/FreeRTOS.h"
@@ -21,8 +22,15 @@
 #include "metrics.h"
 #include "app_main.h"
 #include "esp_task_wdt.h"
+#include "ha_sync.h"
 
 #define TAG "app_main"
+
+#define HA_BASE_URL "http://homeassistant.local:8123"
+#define HA_ENTITY_ID_LIGHT "switch.example_light"
+#define HA_ENTITY_ID_FAN   "fan.example_fan"
+#define HA_TOKEN "YOUR_LONG_LIVED_ACCESS_TOKEN"
+#define HA_POLL_INTERVAL_MS 5000
 
 lv_ui guider_ui;
 
@@ -133,6 +141,52 @@ static void sntp_task(void *arg)
     vTaskDelete(NULL);
 }
 
+static void ha_remote_state_light(const char *state, void *user_ctx)
+{
+    (void)user_ctx;
+    if (!state) {
+        return;
+    }
+    ESP_LOGI(TAG, "HA light state update: %s", state);
+    // TODO: apply to local light/relay.
+}
+
+static void ha_remote_state_fan(const char *state, void *user_ctx)
+{
+    (void)user_ctx;
+    if (!state) {
+        return;
+    }
+    ESP_LOGI(TAG, "HA fan state update: %s", state);
+    // TODO: apply to local fan control.
+}
+
+static void start_ha_sync(void)
+{
+    if (strcmp(HA_TOKEN, "YOUR_LONG_LIVED_ACCESS_TOKEN") == 0) {
+        ESP_LOGW(TAG, "HA sync disabled: set HA_TOKEN to your long-lived access token");
+        return;
+    }
+
+    static const ha_entity_config_t entities[] = {
+        { .entity_id = HA_ENTITY_ID_LIGHT, .on_remote_state = ha_remote_state_light, .user_ctx = NULL },
+        { .entity_id = HA_ENTITY_ID_FAN,   .on_remote_state = ha_remote_state_fan,   .user_ctx = NULL },
+    };
+
+    ha_sync_config_t cfg = {
+        .base_url = HA_BASE_URL,
+        .auth_token = HA_TOKEN,
+        .poll_interval_ms = HA_POLL_INTERVAL_MS,
+        .entities = entities,
+        .entity_count = sizeof(entities) / sizeof(entities[0]),
+    };
+
+    esp_err_t err = ha_sync_start(&cfg);
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG, "Failed to start HA sync: %s", esp_err_to_name(err));
+    }
+}
+
 static void lvgl_task(void *arg)
 {
     ESP_LOGI(TAG, "Initialize LVGL");
@@ -211,6 +265,8 @@ void app_main(void)
     xTaskCreate(lvgl_task, "lvgl_task", 4096, NULL, 2, NULL);
 
     xTaskCreate(cdc_task, "cdc_task", 4096, NULL, 2, NULL);
+
+    start_ha_sync();
 
     ESP_LOGI(TAG, "LVGL task started");
 }
