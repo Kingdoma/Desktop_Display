@@ -124,6 +124,15 @@ static bool update_wall_clock(system_metrics_t *metrics)
     return changed;
 }
 
+static void sntp_task(void *arg)
+{
+    ESP_LOGI(TAG, "Initialize sntp sync");
+    setenv("TZ", "CST-8", 1);
+    tzset();
+    sntp_time_sync();
+    vTaskDelete(NULL);
+}
+
 static void lvgl_task(void *arg)
 {
     ESP_LOGI(TAG, "Initialize LVGL");
@@ -196,10 +205,8 @@ static void cdc_task(void *arg)
 
 void app_main(void)
 {
-    // set time zone and perform a sync
-    setenv("TZ", "CST-8", 1);
-    tzset();
-    sntp_time_sync();
+    // SNTP sync performs networking and logging; give it a real stack to avoid corruption.
+    xTaskCreate(sntp_task, "sntp_task", 4096, NULL, 2, NULL);
 
     xTaskCreate(lvgl_task, "lvgl_task", 4096, NULL, 2, NULL);
 
