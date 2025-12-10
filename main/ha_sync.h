@@ -1,4 +1,4 @@
-// Home Assistant HTTP sync helper.
+// Home Assistant sync helper (WebSocket + REST).
 #pragma once
 
 #include "esp_err.h"

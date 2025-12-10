@@ -23,3 +23,5 @@ dependencies:
 
   espressif/esp_tinyusb: "^1.7.6"
   espressif/tinyusb: "^0.18.0"
+
+  espressif/esp_websocket_client: ^1.6.0

@@ -79,7 +79,7 @@ static void HA_dark_temp_slider_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_VALUE_CHANGED:
     {
-        snprintf(buf, 4, "%u", lv_slider_get_value(guider_ui.HA_dark_temp_slider));
+        snprintf(buf, 4, "%lu", lv_slider_get_value(guider_ui.HA_dark_temp_slider));
         lv_label_set_text(guider_ui.HA_dark_ac_temp, buf);
 
         ac.temp = lv_slider_get_value(guider_ui.HA_dark_temp_slider);
