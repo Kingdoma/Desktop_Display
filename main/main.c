@@ -20,11 +20,51 @@
 #include "tinyusb_cdc.h"
 #include "metrics.h"
 #include "app_main.h"
+#include "ha_sync.h"
 #include "esp_task_wdt.h"
 
 #define TAG "app_main"
 
 lv_ui guider_ui;
+
+static esp_err_t init_network(void)
+{
+    static bool initialized = false;
+    if (initialized) {
+        return ESP_OK;
+    }
+
+    esp_err_t err = nvs_flash_init();
+    if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        err = nvs_flash_init();
+    }
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "nvs_flash_init failed: %s", esp_err_to_name(err));
+        return err;
+    }
+
+    err = esp_netif_init();
+    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
+        ESP_LOGE(TAG, "esp_netif_init failed: %s", esp_err_to_name(err));
+        return err;
+    }
+
+    err = esp_event_loop_create_default();
+    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
+        ESP_LOGE(TAG, "esp_event_loop_create_default failed: %s", esp_err_to_name(err));
+        return err;
+    }
+
+    err = example_connect();
+    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
+        ESP_LOGE(TAG, "example_connect failed: %s", esp_err_to_name(err));
+        return err;
+    }
+
+    initialized = true;
+    return ESP_OK;
+}
 
 static void lvgl_tick_cb(void *arg)
 {
@@ -39,25 +79,8 @@ static void time_sync_notification_cb(struct timeval *tv)
 static void sntp_time_sync(void)
 {
     ESP_LOGI(TAG, "Initializing SNTP");
-
-    ESP_ERROR_CHECK(nvs_flash_init());
-
-    esp_err_t err = esp_netif_init();
-    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
-        ESP_LOGE(TAG, "esp_netif_init failed: %s", esp_err_to_name(err));
-        return;
-    }
-
-    err = esp_event_loop_create_default();
-    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
-        ESP_LOGE(TAG, "esp_event_loop_create_default failed: %s", esp_err_to_name(err));
-        return;
-    }
-
-    // connect to internet
-    err = example_connect();
-    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
-        ESP_LOGE(TAG, "esp_wifi_connect failed: %s", esp_err_to_name(err));
+    if (init_network() != ESP_OK) {
+        ESP_LOGE(TAG, "Network init failed; SNTP not started");
         return;
     }
 
@@ -158,6 +181,7 @@ static void lvgl_task(void *arg)
     metrics_queue_init();
 
     system_metrics_t latest_metrics = {0};
+    ha_state_t latest_ha_state = {0};
     latest_metrics.day_of_week = -1;
     TickType_t last_time_update = xTaskGetTickCount();
     bool needs_ui_update = update_wall_clock(&latest_metrics);
@@ -169,6 +193,10 @@ static void lvgl_task(void *arg)
     while (1) {
         while (metrics_queue_pop(&latest_metrics)) {
             needs_ui_update = true;
+        }
+
+        while (ha_sync_state_pop(&latest_ha_state)) {
+            custom_update_ha_state(&guider_ui, &latest_ha_state);
         }
 
         const TickType_t now = xTaskGetTickCount();
@@ -205,6 +233,12 @@ static void cdc_task(void *arg)
 
 void app_main(void)
 {
+    if (init_network() != ESP_OK) {
+        ESP_LOGW(TAG, "Network init failed; continuing without MQTT/SNTP connectivity");
+    } else {
+        ha_sync_task_start();
+    }
+
     // SNTP sync performs networking and logging; give it a real stack to avoid corruption.
     xTaskCreate(sntp_task, "sntp_task", 4096, NULL, 2, NULL);
 

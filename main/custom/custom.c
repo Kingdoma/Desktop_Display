@@ -15,10 +15,14 @@
 #include <stdbool.h>
 #include "lvgl.h"
 #include "custom.h"
+#include "esp_log.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define TAG "custom"
+
+extern lv_ui guider_ui;
 
 /**********************
  *      TYPEDEFS
@@ -79,6 +83,19 @@ static void spangroup_set(const lv_obj_t* obj, uint8_t idx, float data, uint8_t 
 
     lv_span_set_text(span, data_text);
     return;
+}
+
+static void spangroup_set_text_idx(const lv_obj_t *obj, uint8_t idx, const char *text)
+{
+    if (!obj || !text) {
+        return;
+    }
+
+    lv_span_t *span = lv_spangroup_get_child(obj, idx);
+    if (span) {
+        lv_span_set_text(span, text);
+        lv_spangroup_refr_mode(obj);
+    }
 }
 
 static void monitor_panel_update(lv_ui *ui, const system_metrics_t *metrics)
@@ -225,6 +242,195 @@ void custom_update_metrics(lv_ui *ui, const system_metrics_t *metrics)
         ha_panel_update(ui, metrics);
     }
 
+}
+
+static void update_ac_mode(lv_ui *ui, ha_climate_mode_t mode)
+{
+    if (!ui) {
+        return;
+    }
+
+    if (ui->HA_dark_ac_off && lv_obj_is_valid(ui->HA_dark_ac_off)) {
+        lv_obj_clear_state(ui->HA_dark_ac_off, LV_STATE_CHECKED);
+    }
+    if (ui->HA_dark_ac_cool && lv_obj_is_valid(ui->HA_dark_ac_cool)) {
+        lv_obj_clear_state(ui->HA_dark_ac_cool, LV_STATE_CHECKED);
+    }
+    if (ui->HA_dark_ac_heat && lv_obj_is_valid(ui->HA_dark_ac_heat)) {
+        lv_obj_clear_state(ui->HA_dark_ac_heat, LV_STATE_CHECKED);
+    }
+
+    lv_color_t indicator_color = lv_color_hex(0x686868);
+    switch (mode) {
+    case HA_CLIMATE_MODE_COOL:
+        if (ui->HA_dark_ac_cool) {
+            lv_obj_add_state(ui->HA_dark_ac_cool, LV_STATE_CHECKED);
+        }
+        indicator_color = lv_color_hex(0x2195f6);
+        break;
+    case HA_CLIMATE_MODE_HEAT:
+        if (ui->HA_dark_ac_heat) {
+            lv_obj_add_state(ui->HA_dark_ac_heat, LV_STATE_CHECKED);
+        }
+        indicator_color = lv_color_hex(0xea7b32);
+        break;
+    case HA_CLIMATE_MODE_OFF:
+    default:
+        if (ui->HA_dark_ac_off) {
+            lv_obj_add_state(ui->HA_dark_ac_off, LV_STATE_CHECKED);
+        }
+        indicator_color = lv_color_hex(0x686868);
+        break;
+    }
+
+    if (ui->HA_dark_temp_slider && lv_obj_is_valid(ui->HA_dark_temp_slider)) {
+        lv_obj_set_style_bg_color(ui->HA_dark_temp_slider, indicator_color, LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    }
+}
+
+static int16_t clamp_slider_value(const lv_obj_t *slider, int16_t value)
+{
+    if (!slider) {
+        return value;
+    }
+    const int32_t min = lv_slider_get_min_value(slider);
+    const int32_t max = lv_slider_get_max_value(slider);
+    if (value < min) {
+        return (int16_t)min;
+    }
+    if (value > max) {
+        return (int16_t)max;
+    }
+    return value;
+}
+
+void custom_update_ha_state(lv_ui *ui, const ha_state_t *state)
+{
+    if (!ui || !state) {
+        return;
+    }
+
+    if (!ui->HA_dark || !lv_obj_is_valid(ui->HA_dark)) {
+        return;
+    }
+
+    if (state->has_temperature && ui->HA_dark_temp_info) {
+        char temp_text[16];
+        snprintf(temp_text, sizeof(temp_text), "%.1f°C", state->temperature_c);
+        spangroup_set_text_idx(ui->HA_dark_temp_info, 0, temp_text);
+    }
+
+    if (state->has_humidity && ui->HA_dark_hum_info) {
+        char hum_text[16];
+        snprintf(hum_text, sizeof(hum_text), "%.1f%%", state->humidity_percent);
+        spangroup_set_text_idx(ui->HA_dark_hum_info, 0, hum_text);
+    }
+
+    if (state->has_switch1) {
+        if (ui->HA_dark_sw_1) {
+            if (state->switch1_on) {
+                lv_obj_add_state(ui->HA_dark_sw_1, LV_STATE_CHECKED);
+            } else {
+                lv_obj_clear_state(ui->HA_dark_sw_1, LV_STATE_CHECKED);
+            }
+        }
+        if (ui->HA_dark_sw_info_1) {
+            spangroup_set_text_idx(ui->HA_dark_sw_info_1, 0, state->switch1_on ? "On" : "Off");
+        }
+    }
+
+    if (state->has_switch2) {
+        if (ui->HA_dark_sw_2) {
+            if (state->switch2_on) {
+                lv_obj_add_state(ui->HA_dark_sw_2, LV_STATE_CHECKED);
+            } else {
+                lv_obj_clear_state(ui->HA_dark_sw_2, LV_STATE_CHECKED);
+            }
+        }
+        if (ui->HA_dark_sw_info_2) {
+            spangroup_set_text_idx(ui->HA_dark_sw_info_2, 0, state->switch2_on ? "On" : "Off");
+        }
+    }
+
+    if (state->has_printer_progress && ui->HA_dark_printer_slider) {
+        lv_slider_set_range(ui->HA_dark_printer_slider, 0, 100);
+        const int16_t progress = clamp_slider_value(ui->HA_dark_printer_slider, (int16_t)(state->printer_progress + 0.5f));
+        lv_slider_set_value(ui->HA_dark_printer_slider, progress, LV_ANIM_OFF);
+        if (ui->HA_dark_printer_info) {
+            char progress_text[12];
+            snprintf(progress_text, sizeof(progress_text), "%d%%", (int)progress);
+            spangroup_set_text_idx(ui->HA_dark_printer_info, 2, progress_text);
+        }
+    }
+
+    if (state->has_target_temp && ui->HA_dark_temp_slider) {
+        const int16_t temp_value = clamp_slider_value(ui->HA_dark_temp_slider, (int16_t)(state->target_temp_c + 0.5f));
+        lv_slider_set_value(ui->HA_dark_temp_slider, temp_value, LV_ANIM_OFF);
+        if (ui->HA_dark_ac_temp) {
+            lv_label_set_text_fmt(ui->HA_dark_ac_temp, "%d", (int)temp_value);
+        }
+    }
+
+    if (state->has_climate_mode) {
+        update_ac_mode(ui, state->climate_mode);
+    }
+}
+
+void custom_handle_switch(uint8_t index, bool on)
+{
+    esp_err_t err = ha_sync_publish_switch(index, on);
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG, "Failed to publish switch%u -> %d (%s)", (unsigned)index, on, esp_err_to_name(err));
+    }
+}
+
+void custom_handle_ac_mode(ha_climate_mode_t mode)
+{
+    update_ac_mode(&guider_ui, mode);
+    esp_err_t err = ha_sync_publish_climate_mode(mode);
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG, "Failed to publish climate mode (%s)", esp_err_to_name(err));
+    }
+}
+
+void custom_handle_ac_target_temp(int32_t temp_c)
+{
+    if (temp_c < 0) {
+        temp_c = 0;
+    }
+    if (temp_c > 50) {
+        temp_c = 50;
+    }
+    if (guider_ui.HA_dark_temp_slider && lv_obj_is_valid(guider_ui.HA_dark_temp_slider)) {
+        lv_slider_set_value(guider_ui.HA_dark_temp_slider, temp_c, LV_ANIM_OFF);
+    }
+    if (guider_ui.HA_dark_ac_temp && lv_obj_is_valid(guider_ui.HA_dark_ac_temp)) {
+        lv_label_set_text_fmt(guider_ui.HA_dark_ac_temp, "%d", (int)temp_c);
+    }
+
+    esp_err_t err = ha_sync_publish_climate_temp((float)temp_c);
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG, "Failed to publish climate temp (%s)", esp_err_to_name(err));
+    }
+}
+
+void custom_handle_printer_progress(int32_t progress)
+{
+    if (progress < 0) {
+        progress = 0;
+    }
+    if (progress > 100) {
+        progress = 100;
+    }
+
+    if (guider_ui.HA_dark_printer_slider && lv_obj_is_valid(guider_ui.HA_dark_printer_slider)) {
+        lv_slider_set_value(guider_ui.HA_dark_printer_slider, progress, LV_ANIM_OFF);
+    }
+
+    esp_err_t err = ha_sync_publish_printer_progress((float)progress);
+    if (err != ESP_OK) {
+        ESP_LOGW(TAG, "Failed to publish printer progress (%s)", esp_err_to_name(err));
+    }
 }
 
 void scrollable_disable(lv_obj_t *obj){

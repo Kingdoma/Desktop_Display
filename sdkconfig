@@ -596,6 +596,27 @@ CONFIG_PARTITION_TABLE_MD5=y
 # end of Partition Table
 
 #
+# Home Assistant MQTT
+#
+CONFIG_HA_MQTT_ENABLE=y
+CONFIG_HA_MQTT_BROKER_URI="mqtt://homeassistant.local"
+CONFIG_HA_MQTT_USERNAME=""
+CONFIG_HA_MQTT_PASSWORD=""
+CONFIG_HA_MQTT_TEMP_STATE_TOPIC="homeassistant/sensor/room_temperature/state"
+CONFIG_HA_MQTT_HUM_STATE_TOPIC="homeassistant/sensor/room_humidity/state"
+CONFIG_HA_MQTT_SWITCH1_STATE_TOPIC="homeassistant/switch/switch1/state"
+CONFIG_HA_MQTT_SWITCH1_COMMAND_TOPIC="homeassistant/switch/switch1/set"
+CONFIG_HA_MQTT_SWITCH2_STATE_TOPIC="homeassistant/switch/switch2/state"
+CONFIG_HA_MQTT_SWITCH2_COMMAND_TOPIC="homeassistant/switch/switch2/set"
+CONFIG_HA_MQTT_CLIMATE_MODE_STATE_TOPIC="homeassistant/climate/thermostat/mode"
+CONFIG_HA_MQTT_CLIMATE_MODE_COMMAND_TOPIC="homeassistant/climate/thermostat/mode/set"
+CONFIG_HA_MQTT_CLIMATE_TEMP_STATE_TOPIC="homeassistant/climate/thermostat/target_temp"
+CONFIG_HA_MQTT_CLIMATE_TEMP_COMMAND_TOPIC="homeassistant/climate/thermostat/target_temp/set"
+CONFIG_HA_MQTT_PRINTER_STATE_TOPIC="homeassistant/sensor/printer/progress"
+CONFIG_HA_MQTT_PRINTER_COMMAND_TOPIC="homeassistant/sensor/printer/progress/set"
+# end of Home Assistant MQTT
+
+#
 # Example Connection Configuration
 #
 CONFIG_ENV_GPIO_RANGE_MIN=0

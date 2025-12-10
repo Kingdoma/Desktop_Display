@@ -1,0 +1,82 @@
+menu "Home Assistant MQTT"
+
+config HA_MQTT_ENABLE
+    bool "Enable Home Assistant MQTT sync"
+    default y
+
+config HA_MQTT_BROKER_URI
+    string "MQTT broker URI"
+    depends on HA_MQTT_ENABLE
+    default "mqtt://homeassistant.local"
+
+config HA_MQTT_USERNAME
+    string "MQTT username"
+    depends on HA_MQTT_ENABLE
+    default ""
+
+config HA_MQTT_PASSWORD
+    string "MQTT password"
+    depends on HA_MQTT_ENABLE
+    default ""
+
+config HA_MQTT_TEMP_STATE_TOPIC
+    string "Temperature state topic"
+    depends on HA_MQTT_ENABLE
+    default "homeassistant/sensor/room_temperature/state"
+
+config HA_MQTT_HUM_STATE_TOPIC
+    string "Humidity state topic"
+    depends on HA_MQTT_ENABLE
+    default "homeassistant/sensor/room_humidity/state"
+
+config HA_MQTT_SWITCH1_STATE_TOPIC
+    string "Switch 1 state topic"
+    depends on HA_MQTT_ENABLE
+    default "homeassistant/switch/switch1/state"
+
+config HA_MQTT_SWITCH1_COMMAND_TOPIC
+    string "Switch 1 command topic"
+    depends on HA_MQTT_ENABLE
+    default "homeassistant/switch/switch1/set"
+
+config HA_MQTT_SWITCH2_STATE_TOPIC
+    string "Switch 2 state topic"
+    depends on HA_MQTT_ENABLE
+    default "homeassistant/switch/switch2/state"
+
+config HA_MQTT_SWITCH2_COMMAND_TOPIC
+    string "Switch 2 command topic"
+    depends on HA_MQTT_ENABLE
+    default "homeassistant/switch/switch2/set"
+
+config HA_MQTT_CLIMATE_MODE_STATE_TOPIC
+    string "Climate mode state topic"
+    depends on HA_MQTT_ENABLE
+    default "homeassistant/climate/thermostat/mode"
+
+config HA_MQTT_CLIMATE_MODE_COMMAND_TOPIC
+    string "Climate mode command topic"
+    depends on HA_MQTT_ENABLE
+    default "homeassistant/climate/thermostat/mode/set"
+
+config HA_MQTT_CLIMATE_TEMP_STATE_TOPIC
+    string "Climate target temperature state topic"
+    depends on HA_MQTT_ENABLE
+    default "homeassistant/climate/thermostat/target_temp"
+
+config HA_MQTT_CLIMATE_TEMP_COMMAND_TOPIC
+    string "Climate target temperature command topic"
+    depends on HA_MQTT_ENABLE
+    default "homeassistant/climate/thermostat/target_temp/set"
+
+config HA_MQTT_PRINTER_STATE_TOPIC
+    string "Printer progress state topic"
+    depends on HA_MQTT_ENABLE
+    default "homeassistant/sensor/printer/progress"
+
+config HA_MQTT_PRINTER_COMMAND_TOPIC
+    string "Printer progress command topic"
+    depends on HA_MQTT_ENABLE
+    default "homeassistant/sensor/printer/progress/set"
+
+endmenu
