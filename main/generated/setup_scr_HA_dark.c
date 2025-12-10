@@ -348,15 +348,12 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_obj_set_size(ui->HA_dark_hum_icon, 35, 35);
 
     //Write style for HA_dark_hum_icon, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_border_width(ui->HA_dark_hum_icon, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(ui->HA_dark_hum_icon, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(ui->HA_dark_hum_icon, lv_color_hex(0x00a1ff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_border_side(ui->HA_dark_hum_icon, LV_BORDER_SIDE_FULL, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui->HA_dark_hum_icon, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->HA_dark_hum_icon, 18, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->HA_dark_hum_icon, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->HA_dark_hum_icon, &lv_font_montserratMedium_16, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->HA_dark_hum_icon, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_letter_space(ui->HA_dark_hum_icon, 2, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_letter_space(ui->HA_dark_hum_icon, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ui->HA_dark_hum_icon, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->HA_dark_hum_icon, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui->HA_dark_hum_icon, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -366,10 +363,22 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_obj_set_style_pad_right(ui->HA_dark_hum_icon, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui->HA_dark_hum_icon, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui->HA_dark_hum_icon, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_img_src(ui->HA_dark_hum_icon, &_humidity_35x35, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_img_opa(ui->HA_dark_hum_icon, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_img_recolor_opa(ui->HA_dark_hum_icon, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->HA_dark_hum_icon, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+
+    //Write codes HA_dark_hum_icon_f
+    ui->HA_dark_hum_icon_f = lv_img_create(ui->HA_dark_humidity_card);
+    lv_obj_add_flag(ui->HA_dark_hum_icon_f, LV_OBJ_FLAG_CLICKABLE);
+    lv_img_set_src(ui->HA_dark_hum_icon_f, &_humidity_alpha_28x28);
+    lv_img_set_pivot(ui->HA_dark_hum_icon_f, 50,50);
+    lv_img_set_angle(ui->HA_dark_hum_icon_f, 0);
+    lv_obj_set_pos(ui->HA_dark_hum_icon_f, 13, 11);
+    lv_obj_set_size(ui->HA_dark_hum_icon_f, 28, 28);
+
+    //Write style for HA_dark_hum_icon_f, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_img_recolor_opa(ui->HA_dark_hum_icon_f, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(ui->HA_dark_hum_icon_f, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->HA_dark_hum_icon_f, 18, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(ui->HA_dark_hum_icon_f, true, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes HA_dark_switch_card_2
     ui->HA_dark_switch_card_2 = lv_obj_create(ui->HA_dark);

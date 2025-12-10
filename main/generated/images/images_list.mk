@@ -1,1 +1,1 @@
-GEN_CSRCS += _download_alpha_13x13.c _upload_alpha_13x13.c _temperature_35x35.c _humidity_35x35.c _cloudy_alpha_60x60.c
+GEN_CSRCS += _download_alpha_13x13.c _upload_alpha_13x13.c _temperature_35x35.c _humidity_alpha_28x28.c _cloudy_alpha_60x60.c

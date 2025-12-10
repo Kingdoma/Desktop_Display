@@ -83,6 +83,7 @@ typedef struct
 	lv_span_t *HA_dark_hum_info_span;
 	lv_obj_t *HA_dark_hum_title;
 	lv_obj_t *HA_dark_hum_icon;
+	lv_obj_t *HA_dark_hum_icon_f;
 	lv_obj_t *HA_dark_switch_card_2;
 	lv_obj_t *HA_dark_sw_info_2;
 	lv_span_t *HA_dark_sw_info_2_span;
@@ -143,8 +144,7 @@ LV_IMG_DECLARE(_download_alpha_13x13);
 LV_IMG_DECLARE(_upload_alpha_13x13);
 
 LV_IMG_DECLARE(_temperature_35x35);
-
-LV_IMG_DECLARE(_humidity_35x35);
+LV_IMG_DECLARE(_humidity_alpha_28x28);
 LV_IMG_DECLARE(_cloudy_alpha_60x60);
 
 LV_FONT_DECLARE(lv_font_montserratMedium_17)
