@@ -13,19 +13,25 @@
 #include "esp_http_client.h"
 #include "esp_websocket_client.h"
 #include "esp_event.h"
+#include "esp_wifi.h"
 #include "esp_check.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
+#include "freertos/event_groups.h"
 #include "cJSON.h"
 
 #define HA_TAG "ha_sync"
+#define HA_HTTP_BUF_SIZE 2048
+#define HA_TASK_STACK_BYTES 8192
+#define WIFI_CONNECTED_BIT BIT0
 
 typedef struct {
     char *entity_id;
     ha_state_cb_t on_remote_state;
     void *user_ctx;
+    bool skip_poll;
 } ha_entity_t;
 
 typedef struct {
@@ -53,6 +59,9 @@ typedef struct {
 } ha_msg_t;
 
 static ha_sync_ctx_t g_ctx = {0};
+static EventGroupHandle_t g_net_events;
+static esp_event_handler_instance_t g_ip_handler;
+static esp_event_handler_instance_t g_wifi_handler;
 
 static void ha_free_ctx(void)
 {
@@ -80,6 +89,19 @@ static void ha_free_ctx(void)
     }
     g_ctx.entity_count = 0;
     g_ctx.task = NULL;
+
+    if (g_net_events) {
+        if (g_ip_handler) {
+            esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, g_ip_handler);
+            g_ip_handler = NULL;
+        }
+        if (g_wifi_handler) {
+            esp_event_handler_instance_unregister(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, g_wifi_handler);
+            g_wifi_handler = NULL;
+        }
+        vEventGroupDelete(g_net_events);
+        g_net_events = NULL;
+    }
 }
 
 static char *dup_string(const char *in)
@@ -120,26 +142,53 @@ static esp_err_t http_request(const char *url,
     if (g_ctx.auth_header) {
         esp_http_client_set_header(client, "Authorization", g_ctx.auth_header);
     }
+    size_t body_len = body ? strlen(body) : 0;
     if (body) {
         esp_http_client_set_header(client, "Content-Type", "application/json");
-        esp_http_client_set_post_field(client, body, strlen(body));
     }
 
-    esp_err_t err = esp_http_client_perform(client);
-    if (err == ESP_OK) {
-        if (status_code) {
-            *status_code = esp_http_client_get_status_code(client);
+    esp_err_t err = esp_http_client_open(client, (int)body_len);
+    if (err != ESP_OK) {
+        ESP_LOGW(HA_TAG, "HTTP open failed: %s", esp_err_to_name(err));
+        goto cleanup;
+    }
+
+    if (body_len > 0) {
+        int written = esp_http_client_write(client, body, (int)body_len);
+        if (written < 0) {
+            ESP_LOGW(HA_TAG, "HTTP write failed");
+            err = ESP_FAIL;
+            goto cleanup_close;
         }
-        if (out && out_len > 0) {
-            int read = esp_http_client_read_response(client, out, out_len - 1);
-            if (read < 0) {
-                out[0] = '\0';
-            } else {
-                out[read] = '\0';
+    }
+
+    int64_t content_len = esp_http_client_fetch_headers(client);
+    if (status_code) {
+        *status_code = esp_http_client_get_status_code(client);
+    }
+    if (err != ESP_OK) {
+        goto cleanup_close;
+    }
+
+    if (out && out_len > 0) {
+        int total = 0;
+        int r = 0;
+        do {
+            r = esp_http_client_read(client, out + total, (int)(out_len - 1 - total));
+            if (r > 0) {
+                total += r;
             }
+        } while (r > 0 && total < (int)(out_len - 1));
+        out[total] = '\0';
+
+        if (content_len > 0 && content_len > total) {
+            ESP_LOGW(HA_TAG, "HTTP body truncated (%d/%d bytes)", total, (int)content_len);
         }
     }
 
+cleanup_close:
+    esp_http_client_close(client);
+cleanup:
     esp_http_client_cleanup(client);
     return err;
 }
@@ -153,7 +202,7 @@ static esp_err_t ha_fetch_remote_state(const char *entity_id, char *state_buf, s
         return ESP_ERR_INVALID_SIZE;
     }
 
-    char resp[512];
+    char resp[HA_HTTP_BUF_SIZE];
     int status = 0;
     esp_err_t err = http_request(url, HTTP_METHOD_GET, NULL, resp, sizeof(resp), &status);
     if (err != ESP_OK) {
@@ -161,13 +210,13 @@ static esp_err_t ha_fetch_remote_state(const char *entity_id, char *state_buf, s
         return err;
     }
     if (status != 200) {
-        ESP_LOGW(HA_TAG, "GET returned HTTP %d", status);
-        return ESP_FAIL;
+        ESP_LOGW(HA_TAG, "GET %s returned HTTP %d", entity_id, status);
+        return status == 404 ? ESP_ERR_NOT_FOUND : ESP_FAIL;
     }
 
     cJSON *root = cJSON_Parse(resp);
     if (!root) {
-        ESP_LOGW(HA_TAG, "Failed to parse HA response");
+        ESP_LOGW(HA_TAG, "Failed to parse HA response (status=%d, len=%d): %s", status, (int)strlen(resp), resp);
         return ESP_FAIL;
     }
 
@@ -209,7 +258,7 @@ static esp_err_t ha_push_state(const char *entity_id, const char *state)
     return ESP_OK;
 }
 
-static const ha_entity_t *find_entity(const char *entity_id)
+static ha_entity_t *find_entity(const char *entity_id)
 {
     if (!entity_id) {
         return NULL;
@@ -233,6 +282,43 @@ static void enqueue_event(const char *entity_id, const char *state)
     strlcpy(msg.entity_id, entity_id, sizeof(msg.entity_id));
     strlcpy(msg.state, state, sizeof(msg.state));
     xQueueSend(g_ctx.queue, &msg, 0);
+}
+
+static void on_ip_event(void *arg, esp_event_base_t base, int32_t id, void *data)
+{
+    (void)arg;
+    (void)base;
+    (void)data;
+    if (id == IP_EVENT_STA_GOT_IP && g_net_events) {
+        xEventGroupSetBits(g_net_events, WIFI_CONNECTED_BIT);
+    }
+}
+
+static void on_wifi_event(void *arg, esp_event_base_t base, int32_t id, void *data)
+{
+    (void)arg;
+    (void)data;
+    if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED && g_net_events) {
+        xEventGroupClearBits(g_net_events, WIFI_CONNECTED_BIT);
+    }
+}
+
+static bool wait_for_wifi_connected(TickType_t wait_ticks)
+{
+    if (!g_net_events) {
+        return true; // assume ready if we couldn't create tracking
+    }
+    EventBits_t bits = xEventGroupWaitBits(g_net_events, WIFI_CONNECTED_BIT, pdFALSE, pdFALSE, wait_ticks);
+    if ((bits & WIFI_CONNECTED_BIT) != 0) {
+        return true;
+    }
+    // Poll WiFi state in case we missed the event (e.g., handler not yet registered).
+    wifi_ap_record_t ap = {0};
+    if (esp_wifi_sta_get_ap_info(&ap) == ESP_OK) {
+        xEventGroupSetBits(g_net_events, WIFI_CONNECTED_BIT);
+        return true;
+    }
+    return false;
 }
 
 static esp_err_t enqueue_push(const char *entity_id, const char *state)
@@ -280,7 +366,9 @@ static void handle_ws_payload(const char *payload)
 
     cJSON *root = cJSON_Parse(payload);
     if (!root) {
-        ESP_LOGW(HA_TAG, "WS JSON parse failed");
+        const size_t max_dump = 120;
+        size_t len = strnlen(payload, max_dump);
+        ESP_LOGW(HA_TAG, "WS JSON parse failed (len=%d): %.*s", (int)len, (int)len, payload);
         return;
     }
 
@@ -321,6 +409,9 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
     (void)handler_args;
     esp_websocket_event_data_t *data = (esp_websocket_event_data_t *)event_data;
 
+    static char *ws_buf = NULL;
+    static size_t ws_buf_cap = 0;
+
     switch (event_id) {
     case WEBSOCKET_EVENT_CONNECTED:
         ESP_LOGI(HA_TAG, "WS connected");
@@ -331,13 +422,26 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
         g_ctx.ws_authed = false;
         break;
     case WEBSOCKET_EVENT_DATA: {
-        // Payload is not null-terminated.
-        char *buf = malloc(data->data_len + 1);
-        if (buf) {
-            memcpy(buf, data->data_ptr, data->data_len);
-            buf[data->data_len] = '\0';
-            handle_ws_payload(buf);
-            free(buf);
+        // Handle fragmented frames: accumulate until full payload is received.
+        size_t total_len = data->payload_len;
+        size_t offset = data->payload_offset;
+        size_t chunk_len = data->data_len;
+        if (total_len == 0) {
+            break;
+        }
+        if (ws_buf_cap < total_len + 1) {
+            char *newbuf = realloc(ws_buf, total_len + 1);
+            if (!newbuf) {
+                ESP_LOGW(HA_TAG, "WS buffer alloc failed (%d bytes)", (int)(total_len + 1));
+                break;
+            }
+            ws_buf = newbuf;
+            ws_buf_cap = total_len + 1;
+        }
+        memcpy(ws_buf + offset, data->data_ptr, chunk_len);
+        if ((offset + chunk_len) == total_len) {
+            ws_buf[total_len] = '\0';
+            handle_ws_payload(ws_buf);
         }
         break;
     }
@@ -396,11 +500,21 @@ static void ha_sync_task(void *arg)
     TickType_t last_poll = xTaskGetTickCount();
     char remote_state[32] = {0};
 
+    while (!wait_for_wifi_connected(pdMS_TO_TICKS(30000))) {
+        ESP_LOGW(HA_TAG, "Waiting for WiFi connection before HA sync...");
+    }
+
     // Initial pull to seed local state
     for (size_t i = 0; i < g_ctx.entity_count; ++i) {
-        if (ha_fetch_remote_state(g_ctx.entities[i].entity_id, remote_state, sizeof(remote_state)) == ESP_OK &&
-            g_ctx.entities[i].on_remote_state) {
+        if (g_ctx.entities[i].skip_poll) {
+            continue;
+        }
+        esp_err_t res = ha_fetch_remote_state(g_ctx.entities[i].entity_id, remote_state, sizeof(remote_state));
+        if (res == ESP_OK && g_ctx.entities[i].on_remote_state) {
             g_ctx.entities[i].on_remote_state(remote_state, g_ctx.entities[i].user_ctx);
+        } else if (res == ESP_ERR_NOT_FOUND) {
+            g_ctx.entities[i].skip_poll = true;
+            ESP_LOGW(HA_TAG, "Disabling polling for missing entity: %s", g_ctx.entities[i].entity_id);
         }
     }
 
@@ -413,9 +527,15 @@ static void ha_sync_task(void *arg)
         // Periodic pull
         if (g_ctx.poll_ms > 0 && (xTaskGetTickCount() - last_poll) >= pdMS_TO_TICKS(g_ctx.poll_ms)) {
             for (size_t i = 0; i < g_ctx.entity_count; ++i) {
-                if (ha_fetch_remote_state(g_ctx.entities[i].entity_id, remote_state, sizeof(remote_state)) == ESP_OK &&
-                    g_ctx.entities[i].on_remote_state) {
+                if (g_ctx.entities[i].skip_poll) {
+                    continue;
+                }
+                esp_err_t res = ha_fetch_remote_state(g_ctx.entities[i].entity_id, remote_state, sizeof(remote_state));
+                if (res == ESP_OK && g_ctx.entities[i].on_remote_state) {
                     g_ctx.entities[i].on_remote_state(remote_state, g_ctx.entities[i].user_ctx);
+                } else if (res == ESP_ERR_NOT_FOUND) {
+                    g_ctx.entities[i].skip_poll = true;
+                    ESP_LOGW(HA_TAG, "Disabling polling for missing entity: %s", g_ctx.entities[i].entity_id);
                 }
             }
             last_poll = xTaskGetTickCount();
@@ -429,7 +549,7 @@ static void ha_sync_task(void *arg)
                 ha_push_state(cmd.entity_id, cmd.state);
                 break;
             case HA_MSG_EVENT_STATE: {
-                const ha_entity_t *ent = find_entity(cmd.entity_id);
+                ha_entity_t *ent = find_entity(cmd.entity_id);
                 if (ent && ent->on_remote_state) {
                     ent->on_remote_state(cmd.state, ent->user_ctx);
                 }
@@ -475,6 +595,7 @@ esp_err_t ha_sync_start(const ha_sync_config_t *config)
     g_ctx.poll_ms = config->poll_interval_ms ? config->poll_interval_ms : 5000;
     g_ctx.entity_count = config->entity_count;
     g_ctx.queue = xQueueCreate(8, sizeof(ha_msg_t));
+    g_net_events = xEventGroupCreate();
 
     if (!g_ctx.base_url || !g_ctx.entities || !g_ctx.auth_header || !g_ctx.auth_token || !g_ctx.queue) {
         ESP_LOGE(HA_TAG, "Failed to allocate HA sync resources");
@@ -482,10 +603,21 @@ esp_err_t ha_sync_start(const ha_sync_config_t *config)
         return ESP_ERR_NO_MEM;
     }
 
+    // Ensure the default event loop exists for WiFi/IP events.
+    esp_event_loop_create_default();
+    // Track WiFi connectivity so we don't hammer HA before network is ready.
+    esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, on_ip_event, NULL, &g_ip_handler);
+    esp_event_handler_instance_register(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, on_wifi_event, NULL, &g_wifi_handler);
+    wifi_ap_record_t ap = {0};
+    if (esp_wifi_sta_get_ap_info(&ap) == ESP_OK && g_net_events) {
+        xEventGroupSetBits(g_net_events, WIFI_CONNECTED_BIT);
+    }
+
     for (size_t i = 0; i < config->entity_count; ++i) {
         g_ctx.entities[i].entity_id = dup_string(config->entities[i].entity_id);
         g_ctx.entities[i].on_remote_state = config->entities[i].on_remote_state;
         g_ctx.entities[i].user_ctx = config->entities[i].user_ctx;
+        g_ctx.entities[i].skip_poll = false;
         if (!g_ctx.entities[i].entity_id) {
             ESP_LOGE(HA_TAG, "Failed to alloc entity %zu", i);
             ha_free_ctx();
@@ -493,7 +625,7 @@ esp_err_t ha_sync_start(const ha_sync_config_t *config)
         }
     }
 
-    BaseType_t ok = xTaskCreate(ha_sync_task, "ha_sync", 4096, NULL, 3, &g_ctx.task);
+    BaseType_t ok = xTaskCreate(ha_sync_task, "ha_sync", HA_TASK_STACK_BYTES, NULL, 3, &g_ctx.task);
     if (ok != pdPASS) {
         ESP_LOGE(HA_TAG, "Failed to start ha_sync task");
         ha_free_ctx();

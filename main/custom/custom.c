@@ -66,7 +66,7 @@ static void spangroup_set(const lv_obj_t* obj, uint8_t idx, float data, uint8_t 
 
     if(digits == 0)
     {
-        snprintf(data_text, sizeof(data_text), "%d" , (uint8_t)data);
+        snprintf(data_text, sizeof(data_text), "%d" , (uint16_t)data);
     }
     else if(digits == 2)
     {
