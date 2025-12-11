@@ -26,6 +26,9 @@
 #define HA_HTTP_BUF_SIZE 2048
 #define HA_TASK_STACK_BYTES 8192
 #define WIFI_CONNECTED_BIT BIT0
+#define HA_ENTITY_ID_MAX_LEN 96
+#define HA_STATE_MAX_LEN 32
+#define HA_LAST_CHANGED_MAX_LEN 48
 
 typedef struct {
     char *entity_id;
@@ -54,14 +57,31 @@ typedef enum {
 
 typedef struct {
     ha_msg_type_t type;
-    char entity_id[96];
-    char state[32];
+    char entity_id[HA_ENTITY_ID_MAX_LEN];
+    char state[HA_STATE_MAX_LEN];
+    char last_changed[HA_LAST_CHANGED_MAX_LEN];
+    bool has_temperature;
+    float temperature;
 } ha_msg_t;
 
 static ha_sync_ctx_t g_ctx = {0};
 static EventGroupHandle_t g_net_events;
 static esp_event_handler_instance_t g_ip_handler;
 static esp_event_handler_instance_t g_wifi_handler;
+
+static bool json_get_temperature(cJSON *state_obj, float *out_temp)
+{
+    if (!state_obj || !out_temp) {
+        return false;
+    }
+    cJSON *attrs = cJSON_GetObjectItemCaseSensitive(state_obj, "attributes");
+    cJSON *temp = attrs ? cJSON_GetObjectItemCaseSensitive(attrs, "temperature") : NULL;
+    if (cJSON_IsNumber(temp)) {
+        *out_temp = (float)temp->valuedouble;
+        return true;
+    }
+    return false;
+}
 
 static void ha_free_ctx(void)
 {
@@ -193,7 +213,13 @@ cleanup:
     return err;
 }
 
-static esp_err_t ha_fetch_remote_state(const char *entity_id, char *state_buf, size_t state_len)
+static esp_err_t ha_fetch_remote_state(const char *entity_id,
+                                       char *state_buf,
+                                       size_t state_len,
+                                       char *last_changed_buf,
+                                       size_t last_changed_len,
+                                       float *temp_out,
+                                       bool *has_temp_out)
 {
     char url[256];
     int written = snprintf(url, sizeof(url), "%s/api/states/%s", g_ctx.base_url, entity_id);
@@ -221,9 +247,29 @@ static esp_err_t ha_fetch_remote_state(const char *entity_id, char *state_buf, s
     }
 
     esp_err_t ret = ESP_FAIL;
+    if (has_temp_out) {
+        *has_temp_out = false;
+    }
+    if (temp_out) {
+        *temp_out = 0.0f;
+    }
+    if (last_changed_buf && last_changed_len > 0) {
+        last_changed_buf[0] = '\0';
+    }
     cJSON *state = cJSON_GetObjectItemCaseSensitive(root, "state");
+    cJSON *last_changed = cJSON_GetObjectItemCaseSensitive(root, "last_changed");
     if (cJSON_IsString(state) && state->valuestring) {
         strlcpy(state_buf, state->valuestring, state_len);
+        if (last_changed_buf && last_changed_len > 0 && cJSON_IsString(last_changed) && last_changed->valuestring) {
+            strlcpy(last_changed_buf, last_changed->valuestring, last_changed_len);
+        }
+        if (temp_out && has_temp_out) {
+            float t = 0.0f;
+            if (json_get_temperature(root, &t)) {
+                *temp_out = t;
+                *has_temp_out = true;
+            }
+        }
         ret = ESP_OK;
     } else {
         ESP_LOGW(HA_TAG, "No state in HA response");
@@ -271,7 +317,11 @@ static ha_entity_t *find_entity(const char *entity_id)
     return NULL;
 }
 
-static void enqueue_event(const char *entity_id, const char *state)
+static void enqueue_event(const char *entity_id,
+                          const char *state,
+                          const char *last_changed,
+                          bool has_temperature,
+                          float temperature)
 {
     if (!g_ctx.queue || !entity_id || !state) {
         return;
@@ -281,6 +331,12 @@ static void enqueue_event(const char *entity_id, const char *state)
     };
     strlcpy(msg.entity_id, entity_id, sizeof(msg.entity_id));
     strlcpy(msg.state, state, sizeof(msg.state));
+    msg.last_changed[0] = '\0';
+    msg.has_temperature = has_temperature;
+    msg.temperature = temperature;
+    if (last_changed) {
+        strlcpy(msg.last_changed, last_changed, sizeof(msg.last_changed));
+    }
     xQueueSend(g_ctx.queue, &msg, 0);
 }
 
@@ -331,6 +387,9 @@ static esp_err_t enqueue_push(const char *entity_id, const char *state)
     };
     strlcpy(msg.entity_id, entity_id, sizeof(msg.entity_id));
     strlcpy(msg.state, state, sizeof(msg.state));
+    msg.last_changed[0] = '\0';
+    msg.has_temperature = false;
+    msg.temperature = 0.0f;
     return xQueueSend(g_ctx.queue, &msg, 0) == pdTRUE ? ESP_OK : ESP_ERR_TIMEOUT;
 }
 
@@ -391,9 +450,20 @@ static void handle_ws_payload(const char *payload)
                 cJSON *entity = cJSON_GetObjectItem(data, "entity_id");
                 cJSON *new_state = cJSON_GetObjectItem(data, "new_state");
                 cJSON *state = new_state ? cJSON_GetObjectItem(new_state, "state") : NULL;
+                cJSON *last_changed = new_state ? cJSON_GetObjectItemCaseSensitive(new_state, "last_changed") : NULL;
+                const char *last_changed_str = NULL;
+                if (cJSON_IsString(last_changed) && last_changed->valuestring) {
+                    last_changed_str = last_changed->valuestring;
+                }
+                float temperature = 0.0f;
+                bool has_temperature = json_get_temperature(new_state, &temperature);
                 if (cJSON_IsString(entity) && cJSON_IsString(state)) {
                     if (find_entity(entity->valuestring)) {
-                        enqueue_event(entity->valuestring, state->valuestring);
+                        enqueue_event(entity->valuestring,
+                                      state->valuestring,
+                                      last_changed_str,
+                                      has_temperature,
+                                      temperature);
                     }
                 }
             }
@@ -498,7 +568,10 @@ static esp_err_t start_websocket(void)
 static void ha_sync_task(void *arg)
 {
     TickType_t last_poll = xTaskGetTickCount();
-    char remote_state[32] = {0};
+    char remote_state[HA_STATE_MAX_LEN] = {0};
+    char remote_last_changed[HA_LAST_CHANGED_MAX_LEN] = {0};
+    float remote_temp = 0.0f;
+    bool remote_has_temp = false;
 
     while (!wait_for_wifi_connected(pdMS_TO_TICKS(30000))) {
         ESP_LOGW(HA_TAG, "Waiting for WiFi connection before HA sync...");
@@ -509,9 +582,19 @@ static void ha_sync_task(void *arg)
         if (g_ctx.entities[i].skip_poll) {
             continue;
         }
-        esp_err_t res = ha_fetch_remote_state(g_ctx.entities[i].entity_id, remote_state, sizeof(remote_state));
+        esp_err_t res = ha_fetch_remote_state(g_ctx.entities[i].entity_id,
+                                              remote_state,
+                                              sizeof(remote_state),
+                                              remote_last_changed,
+                                              sizeof(remote_last_changed),
+                                              &remote_temp,
+                                              &remote_has_temp);
         if (res == ESP_OK && g_ctx.entities[i].on_remote_state) {
-            g_ctx.entities[i].on_remote_state(remote_state, g_ctx.entities[i].user_ctx);
+            g_ctx.entities[i].on_remote_state(remote_state,
+                                              remote_last_changed[0] ? remote_last_changed : NULL,
+                                              remote_has_temp,
+                                              remote_temp,
+                                              g_ctx.entities[i].user_ctx);
         } else if (res == ESP_ERR_NOT_FOUND) {
             g_ctx.entities[i].skip_poll = true;
             ESP_LOGW(HA_TAG, "Disabling polling for missing entity: %s", g_ctx.entities[i].entity_id);
@@ -530,9 +613,19 @@ static void ha_sync_task(void *arg)
                 if (g_ctx.entities[i].skip_poll) {
                     continue;
                 }
-                esp_err_t res = ha_fetch_remote_state(g_ctx.entities[i].entity_id, remote_state, sizeof(remote_state));
+                esp_err_t res = ha_fetch_remote_state(g_ctx.entities[i].entity_id,
+                                                      remote_state,
+                                                      sizeof(remote_state),
+                                                      remote_last_changed,
+                                                      sizeof(remote_last_changed),
+                                                      &remote_temp,
+                                                      &remote_has_temp);
                 if (res == ESP_OK && g_ctx.entities[i].on_remote_state) {
-                    g_ctx.entities[i].on_remote_state(remote_state, g_ctx.entities[i].user_ctx);
+                    g_ctx.entities[i].on_remote_state(remote_state,
+                                                      remote_last_changed[0] ? remote_last_changed : NULL,
+                                                      remote_has_temp,
+                                                      remote_temp,
+                                                      g_ctx.entities[i].user_ctx);
                 } else if (res == ESP_ERR_NOT_FOUND) {
                     g_ctx.entities[i].skip_poll = true;
                     ESP_LOGW(HA_TAG, "Disabling polling for missing entity: %s", g_ctx.entities[i].entity_id);
@@ -551,7 +644,11 @@ static void ha_sync_task(void *arg)
             case HA_MSG_EVENT_STATE: {
                 ha_entity_t *ent = find_entity(cmd.entity_id);
                 if (ent && ent->on_remote_state) {
-                    ent->on_remote_state(cmd.state, ent->user_ctx);
+                    ent->on_remote_state(cmd.state,
+                                         cmd.last_changed[0] ? cmd.last_changed : NULL,
+                                         cmd.has_temperature,
+                                         cmd.temperature,
+                                         ent->user_ctx);
                 }
                 break;
             }

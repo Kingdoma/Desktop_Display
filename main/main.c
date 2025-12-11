@@ -140,43 +140,78 @@ static void sntp_task(void *arg)
     vTaskDelete(NULL);
 }
 
-static void ha_remote_state_sw(const char *state, void *user_ctx)
+static void ha_remote_state_sw(const char *state,
+                               const char *last_changed,
+                               bool has_temperature,
+                               float temperature,
+                               void *user_ctx)
 {
     (void)user_ctx;
     if (!state) {
         return;
     }
-    ESP_LOGI(TAG, "HA Switch state update: %s", state);
+    const char *ts = last_changed ? last_changed : "unknown";
+    ESP_LOGI(TAG, "HA Switch state update: %s (changed %s)", state, ts);
+    if (has_temperature) {
+        ESP_LOGD(TAG, "HA Switch temperature: %.2f", temperature);
+    }
     // TODO: apply to local light/relay.
 }
 
-static void ha_remote_state_ac(const char *state, void *user_ctx)
+static void ha_remote_state_ac(const char *state,
+                               const char *last_changed,
+                               bool has_temperature,
+                               float temperature,
+                               void *user_ctx)
 {
     (void)user_ctx;
     if (!state) {
         return;
     }
-    ESP_LOGI(TAG, "HA AC state update: %s", state);
+    const char *ts = last_changed ? last_changed : "unknown";
+    if (has_temperature) {
+        ESP_LOGI(TAG, "HA AC state update: %s (changed %s, temp %.1f)", state, ts, temperature);
+    } else {
+        ESP_LOGI(TAG, "HA AC state update: %s (changed %s)", state, ts);
+    }
     // TODO: apply to local fan control.
 }
 
-static void ha_remote_state_weather(const char *state, void *user_ctx)
+static void ha_remote_state_weather(const char *state,
+                                    const char *last_changed,
+                                    bool has_temperature,
+                                    float temperature,
+                                    void *user_ctx)
 {
     (void)user_ctx;
     if (!state) {
         return;
     }
-    ESP_LOGI(TAG, "HA weather state update: %s", state);
+    const char *ts = last_changed ? last_changed : "unknown";
+    if (has_temperature) {
+        ESP_LOGI(TAG, "HA weather state update: %s (changed %s, temp %.1f)", state, ts, temperature);
+    } else {
+        ESP_LOGI(TAG, "HA weather state update: %s (changed %s)", state, ts);
+    }
     // TODO: apply to local fan control.
 }
 
-static void ha_remote_state_generic(const char *state, void *user_ctx)
+static void ha_remote_state_generic(const char *state,
+                                    const char *last_changed,
+                                    bool has_temperature,
+                                    float temperature,
+                                    void *user_ctx)
 {
     const char *entity_id = (const char *)user_ctx;
     if (!state || !entity_id) {
         return;
     }
-    ESP_LOGI(TAG, "HA state update (%s): %s", entity_id, state);
+    const char *ts = last_changed ? last_changed : "unknown";
+    if (has_temperature) {
+        ESP_LOGI(TAG, "HA state update (%s): %s (changed %s, temp %.1f)", entity_id, state, ts, temperature);
+    } else {
+        ESP_LOGI(TAG, "HA state update (%s): %s (changed %s)", entity_id, state, ts);
+    }
 }
 
 static void try_add_entity(ha_entity_config_t *entities,

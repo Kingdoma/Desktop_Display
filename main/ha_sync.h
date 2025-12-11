@@ -2,13 +2,21 @@
 #pragma once
 
 #include "esp_err.h"
+#include <stdbool.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef void (*ha_state_cb_t)(const char *state, void *user_ctx);
+// last_changed is the ISO timestamp string from HA (e.g., "2024-01-05T12:34:56.123456+00:00").
+// temperature is the numeric target temperature from HA attributes (if present).
+// Any optional pointer values may be NULL if not provided by the payload.
+typedef void (*ha_state_cb_t)(const char *state,
+                              const char *last_changed,
+                              bool has_temperature,
+                              float temperature,
+                              void *user_ctx);
 
 typedef struct {
     const char *entity_id;       // e.g. "switch.office_light"

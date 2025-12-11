@@ -83,3 +83,12 @@ Example packet (`A5 02 78 00 C2 01 10 0E 30 02 8A 02 DC 05 A4 01 26 02 E9 07 0A 
 - Graphics RAM usage: 42.0%  
 - System RAM usage: 55.0%  
 - Date/time: 2025-10-18 (weekday index 6) 13:12:45
+
+
+I (126547) app_main: HA Switch state update: off (changed 2025-12-11T13:52:24.208492+00:00)
+I (126567) app_main: HA AC state update: heat (changed 2025-12-11T13:52:27.055540+00:00, temp 25.0)
+I (126613) app_main: HA weather state update: partlycloudy (changed 2025-12-11T11:34:31.921944+00:00, temp 12.2)
+I (126633) app_main: HA state update (sensor.6_humidity): 47 (changed 2025-12-11T14:08:32.005639+00:00)
+I (126655) app_main: HA state update (sensor.6_temperature): 23.4 (changed 2025-12-11T14:07:23.806806+00:00)
+I (126673) app_main: HA state update (sensor.5_humidity): 42 (changed 2025-12-11T14:06:00.150303+00:00)
+I (126692) app_main: HA state update (sensor.5_temperature): 19.8 (changed 2025-12-11T14:12:15.853921+00:00)
