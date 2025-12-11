@@ -28,7 +28,7 @@
 #define TAG "app_main"
 #define HA_TOKEN_PLACEHOLDER "YOUR_LONG_LIVED_ACCESS_TOKEN"
 #define HA_EXTRA_ENTITY_SLOTS 5
-#define HA_MAX_ENTITY_SLOTS (2 + HA_EXTRA_ENTITY_SLOTS)
+#define HA_MAX_ENTITY_SLOTS (5 + HA_EXTRA_ENTITY_SLOTS)
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
 lv_ui guider_ui;
@@ -140,23 +140,33 @@ static void sntp_task(void *arg)
     vTaskDelete(NULL);
 }
 
-static void ha_remote_state_light(const char *state, void *user_ctx)
+static void ha_remote_state_sw(const char *state, void *user_ctx)
 {
     (void)user_ctx;
     if (!state) {
         return;
     }
-    ESP_LOGI(TAG, "HA light state update: %s", state);
+    ESP_LOGI(TAG, "HA Switch state update: %s", state);
     // TODO: apply to local light/relay.
 }
 
-static void ha_remote_state_fan(const char *state, void *user_ctx)
+static void ha_remote_state_ac(const char *state, void *user_ctx)
 {
     (void)user_ctx;
     if (!state) {
         return;
     }
-    ESP_LOGI(TAG, "HA fan state update: %s", state);
+    ESP_LOGI(TAG, "HA AC state update: %s", state);
+    // TODO: apply to local fan control.
+}
+
+static void ha_remote_state_weather(const char *state, void *user_ctx)
+{
+    (void)user_ctx;
+    if (!state) {
+        return;
+    }
+    ESP_LOGI(TAG, "HA weather state update: %s", state);
     // TODO: apply to local fan control.
 }
 
@@ -204,8 +214,12 @@ static void start_ha_sync(void)
     ha_entity_config_t entities[HA_MAX_ENTITY_SLOTS];
     size_t entity_count = 0;
 
-    try_add_entity(entities, HA_MAX_ENTITY_SLOTS, &entity_count, CONFIG_HA_ENTITY_ID_LIGHT, ha_remote_state_light);
-    try_add_entity(entities, HA_MAX_ENTITY_SLOTS, &entity_count, CONFIG_HA_ENTITY_ID_FAN, ha_remote_state_fan);
+    try_add_entity(entities, HA_MAX_ENTITY_SLOTS, &entity_count, CONFIG_HA_ENTITY_ID_SWITCH_1, ha_remote_state_sw);
+    try_add_entity(entities, HA_MAX_ENTITY_SLOTS, &entity_count, CONFIG_HA_ENTITY_ID_SWITCH_2, ha_remote_state_sw);
+
+    try_add_entity(entities, HA_MAX_ENTITY_SLOTS, &entity_count, CONFIG_HA_ENTITY_ID_AC, ha_remote_state_ac);
+    
+    try_add_entity(entities, HA_MAX_ENTITY_SLOTS, &entity_count, CONFIG_HA_ENTITY_ID_WEATHER, ha_remote_state_weather);
 
     const char *extra_entities[] = {
         CONFIG_HA_ENTITY_ID_1,
@@ -214,6 +228,7 @@ static void start_ha_sync(void)
         CONFIG_HA_ENTITY_ID_4,
         CONFIG_HA_ENTITY_ID_5,
     };
+
     for (size_t i = 0; i < ARRAY_SIZE(extra_entities); ++i) {
         try_add_entity(entities, HA_MAX_ENTITY_SLOTS, &entity_count, extra_entities[i], ha_remote_state_generic);
     }

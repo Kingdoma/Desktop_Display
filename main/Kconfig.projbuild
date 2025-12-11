@@ -28,17 +28,29 @@ config HA_POLL_INTERVAL_MS
         How often to poll Home Assistant via REST for state refresh. Set to 0 to
         disable periodic polling (WebSocket updates will still be used).
 
-config HA_ENTITY_ID_LIGHT
-    string "Entity ID for light"
-    default "switch.example_light"
+config HA_ENTITY_ID_SWITCH_1
+    string "Entity ID for switch_1"
+    default "switch.example_sw_1"
     help
-        Entity ID to sync for the light.
+        Entity ID to sync for the sw 1.
 
-config HA_ENTITY_ID_FAN
-    string "Entity ID for fan"
-    default "fan.example_fan"
+config HA_ENTITY_ID_SWITCH_2
+    string "Entity ID for switch_2"
+    default "switch.example_sw_2"
     help
-        Entity ID to sync for the fan.
+        Entity ID to sync for the sw 2.
+
+config HA_ENTITY_ID_AC
+    string "Entity ID for AC"
+    default "climate.example_ac"
+    help
+        Entity ID to sync for the AC.
+
+config HA_ENTITY_ID_WEATHER
+    string "Entity ID for Weather"
+    default "card.example_weather"
+    help
+        Entity ID to sync for the weather card.
 
 config HA_ENTITY_ID_1
     string "Extra entity ID #1"
