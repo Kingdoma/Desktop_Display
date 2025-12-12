@@ -75,7 +75,11 @@ static bool json_get_temperature(cJSON *state_obj, float *out_temp)
         return false;
     }
     cJSON *attrs = cJSON_GetObjectItemCaseSensitive(state_obj, "attributes");
-    cJSON *temp = attrs ? cJSON_GetObjectItemCaseSensitive(attrs, "temperature") : NULL;
+    // Climate entities report mode in "state"; temperature lives in attributes.
+    cJSON *temp = attrs ? cJSON_GetObjectItemCaseSensitive(attrs, "current_temperature") : NULL;
+    if (!cJSON_IsNumber(temp) && attrs) {
+        temp = cJSON_GetObjectItemCaseSensitive(attrs, "temperature");
+    }
     if (cJSON_IsNumber(temp)) {
         *out_temp = (float)temp->valuedouble;
         return true;
@@ -417,6 +421,16 @@ static void ws_send_subscribe(void)
     ws_send_text("{\"id\":1,\"type\":\"subscribe_events\",\"event_type\":\"state_changed\"}");
 }
 
+static void stop_websocket(void)
+{
+    if (g_ctx.ws) {
+        esp_websocket_client_stop(g_ctx.ws);
+        esp_websocket_client_destroy(g_ctx.ws);
+        g_ctx.ws = NULL;
+        g_ctx.ws_authed = false;
+    }
+}
+
 static void handle_ws_payload(const char *payload)
 {
     if (!payload) {
@@ -567,11 +581,11 @@ static esp_err_t start_websocket(void)
 
 static void ha_sync_task(void *arg)
 {
-    TickType_t last_poll = xTaskGetTickCount();
     char remote_state[HA_STATE_MAX_LEN] = {0};
     char remote_last_changed[HA_LAST_CHANGED_MAX_LEN] = {0};
     float remote_temp = 0.0f;
     bool remote_has_temp = false;
+    TickType_t next_ws_retry = 0;
 
     while (!wait_for_wifi_connected(pdMS_TO_TICKS(30000))) {
         ESP_LOGW(HA_TAG, "Waiting for WiFi connection before HA sync...");
@@ -601,37 +615,29 @@ static void ha_sync_task(void *arg)
         }
     }
 
-    // Start websocket listener
-    if (start_websocket() != ESP_OK) {
-        ESP_LOGW(HA_TAG, "WS start failed; relying on REST polling");
-    }
-
     for (;;) {
-        // Periodic pull
-        if (g_ctx.poll_ms > 0 && (xTaskGetTickCount() - last_poll) >= pdMS_TO_TICKS(g_ctx.poll_ms)) {
-            for (size_t i = 0; i < g_ctx.entity_count; ++i) {
-                if (g_ctx.entities[i].skip_poll) {
-                    continue;
-                }
-                esp_err_t res = ha_fetch_remote_state(g_ctx.entities[i].entity_id,
-                                                      remote_state,
-                                                      sizeof(remote_state),
-                                                      remote_last_changed,
-                                                      sizeof(remote_last_changed),
-                                                      &remote_temp,
-                                                      &remote_has_temp);
-                if (res == ESP_OK && g_ctx.entities[i].on_remote_state) {
-                    g_ctx.entities[i].on_remote_state(remote_state,
-                                                      remote_last_changed[0] ? remote_last_changed : NULL,
-                                                      remote_has_temp,
-                                                      remote_temp,
-                                                      g_ctx.entities[i].user_ctx);
-                } else if (res == ESP_ERR_NOT_FOUND) {
-                    g_ctx.entities[i].skip_poll = true;
-                    ESP_LOGW(HA_TAG, "Disabling polling for missing entity: %s", g_ctx.entities[i].entity_id);
-                }
+        TickType_t now = xTaskGetTickCount();
+
+        // Wait for WiFi; tear down WS if WiFi drops.
+        if (!wait_for_wifi_connected(pdMS_TO_TICKS(1000))) {
+            if (g_ctx.ws) {
+                ESP_LOGW(HA_TAG, "WiFi lost; stopping websocket");
+                stop_websocket();
             }
-            last_poll = xTaskGetTickCount();
+            continue;
+        }
+
+        // Ensure websocket is running; retry with backoff.
+        if (!g_ctx.ws && now >= next_ws_retry) {
+            if (start_websocket() != ESP_OK) {
+                next_ws_retry = now + pdMS_TO_TICKS(2000);
+            } else {
+                next_ws_retry = now + pdMS_TO_TICKS(5000);
+            }
+        } else if (g_ctx.ws && !esp_websocket_client_is_connected(g_ctx.ws) && now >= next_ws_retry) {
+            ESP_LOGW(HA_TAG, "WS disconnected; restarting");
+            stop_websocket();
+            next_ws_retry = now + pdMS_TO_TICKS(2000);
         }
 
         // Handle outbound updates
