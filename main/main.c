@@ -48,8 +48,14 @@ static void ha_remote_state_sw(const char *state,
         ESP_LOGD(TAG, "HA Switch temperature: %.2f", temperature);
     }
 
-    if (entity_id && strcmp(entity_id, "switch.cuco_cn_959326664_v3_on_p_2_1") == 0) {
-        ha_ui_update_switch(state, last_changed);
+    if (entity_id) {
+        uint8_t lvgl_id = 1;
+        if (strcmp(entity_id, CONFIG_HA_ENTITY_ID_SWITCH_2) == 0) {
+            lvgl_id = 2;
+        } else if (strcmp(entity_id, "switch.cuco_cn_959326664_v3_on_p_2_1") == 0) {
+            lvgl_id = 1;
+        }
+        ha_ui_update_switch(lvgl_id, state, last_changed);
     }
 }
 
@@ -89,6 +95,7 @@ static void ha_remote_state_weather(const char *state,
         ESP_LOGI(TAG, "HA weather state update: %s (changed %s)", state, ts);
     }
 
+    ha_ui_update_weather(temperature, state, last_changed);
 }
 
 static void ha_remote_state_generic(const char *state,

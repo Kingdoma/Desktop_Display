@@ -145,7 +145,13 @@ LV_IMG_DECLARE(_upload_alpha_13x13);
 
 LV_IMG_DECLARE(_temperature_35x35);
 LV_IMG_DECLARE(_humidity_alpha_28x28);
+LV_IMG_DECLARE(_sun_alpha_60x60);
 LV_IMG_DECLARE(_cloudy_alpha_60x60);
+LV_IMG_DECLARE(_foog_alpha_60x60);
+LV_IMG_DECLARE(_rainy_alpha_60x60);
+LV_IMG_DECLARE(_windy_alpha_60x60);
+LV_IMG_DECLARE(_storm_alpha_60x60);
+LV_IMG_DECLARE(_snowy_alpha_60x60);
 
 LV_FONT_DECLARE(lv_font_montserratMedium_17)
 LV_FONT_DECLARE(lv_font_montserratMedium_15)
