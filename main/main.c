@@ -1,21 +1,12 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
-#include <time.h>
-#include <sys/time.h>
-#include <stdlib.h>
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_timer.h"
-#include "esp_event.h"
-#include "esp_netif.h"
-#include "esp_sntp.h"
-#include "esp_netif_sntp.h"
-#include "protocol_examples_common.h"
-#include "nvs_flash.h"
 #include "lvgl.h"
 #include "generated/gui_guider.h"
 #include "custom/custom.h"
@@ -25,6 +16,8 @@
 #include "app_main.h"
 #include "esp_task_wdt.h"
 #include "ha_sync.h"
+#include "time_sync.h"
+#include "ha_ui.h"
 
 #define TAG "app_main"
 #define HA_TOKEN_PLACEHOLDER "YOUR_LONG_LIVED_ACCESS_TOKEN"
@@ -34,232 +27,9 @@
 
 lv_ui guider_ui;
 
-typedef struct {
-    bool switch_on;
-    char elapsed[24];
-} ha_sw_ui_msg_t;
-
 static void lvgl_tick_cb(void *arg)
 {
     lv_tick_inc(1);
-}
-
-static void time_sync_notification_cb(struct timeval *tv)
-{
-    ESP_LOGI(TAG, "SNTP time synchronized");
-}
-
-static void sntp_time_sync(void)
-{
-    ESP_LOGI(TAG, "Initializing SNTP");
-
-    ESP_ERROR_CHECK(nvs_flash_init());
-
-    esp_err_t err = esp_netif_init();
-    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
-        ESP_LOGE(TAG, "esp_netif_init failed: %s", esp_err_to_name(err));
-        return;
-    }
-
-    err = esp_event_loop_create_default();
-    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
-        ESP_LOGE(TAG, "esp_event_loop_create_default failed: %s", esp_err_to_name(err));
-        return;
-    }
-
-    // connect to internet
-    err = example_connect();
-    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
-        ESP_LOGE(TAG, "esp_wifi_connect failed: %s", esp_err_to_name(err));
-        return;
-    }
-
-    esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG("pool.ntp.org");
-    config.sync_cb = time_sync_notification_cb;
-    esp_netif_sntp_init(&config);
-
-    // wait for time to be set
-    int retry = 0;
-    const int retry_count = 15;
-    while (esp_netif_sntp_sync_wait(2000 / portTICK_PERIOD_MS) == ESP_ERR_TIMEOUT && ++retry < retry_count) {
-        ESP_LOGI(TAG, "Waiting for system time to be set... (%d/%d)", retry, retry_count);
-    }
-
-    esp_netif_sntp_deinit();
-}
-
-static bool update_wall_clock(system_metrics_t *metrics)
-{
-    if (!metrics) {
-        return false;
-    }
-
-    time_t now = 0;
-    struct tm timeinfo = {0};
-    time(&now);
-
-    /* Bail out if SNTP has not set the time yet */
-    if (now < 1609459200) { // 2021-01-01
-        return false;
-    }
-
-    if (!localtime_r(&now, &timeinfo)) {
-        return false;
-    }
-
-    const uint16_t year = (uint16_t)(timeinfo.tm_year + 1900);
-    const uint8_t month = (uint8_t)(timeinfo.tm_mon + 1);
-    const uint8_t day = (uint8_t)timeinfo.tm_mday;
-    const uint8_t hour = (uint8_t)timeinfo.tm_hour;
-    const uint8_t minute = (uint8_t)timeinfo.tm_min;
-    const uint8_t second = (uint8_t)timeinfo.tm_sec;
-    const int8_t day_of_week = (int8_t)timeinfo.tm_wday;
-
-    bool changed = false;
-    changed |= !metrics->has_date || metrics->year != year || metrics->month != month || metrics->day != day;
-    changed |= !metrics->has_time || metrics->hour != hour || metrics->minute != minute || metrics->second != second;
-    changed |= !metrics->has_day_of_week || metrics->day_of_week != day_of_week;
-
-    metrics->year = year;
-    metrics->month = month;
-    metrics->day = day;
-    metrics->hour = hour;
-    metrics->minute = minute;
-    metrics->second = second;
-    metrics->day_of_week = day_of_week;
-    metrics->has_date = true;
-    metrics->has_time = true;
-    metrics->has_day_of_week = true;
-
-    ESP_LOGD(TAG, "Y:%d,M:%d,D:%d,H:%d,M:%d,S:%d,WD:%d,HD:%d,HT:%d,HWD:%d",
-        year, month, day, hour, minute, second, day_of_week, metrics->has_date, metrics->has_time, metrics->has_day_of_week);
-
-    return changed;
-}
-
-static void sntp_task(void *arg)
-{
-    ESP_LOGI(TAG, "Initialize sntp sync");
-    setenv("TZ", "CST-8", 1);
-    tzset();
-    sntp_time_sync();
-    vTaskDelete(NULL);
-}
-
-static bool parse_iso8601_utc(const char *ts, time_t *out_epoch)
-{
-    if (!ts || !out_epoch) {
-        return false;
-    }
-    int year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0;
-    int tz_sign = 1, tz_hour = 0, tz_min = 0;
-
-    // Basic YYYY-MM-DDTHH:MM:SS parsing; ignore fractional seconds.
-    if (sscanf(ts, "%4d-%2d-%2dT%2d:%2d:%2d", &year, &month, &day, &hour, &minute, &second) != 6) {
-        return false;
-    }
-
-    const char *tz = strpbrk(ts, "+-");
-    if (tz && (tz[0] == '+' || tz[0] == '-') && strlen(tz) >= 6) {
-        tz_sign = (tz[0] == '-') ? -1 : 1;
-        sscanf(tz + 1, "%2d:%2d", &tz_hour, &tz_min);
-    }
-
-    struct tm tm = {0};
-    tm.tm_year = year - 1900;
-    tm.tm_mon = month - 1;
-    tm.tm_mday = day;
-    tm.tm_hour = hour;
-    tm.tm_min = minute;
-    tm.tm_sec = second;
-    tm.tm_isdst = -1;
-
-    time_t epoch_utc = timegm(&tm);
-    if (epoch_utc == (time_t)-1) {
-        return false;
-    }
-    epoch_utc -= tz_sign * (tz_hour * 3600 + tz_min * 60);
-    *out_epoch = epoch_utc;
-    return true;
-}
-
-static void format_elapsed_since(const char *last_changed, char *out, size_t out_len)
-{
-    if (!out || out_len == 0) {
-        return;
-    }
-    out[0] = '\0';
-
-    time_t changed = 0;
-    if (!last_changed || !parse_iso8601_utc(last_changed, &changed)) {
-        strlcpy(out, "--", out_len);
-        return;
-    }
-
-    time_t now = time(NULL);
-    if (now < changed) {
-        now = changed;
-    }
-    uint32_t diff = (uint32_t)difftime(now, changed);
-    uint32_t days = diff / 86400;
-    uint32_t hours = (diff % 86400) / 3600;
-    uint32_t mins = (diff % 3600) / 60;
-    uint32_t secs = diff % 60;
-
-    if (days > 0) {
-        snprintf(out, out_len, "%lu day%s", (unsigned long)days, days == 1 ? "" : "s");
-    } else if (hours > 0) {
-        snprintf(out, out_len, "%lu hour%s", (unsigned long)hours, hours == 1 ? "" : "s");
-    } else if (mins > 0) {
-        snprintf(out, out_len, "%lu min", (unsigned long)mins);
-    } else {
-        snprintf(out, out_len, "%lu s", (unsigned long)secs);
-    }
-}
-
-static void ha_switch_ui_apply(void *arg)
-{
-    ha_sw_ui_msg_t *msg = (ha_sw_ui_msg_t *)arg;
-    if (!msg) {
-        return;
-    }
-
-    if (guider_ui.HA_dark_sw_1 && lv_obj_is_valid(guider_ui.HA_dark_sw_1)) {
-        if (msg->switch_on) {
-            lv_obj_add_state(guider_ui.HA_dark_sw_1, LV_STATE_CHECKED);
-        } else {
-            lv_obj_clear_state(guider_ui.HA_dark_sw_1, LV_STATE_CHECKED);
-        }
-    }
-
-    if (guider_ui.HA_dark_sw_info_1 && lv_obj_is_valid(guider_ui.HA_dark_sw_info_1)) {
-        lv_span_t *span_state = lv_spangroup_get_child(guider_ui.HA_dark_sw_info_1, 0);
-        lv_span_t *span_time = lv_spangroup_get_child(guider_ui.HA_dark_sw_info_1, 2);
-        if (span_state) {
-            lv_span_set_text(span_state, msg->switch_on ? "On" : "Off");
-        }
-        if (span_time) {
-            lv_span_set_text(span_time, msg->elapsed);
-        }
-        lv_spangroup_refr_mode(guider_ui.HA_dark_sw_info_1);
-    }
-
-    free(msg);
-}
-
-static void ha_switch_ui_update_async(bool switch_on, const char *elapsed)
-{
-    ha_sw_ui_msg_t *msg = malloc(sizeof(*msg));
-    if (!msg) {
-        return;
-    }
-    msg->switch_on = switch_on;
-    strlcpy(msg->elapsed, elapsed ? elapsed : "--", sizeof(msg->elapsed));
-
-    // Run LVGL updates in the LVGL context.
-    if (lv_async_call(ha_switch_ui_apply, msg) != LV_RES_OK) {
-        free(msg);
-    }
 }
 
 static void ha_remote_state_sw(const char *state,
@@ -279,10 +49,7 @@ static void ha_remote_state_sw(const char *state,
     }
 
     if (entity_id && strcmp(entity_id, "switch.cuco_cn_959326664_v3_on_p_2_1") == 0) {
-        bool is_on = (state[0] == 'o' || state[0] == 'O') && (state[1] == 'n' || state[1] == 'N');
-        char elapsed[24];
-        format_elapsed_since(last_changed, elapsed, sizeof(elapsed));
-        ha_switch_ui_update_async(is_on, elapsed);
+        ha_ui_update_switch(state, last_changed);
     }
 }
 
@@ -432,6 +199,7 @@ static void lvgl_task(void *arg)
 
     setup_ui(&guider_ui);
     custom_init(&guider_ui);
+    ha_ui_set_ui(&guider_ui);
 
     vTaskDelay(pdMS_TO_TICKS(20));
 
@@ -488,7 +256,7 @@ static void cdc_task(void *arg)
 void app_main(void)
 {
     // SNTP sync performs networking and logging; give it a real stack to avoid corruption.
-    xTaskCreate(sntp_task, "sntp_task", 4096, NULL, 2, NULL);
+    start_sntp_task();
 
     xTaskCreate(lvgl_task, "lvgl_task", 4096, NULL, 2, NULL);
 

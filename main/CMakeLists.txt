@@ -10,6 +10,8 @@ idf_component_register(
         "tinyusb_cdc.c"
         "metrics.c"
         "ha_sync.c"
+        "time_sync.c"
+        "ha_ui.c"
         ${GUI_GUIDER_SOURCES}
     INCLUDE_DIRS
         "."
