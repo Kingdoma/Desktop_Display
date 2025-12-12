@@ -55,7 +55,9 @@ static void ha_remote_state_sw(const char *state,
         } else if (strcmp(entity_id, "switch.cuco_cn_959326664_v3_on_p_2_1") == 0) {
             lvgl_id = 1;
         }
-        ha_ui_update_switch(lvgl_id, state, last_changed);
+        if(lv_scr_act() == guider_ui.HA_dark){
+            ha_ui_update_switch(lvgl_id, state, last_changed);
+        }
     }
 }
 
@@ -76,7 +78,9 @@ static void ha_remote_state_ac(const char *state,
         ESP_LOGI(TAG, "HA AC state update: %s (changed %s)", state, ts);
     }
 
-    ha_ui_update_climate(0, temperature, state, last_changed);
+    if(lv_scr_act() == guider_ui.HA_dark){
+        ha_ui_update_climate(0, temperature, state, last_changed);
+    }
 
 }
 
@@ -96,8 +100,9 @@ static void ha_remote_state_weather(const char *state,
     } else {
         ESP_LOGI(TAG, "HA weather state update: %s (changed %s)", state, ts);
     }
-
-    ha_ui_update_weather(temperature, state, last_changed);
+    if(lv_scr_act() == guider_ui.HA_dark){
+        ha_ui_update_weather(temperature, state, last_changed);
+    }
 }
 
 static void ha_remote_state_generic(const char *state,
@@ -120,18 +125,22 @@ static void ha_remote_state_generic(const char *state,
     const char *delim = "_";
     char *token;
 
-    token = strtok(entity_id, delim);
+    char id[20];
+
+    strcpy(id, entity_id);
+
+    token = strtok(id, delim);
     token = strtok(NULL, delim);
-
-    if(strcmp(token, "humidity") == 0)
-    {
-        ha_ui_update_hum_sensor(state, last_changed);
+    if(lv_scr_act() == guider_ui.HA_dark){
+        if(strcmp(token, "humidity") == 0)
+        {
+            ha_ui_update_hum_sensor(state, last_changed);
+        }
+        else if(strcmp(token, "temperature") == 0)
+        {
+            ha_ui_update_temp_sensor(state, last_changed);
+        }
     }
-    else if(strcmp(token, "temperature") == 0)
-    {
-        ha_ui_update_temp_sensor(state, last_changed);
-    }
-
 }
 
 static void try_add_entity(ha_entity_config_t *entities,

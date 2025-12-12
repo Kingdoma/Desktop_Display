@@ -223,8 +223,14 @@ static void ha_climate_ui_apply(void *arg)
     char out[4];
 
     snprintf(out, sizeof(out), "%.0f", msg->temperature);
-    lv_label_set_text(temp, out);
-    lv_slider_set_value(temp_slider, (int32_t)msg->temperature, LV_ANIM_OFF);
+    if (temp && lv_obj_is_valid(temp)) {
+        lv_label_set_text(temp, out);
+    } else {
+        ESP_LOGW(HA_UI_TAG, "AC temp label not ready");
+    }
+    if (temp_slider && lv_obj_is_valid(temp_slider)) {
+        lv_slider_set_value(temp_slider, (int32_t)msg->temperature, LV_ANIM_OFF);
+    }
 
     if (info && lv_obj_is_valid(info)) {
         lv_span_t *span_state = lv_spangroup_get_child(info, 0);
@@ -237,17 +243,16 @@ static void ha_climate_ui_apply(void *arg)
         }
         lv_spangroup_refr_mode(info);
         
-        if(strcmp(msg->state, "cool") == 0)
-        {
-            lv_event_send(s_ui->HA_dark_ac_cool, LV_EVENT_CLICKED, NULL);
-        }
-        else if(strcmp(msg->state, "heat") == 0)
-        {
-            lv_event_send(s_ui->HA_dark_ac_heat, LV_EVENT_CLICKED, NULL);
-        }
-        else if(strcmp(msg->state, "off") == 0)
-        {
-            lv_event_send(s_ui->HA_dark_ac_off, LV_EVENT_CLICKED, NULL);
+        lv_obj_t *btn_cool = s_ui->HA_dark_ac_cool;
+        lv_obj_t *btn_heat = s_ui->HA_dark_ac_heat;
+        lv_obj_t *btn_off = s_ui->HA_dark_ac_off;
+
+        if (strcmp(msg->state, "cool") == 0 && btn_cool && lv_obj_is_valid(btn_cool)) {
+            lv_event_send(btn_cool, LV_EVENT_CLICKED, NULL);
+        } else if (strcmp(msg->state, "heat") == 0 && btn_heat && lv_obj_is_valid(btn_heat)) {
+            lv_event_send(btn_heat, LV_EVENT_CLICKED, NULL);
+        } else if (strcmp(msg->state, "off") == 0 && btn_off && lv_obj_is_valid(btn_off)) {
+            lv_event_send(btn_off, LV_EVENT_CLICKED, NULL);
         }
     }
     free(msg);
