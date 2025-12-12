@@ -209,6 +209,50 @@ static void ha_weather_ui_apply(void *arg)
     free(msg);
 }
 
+static void ha_climate_ui_apply(void *arg)
+{
+    ha_ui_msg_t *msg = (ha_ui_msg_t *)arg;
+    if (!msg || !s_ui) {
+        free(msg);
+        return;
+    }
+
+    lv_obj_t *temp = s_ui->HA_dark_ac_temp;
+    lv_obj_t *temp_slider = s_ui->HA_dark_temp_slider;
+    lv_obj_t *info = s_ui->HA_dark_ac_info;
+    char out[4];
+
+    snprintf(out, sizeof(out), "%.0f", msg->temperature);
+    lv_label_set_text(temp, out);
+    lv_slider_set_value(temp_slider, (int32_t)msg->temperature, LV_ANIM_OFF);
+
+    if (info && lv_obj_is_valid(info)) {
+        lv_span_t *span_state = lv_spangroup_get_child(info, 0);
+        lv_span_t *span_time = lv_spangroup_get_child(info, 2);
+        if (span_state) {
+            lv_span_set_text(span_state, msg->state);
+        }
+        if (span_time) {
+            lv_span_set_text(span_time, msg->elapsed);
+        }
+        lv_spangroup_refr_mode(info);
+        
+        if(strcmp(msg->state, "cool") == 0)
+        {
+            lv_event_send(s_ui->HA_dark_ac_cool, LV_EVENT_CLICKED, NULL);
+        }
+        else if(strcmp(msg->state, "heat") == 0)
+        {
+            lv_event_send(s_ui->HA_dark_ac_heat, LV_EVENT_CLICKED, NULL);
+        }
+        else if(strcmp(msg->state, "off") == 0)
+        {
+            lv_event_send(s_ui->HA_dark_ac_off, LV_EVENT_CLICKED, NULL);
+        }
+    }
+    free(msg);
+}
+
 static void ha_sensor_ui_apply(void *arg)
 {
     ha_ui_msg_t *msg = (ha_ui_msg_t *)arg;
@@ -259,18 +303,32 @@ void ha_ui_update_switch(uint8_t lvgl_id, const char *state, const char *last_ch
     }
 }
 
-void ha_ui_update_climate(const char *state, const char *last_changed, uint8_t lvgl_id)
+void ha_ui_update_climate(uint8_t lvgl_id, const float temperature, const char *state, const char *last_changed)
 {
-    // if (!state) {
-    //     return;
-    // }
-    // char elapsed[24];
-    // format_elapsed_since(last_changed, elapsed, sizeof(elapsed));
+    if (!state) {
+        return;
+    }
+    char elapsed[24];
+    format_elapsed_since(last_changed, elapsed, sizeof(elapsed));
 
-    // ha_switch_ui_update_async(is_on, elapsed, lvgl_id ? lvgl_id : 1);
+    ha_ui_msg_t *msg = malloc(sizeof(*msg));
+    if (!msg) {
+        ESP_LOGW(HA_UI_TAG, "Failed to alloc HA UI msg");
+        return;
+    }
+
+    msg->temperature = temperature;
+    strlcpy(msg->state, state, sizeof(msg->state));
+    strlcpy(msg->elapsed, elapsed, sizeof(msg->elapsed));
+
+    // Run LVGL updates in the LVGL context.
+    if (lv_async_call(ha_climate_ui_apply, msg) != LV_RES_OK) {
+        free(msg);
+        ESP_LOGW(HA_UI_TAG, "Failed to enqueue LVGL async update");
+    }
 }
 
-void ha_ui_update_printer(const char *state, const char *last_changed, uint8_t lvgl_id)
+void ha_ui_update_printer(uint8_t lvgl_id, const char *state, const char *last_changed)
 {
     ;
 }

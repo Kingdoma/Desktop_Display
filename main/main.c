@@ -76,6 +76,8 @@ static void ha_remote_state_ac(const char *state,
         ESP_LOGI(TAG, "HA AC state update: %s (changed %s)", state, ts);
     }
 
+    ha_ui_update_climate(0, temperature, state, last_changed);
+
 }
 
 static void ha_remote_state_weather(const char *state,
