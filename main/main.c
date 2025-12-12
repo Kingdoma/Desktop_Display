@@ -104,7 +104,7 @@ static void ha_remote_state_generic(const char *state,
                                     float temperature,
                                     void *user_ctx)
 {
-    const char *entity_id = (const char *)user_ctx;
+    char *entity_id = (char *)user_ctx;
     if (!state || !entity_id) {
         return;
     }
@@ -114,6 +114,22 @@ static void ha_remote_state_generic(const char *state,
     } else {
         ESP_LOGI(TAG, "HA state update (%s): %s (changed %s)", entity_id, state, ts);
     }
+
+    const char *delim = "_";
+    char *token;
+
+    token = strtok(entity_id, delim);
+    token = strtok(NULL, delim);
+
+    if(strcmp(token, "humidity") == 0)
+    {
+        ha_ui_update_hum_sensor(state, last_changed);
+    }
+    else if(strcmp(token, "temperature") == 0)
+    {
+        ha_ui_update_temp_sensor(state, last_changed);
+    }
+
 }
 
 static void try_add_entity(ha_entity_config_t *entities,

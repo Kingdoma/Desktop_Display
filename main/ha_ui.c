@@ -16,6 +16,7 @@ typedef struct {
     char state[16];
     char elapsed[24];
     uint8_t lvgl_id;
+    lv_obj_t *lv_obj;
 } ha_ui_msg_t;
 
 static lv_ui *s_ui = NULL;
@@ -208,6 +209,31 @@ static void ha_weather_ui_apply(void *arg)
     free(msg);
 }
 
+static void ha_sensor_ui_apply(void *arg)
+{
+    ha_ui_msg_t *msg = (ha_ui_msg_t *)arg;
+    if (!msg || !s_ui) {
+        free(msg);
+        return;
+    }
+
+    lv_obj_t *info = msg->lv_obj;
+
+    if (info && lv_obj_is_valid(info)) {
+        lv_span_t *span_state = lv_spangroup_get_child(info, 0);
+        lv_span_t *span_time = lv_spangroup_get_child(info, 3);
+        if (span_state) {
+            lv_span_set_text(span_state, msg->state);
+        }
+        if (span_time) {
+            lv_span_set_text(span_time, msg->elapsed);
+        }
+        lv_spangroup_refr_mode(info);
+    }
+
+    free(msg);
+}
+
 void ha_ui_update_switch(uint8_t lvgl_id, const char *state, const char *last_changed)
 {
     if (!state) {
@@ -269,6 +295,56 @@ void ha_ui_update_weather(const float temperature, const char *state, const char
 
     // Run LVGL updates in the LVGL context.
     if (lv_async_call(ha_weather_ui_apply, msg) != LV_RES_OK) {
+        free(msg);
+        ESP_LOGW(HA_UI_TAG, "Failed to enqueue LVGL async update");
+    }
+}
+
+void ha_ui_update_temp_sensor(const char *state, const char *last_changed)
+{
+    if (!state) {
+        return;
+    }
+    char elapsed[24];
+    format_elapsed_since(last_changed, elapsed, sizeof(elapsed));
+
+    ha_ui_msg_t *msg = malloc(sizeof(*msg));
+    if (!msg) {
+        ESP_LOGW(HA_UI_TAG, "Failed to alloc HA UI msg");
+        return;
+    }
+
+    msg->lv_obj = s_ui->HA_dark_temp_info;
+    strlcpy(msg->state, state, sizeof(msg->state));
+    strlcpy(msg->elapsed, elapsed, sizeof(msg->elapsed));
+
+    // Run LVGL updates in the LVGL context.
+    if (lv_async_call(ha_sensor_ui_apply, msg) != LV_RES_OK) {
+        free(msg);
+        ESP_LOGW(HA_UI_TAG, "Failed to enqueue LVGL async update");
+    }
+}
+
+void ha_ui_update_hum_sensor(const char *state, const char *last_changed)
+{
+        if (!state) {
+        return;
+    }
+    char elapsed[24];
+    format_elapsed_since(last_changed, elapsed, sizeof(elapsed));
+
+    ha_ui_msg_t *msg = malloc(sizeof(*msg));
+    if (!msg) {
+        ESP_LOGW(HA_UI_TAG, "Failed to alloc HA UI msg");
+        return;
+    }
+
+    msg->lv_obj = s_ui->HA_dark_hum_info;
+    strlcpy(msg->state, state, sizeof(msg->state));
+    strlcpy(msg->elapsed, elapsed, sizeof(msg->elapsed));
+
+    // Run LVGL updates in the LVGL context.
+    if (lv_async_call(ha_sensor_ui_apply, msg) != LV_RES_OK) {
         free(msg);
         ESP_LOGW(HA_UI_TAG, "Failed to enqueue LVGL async update");
     }

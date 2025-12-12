@@ -17,4 +17,8 @@ void ha_ui_update_printer(const char *state, const char *last_changed, uint8_t l
 
 void ha_ui_update_weather(const float temperature, const char *state, const char *last_changed);
 
+void ha_ui_update_temp_sensor(const char *state, const char *last_changed);
+
+void ha_ui_update_hum_sensor(const char *state, const char *last_changed);
+
 #endif /* HA_UI_H */
