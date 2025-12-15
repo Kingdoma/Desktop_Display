@@ -221,3 +221,40 @@ void events_init(lv_ui *ui)
 {
 
 }
+
+
+// Switch 1 toggle
+static void HA_dark_sw_1_event_handler(lv_event_t *e)
+{
+    if (lv_event_get_code(e) != LV_EVENT_VALUE_CHANGED) {
+        return;
+    }
+    const bool on = lv_obj_has_state(guider_ui.HA_dark_sw_1, LV_STATE_CHECKED);
+    ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_SWITCH_1, on ? "on" : "off");
+}
+
+// Switch 2 toggle
+static void HA_dark_sw_2_event_handler(lv_event_t *e)
+{
+    if (lv_event_get_code(e) != LV_EVENT_VALUE_CHANGED) {
+        return;
+    }
+    const bool on = lv_obj_has_state(guider_ui.HA_dark_sw_2, LV_STATE_CHECKED);
+    ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_SWITCH_2, on ? "on" : "off");
+}
+
+// AC mode buttons
+static void HA_dark_ac_off_event_handler(lv_event_t *e) { if (lv_event_get_code(e) == LV_EVENT_CLICKED) ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, "off"); }
+static void HA_dark_ac_cool_event_handler(lv_event_t *e){ if (lv_event_get_code(e) == LV_EVENT_CLICKED) ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, "cool"); }
+static void HA_dark_ac_heat_event_handler(lv_event_t *e){ if (lv_event_get_code(e) == LV_EVENT_CLICKED) ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, "heat"); }
+
+// AC temperature slider (sends the value as state; see note below)
+static void HA_dark_temp_slider_event_handler(lv_event_t *e)
+{
+    if (lv_event_get_code(e) != LV_EVENT_VALUE_CHANGED) {
+        return;
+    }
+    char buf[8];
+    snprintf(buf, sizeof(buf), "%ld", (long)lv_slider_get_value(guider_ui.HA_dark_temp_slider));
+    ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, buf);
+}
