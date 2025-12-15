@@ -455,7 +455,7 @@ static void ha_panel_update(lv_ui *ui, const system_metrics_t *metrics)
     }
 
     if (metrics->has_time && ui->HA_dark_digital_clock_time && lv_obj_is_valid(ui->HA_dark_digital_clock_time)) {
-        lv_dclock_set_text_fmt(ui->HA_dark_digital_clock_time, "%02u:%02u:%02u",
+        lv_dclock_set_text_fmt(ui->HA_dark_digital_clock_time, "%u:%02u:%02u",
                                 (unsigned)metrics->hour,
                                 (unsigned)metrics->minute,
                                 (unsigned)metrics->second);
