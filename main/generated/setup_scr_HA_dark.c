@@ -195,7 +195,12 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_spangroup_set_mode(ui->HA_dark_temp_info, LV_SPAN_MODE_BREAK);
     //create span
     ui->HA_dark_temp_info_span = lv_spangroup_new_span(ui->HA_dark_temp_info);
-    lv_span_set_text(ui->HA_dark_temp_info_span, "21°C");
+    lv_span_set_text(ui->HA_dark_temp_info_span, "21");
+    lv_style_set_text_color(&ui->HA_dark_temp_info_span->style, lv_color_hex(0xe6e6e6));
+    lv_style_set_text_decor(&ui->HA_dark_temp_info_span->style, LV_TEXT_DECOR_NONE);
+    lv_style_set_text_font(&ui->HA_dark_temp_info_span->style, &lv_font_montserratMedium_12);
+    ui->HA_dark_temp_info_span = lv_spangroup_new_span(ui->HA_dark_temp_info);
+    lv_span_set_text(ui->HA_dark_temp_info_span, "°C");
     lv_style_set_text_color(&ui->HA_dark_temp_info_span->style, lv_color_hex(0xe6e6e6));
     lv_style_set_text_decor(&ui->HA_dark_temp_info_span->style, LV_TEXT_DECOR_NONE);
     lv_style_set_text_font(&ui->HA_dark_temp_info_span->style, &lv_font_montserratMedium_12);
@@ -285,7 +290,12 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_spangroup_set_mode(ui->HA_dark_hum_info, LV_SPAN_MODE_BREAK);
     //create span
     ui->HA_dark_hum_info_span = lv_spangroup_new_span(ui->HA_dark_hum_info);
-    lv_span_set_text(ui->HA_dark_hum_info_span, "70%");
+    lv_span_set_text(ui->HA_dark_hum_info_span, "70");
+    lv_style_set_text_color(&ui->HA_dark_hum_info_span->style, lv_color_hex(0xe6e6e6));
+    lv_style_set_text_decor(&ui->HA_dark_hum_info_span->style, LV_TEXT_DECOR_NONE);
+    lv_style_set_text_font(&ui->HA_dark_hum_info_span->style, &lv_font_montserratMedium_12);
+    ui->HA_dark_hum_info_span = lv_spangroup_new_span(ui->HA_dark_hum_info);
+    lv_span_set_text(ui->HA_dark_hum_info_span, "%");
     lv_style_set_text_color(&ui->HA_dark_hum_info_span->style, lv_color_hex(0xe6e6e6));
     lv_style_set_text_decor(&ui->HA_dark_hum_info_span->style, LV_TEXT_DECOR_NONE);
     lv_style_set_text_font(&ui->HA_dark_hum_info_span->style, &lv_font_montserratMedium_12);
@@ -852,7 +862,7 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_style_set_text_decor(&ui->HA_dark_ac_info_span->style, LV_TEXT_DECOR_NONE);
     lv_style_set_text_font(&ui->HA_dark_ac_info_span->style, &lv_font_montserratMedium_12);
     ui->HA_dark_ac_info_span = lv_spangroup_new_span(ui->HA_dark_ac_info);
-    lv_span_set_text(ui->HA_dark_ac_info_span, "59min Ago");
+    lv_span_set_text(ui->HA_dark_ac_info_span, "59min");
     lv_style_set_text_color(&ui->HA_dark_ac_info_span->style, lv_color_hex(0x7b7b7b));
     lv_style_set_text_decor(&ui->HA_dark_ac_info_span->style, LV_TEXT_DECOR_NONE);
     lv_style_set_text_font(&ui->HA_dark_ac_info_span->style, &lv_font_montserratMedium_12);
@@ -971,17 +981,17 @@ void setup_scr_HA_dark(lv_ui *ui)
 
     //Write style for HA_dark_digital_clock_time, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_radius(ui->HA_dark_digital_clock_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->HA_dark_digital_clock_time, lv_color_hex(0xebebeb), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->HA_dark_digital_clock_time, &lv_font_montserratMedium_25, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui->HA_dark_digital_clock_time, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_letter_space(ui->HA_dark_digital_clock_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui->HA_dark_digital_clock_time, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui->HA_dark_digital_clock_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui->HA_dark_digital_clock_time, 7, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui->HA_dark_digital_clock_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui->HA_dark_digital_clock_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui->HA_dark_digital_clock_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->HA_dark_digital_clock_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->HA_dark_digital_clock_time, lv_color_hex(0xebebeb), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->HA_dark_digital_clock_time, &lv_font_montserratMedium_25, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui->HA_dark_digital_clock_time, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_letter_space(ui->HA_dark_digital_clock_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_align(ui->HA_dark_digital_clock_time, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes HA_dark_temp
     ui->HA_dark_temp = lv_spangroup_create(ui->HA_dark_time_card);
@@ -1006,6 +1016,7 @@ void setup_scr_HA_dark(lv_ui *ui)
     static lv_style_t style_HA_dark_temp_main_main_default;
     ui_init_style(&style_HA_dark_temp_main_main_default);
 
+    lv_style_set_border_width(&style_HA_dark_temp_main_main_default, 0);
     lv_style_set_radius(&style_HA_dark_temp_main_main_default, 0);
     lv_style_set_bg_opa(&style_HA_dark_temp_main_main_default, 0);
     lv_style_set_pad_top(&style_HA_dark_temp_main_main_default, 0);
@@ -1013,7 +1024,6 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_style_set_pad_bottom(&style_HA_dark_temp_main_main_default, 0);
     lv_style_set_pad_left(&style_HA_dark_temp_main_main_default, 0);
     lv_style_set_shadow_width(&style_HA_dark_temp_main_main_default, 0);
-    lv_style_set_border_width(&style_HA_dark_temp_main_main_default, 0);
     lv_obj_add_style(ui->HA_dark_temp, &style_HA_dark_temp_main_main_default, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_spangroup_refr_mode(ui->HA_dark_temp);
 
