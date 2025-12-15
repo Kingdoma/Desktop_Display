@@ -13,12 +13,18 @@
  *********************/
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <string.h>
+#include <time.h>
+#include "esp_log.h"
 #include "lvgl.h"
 #include "custom.h"
+#include "ha_ui.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define HA_UI_TAG "ha_ui"
 
 /**********************
  *      TYPEDEFS
@@ -79,6 +85,256 @@ static void spangroup_set(const lv_obj_t* obj, uint8_t idx, float data, uint8_t 
 
     lv_span_set_text(span, data_text);
     return;
+}
+
+static time_t timegm_compat(struct tm *tm)
+{
+    time_t local = mktime(tm);
+    if (local == (time_t)-1) {
+        return (time_t)-1;
+    }
+    struct tm gtm = {0};
+    if (!gmtime_r(&local, &gtm)) {
+        return (time_t)-1;
+    }
+    time_t local_as_utc = mktime(&gtm);
+    if (local_as_utc == (time_t)-1) {
+        return (time_t)-1;
+    }
+    return local + (local - local_as_utc);
+}
+
+static bool parse_iso8601_utc(const char *ts, time_t *out_epoch)
+{
+    if (!ts || !out_epoch) {
+        return false;
+    }
+
+    int year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0;
+    if (sscanf(ts, "%4d-%2d-%2dT%2d:%2d:%2d", &year, &month, &day, &hour, &minute, &second) != 6) {
+        return false;
+    }
+
+    const char *search_start = strchr(ts, 'T');
+    if (search_start) {
+        search_start++;
+    } else {
+        search_start = ts;
+    }
+    const char *tz = NULL;
+    const char *cursor = search_start;
+    while (cursor && *cursor) {
+        const char *found = strpbrk(cursor, "+-");
+        if (!found) {
+            break;
+        }
+        tz = found;
+        cursor = found + 1;
+    }
+
+    int tz_sign = 1;
+    int tz_hour = 0;
+    int tz_min = 0;
+    if (tz && strlen(tz) >= 6) {
+        tz_sign = (*tz == '-') ? -1 : 1;
+        (void)sscanf(tz + 1, "%2d:%2d", &tz_hour, &tz_min);
+    }
+
+    struct tm tm = {0};
+    tm.tm_year = year - 1900;
+    tm.tm_mon = month - 1;
+    tm.tm_mday = day;
+    tm.tm_hour = hour;
+    tm.tm_min = minute;
+    tm.tm_sec = second;
+    tm.tm_isdst = -1;
+
+    time_t epoch_utc = timegm_compat(&tm);
+    if (epoch_utc == (time_t)-1) {
+        return false;
+    }
+    epoch_utc -= tz_sign * (tz_hour * 3600 + tz_min * 60);
+    *out_epoch = epoch_utc;
+    return true;
+}
+
+static void format_elapsed_since(const char *last_changed, char *out, size_t out_len)
+{
+    if (!out || out_len == 0) {
+        return;
+    }
+    out[0] = '\0';
+
+    time_t changed = 0;
+    if (!last_changed || !parse_iso8601_utc(last_changed, &changed)) {
+        strlcpy(out, "--", out_len);
+        return;
+    }
+
+    time_t now = time(NULL);
+    if (now < changed) {
+        now = changed;
+    }
+    uint32_t diff = (uint32_t)difftime(now, changed);
+    uint32_t days = diff / 86400;
+    uint32_t hours = (diff % 86400) / 3600;
+    uint32_t mins = (diff % 3600) / 60;
+    uint32_t secs = diff % 60;
+
+    if (days > 0) {
+        snprintf(out, out_len, "%lu day%s", (unsigned long)days, days == 1 ? "" : "s");
+    } else if (hours > 0) {
+        snprintf(out, out_len, "%lu hour%s", (unsigned long)hours, hours == 1 ? "" : "s");
+    } else if (mins > 0) {
+        snprintf(out, out_len, "%lu min", (unsigned long)mins);
+    } else {
+        snprintf(out, out_len, "%lu s", (unsigned long)secs);
+    }
+}
+
+static void update_switch_card(lv_ui *ui, uint8_t id, const ha_ui_sw_t *data)
+{
+    if (!ui || !data) {
+        return;
+    }
+
+    lv_obj_t *sw = (id == 2) ? ui->HA_dark_sw_2 : ui->HA_dark_sw_1;
+    lv_obj_t *info = (id == 2) ? ui->HA_dark_sw_info_2 : ui->HA_dark_sw_info_1;
+
+    if (sw && lv_obj_is_valid(sw)) {
+        if (data->switch_on) {
+            lv_obj_add_state(sw, LV_STATE_CHECKED);
+        } else {
+            lv_obj_clear_state(sw, LV_STATE_CHECKED);
+        }
+    }
+
+    if (info && lv_obj_is_valid(info)) {
+        char elapsed[32];
+        format_elapsed_since(data->last_changed, elapsed, sizeof(elapsed));
+        lv_span_t *span_state = lv_spangroup_get_child(info, 0);
+        lv_span_t *span_time = lv_spangroup_get_child(info, 2);
+        if (span_state) {
+            lv_span_set_text(span_state, data->switch_on ? "On" : "Off");
+        }
+        if (span_time) {
+            lv_span_set_text(span_time, elapsed);
+        }
+        lv_spangroup_refr_mode(info);
+    }
+}
+
+static void update_weather_card(lv_ui *ui, const ha_ui_weather_t *data)
+{
+    if (!ui || !data) {
+        return;
+    }
+
+    if (ui->HA_dark_temp && lv_obj_is_valid(ui->HA_dark_temp)) {
+        char out[8];
+        snprintf(out, sizeof(out), "%.1f", data->temperature);
+        lv_span_t *span_state = lv_spangroup_get_child(ui->HA_dark_temp, 0);
+        if (span_state) {
+            lv_span_set_text(span_state, out);
+        }
+        lv_spangroup_refr_mode(ui->HA_dark_temp);
+    }
+
+    if (!ui->HA_dark_weather || !lv_obj_is_valid(ui->HA_dark_weather) || data->weather[0] == '\0') {
+        return;
+    }
+
+    if(strcmp(data->weather, "sunny") == 0){
+        lv_img_set_src(ui->HA_dark_weather, &_sun_alpha_60x60);
+    }
+    else if (strcmp(data->weather, "cloudy") == 0 || strcmp(data->weather, "partlycloudy") == 0)
+    {
+        lv_img_set_src(ui->HA_dark_weather, &_cloudy_alpha_60x60);
+    }
+    else if (strcmp(data->weather, "foogy") == 0)
+    {
+        lv_img_set_src(ui->HA_dark_weather, &_foog_alpha_60x60);
+    }
+    else if (strcmp(data->weather, "windy") == 0)
+    {
+        lv_img_set_src(ui->HA_dark_weather, &_windy_alpha_60x60);
+    }
+    else if (strcmp(data->weather, "rainy") == 0)
+    {
+        lv_img_set_src(ui->HA_dark_weather, &_rainy_alpha_60x60);
+    }
+    else if (strcmp(data->weather, "storm") == 0)
+    {
+        lv_img_set_src(ui->HA_dark_weather, &_storm_alpha_60x60);
+    }
+    else if (strcmp(data->weather, "snowy") == 0)
+    {
+        lv_img_set_src(ui->HA_dark_weather, &_snowy_alpha_60x60);
+    }else{
+        ESP_LOGW(HA_UI_TAG,"Weather state not listed: %s", data->weather);
+    }
+}
+
+static void update_climate_card(lv_ui *ui, const ha_ui_climate_t *data)
+{
+    if (!ui || !data) {
+        return;
+    }
+
+    if (ui->HA_dark_ac_temp && lv_obj_is_valid(ui->HA_dark_ac_temp)) {
+        char out[8];
+        snprintf(out, sizeof(out), "%.0f", data->temperature);
+        lv_label_set_text(ui->HA_dark_ac_temp, out);
+    }
+
+    if (ui->HA_dark_temp_slider && lv_obj_is_valid(ui->HA_dark_temp_slider)) {
+        lv_slider_set_value(ui->HA_dark_temp_slider, (int32_t)data->temperature, LV_ANIM_OFF);
+    }
+
+    if (ui->HA_dark_ac_info && lv_obj_is_valid(ui->HA_dark_ac_info)) {
+        char elapsed[32];
+        format_elapsed_since(data->last_changed, elapsed, sizeof(elapsed));
+        lv_span_t *span_state = lv_spangroup_get_child(ui->HA_dark_ac_info, 0);
+        lv_span_t *span_time = lv_spangroup_get_child(ui->HA_dark_ac_info, 2);
+        if (span_state) {
+            lv_span_set_text(span_state, data->mode);
+        }
+        if (span_time) {
+            lv_span_set_text(span_time, elapsed);
+        }
+        lv_spangroup_refr_mode(ui->HA_dark_ac_info);
+
+        lv_obj_t *btn_cool = ui->HA_dark_ac_cool;
+        lv_obj_t *btn_heat = ui->HA_dark_ac_heat;
+        lv_obj_t *btn_off = ui->HA_dark_ac_off;
+
+        if (strcmp(data->mode, "cool") == 0 && btn_cool && lv_obj_is_valid(btn_cool)) {
+            lv_event_send(btn_cool, LV_EVENT_CLICKED, NULL);
+        } else if (strcmp(data->mode, "heat") == 0 && btn_heat && lv_obj_is_valid(btn_heat)) {
+            lv_event_send(btn_heat, LV_EVENT_CLICKED, NULL);
+        } else if (strcmp(data->mode, "off") == 0 && btn_off && lv_obj_is_valid(btn_off)) {
+            lv_event_send(btn_off, LV_EVENT_CLICKED, NULL);
+        }
+    }
+}
+
+static void update_sensor_card(lv_obj_t *info, const ha_ui_sensor_t *data)
+{
+    if (!info || !data || !lv_obj_is_valid(info)) {
+        return;
+    }
+
+    char elapsed[32];
+    format_elapsed_since(data->last_changed, elapsed, sizeof(elapsed));
+    lv_span_t *span_state = lv_spangroup_get_child(info, 0);
+    lv_span_t *span_time = lv_spangroup_get_child(info, 2);
+    if (span_state) {
+        lv_span_set_text(span_state, data->data[0] ? data->data : "--");
+    }
+    if (span_time) {
+        lv_span_set_text(span_time, elapsed);
+    }
+    lv_spangroup_refr_mode(info);
 }
 
 static void monitor_panel_update(lv_ui *ui, const system_metrics_t *metrics)
@@ -208,6 +464,17 @@ static void ha_panel_update(lv_ui *ui, const system_metrics_t *metrics)
         HA_dark_digital_clock_time_min_value = metrics->minute;
         HA_dark_digital_clock_time_sec_value = metrics->second;
     }
+
+    if (!sync_data) {
+        return;
+    }
+
+    update_weather_card(ui, sync_data->weahter_card);
+    update_switch_card(ui, 1, sync_data->sw_1);
+    update_switch_card(ui, 2, sync_data->sw_2);
+    update_climate_card(ui, sync_data->ac_card);
+    update_sensor_card(ui->HA_dark_hum_info, sync_data->hum_card);
+    update_sensor_card(ui->HA_dark_temp_info, sync_data->temp_card);
 }
 
 void custom_update_metrics(lv_ui *ui, const system_metrics_t *metrics)

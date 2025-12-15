@@ -12,6 +12,7 @@ idf_component_register(
         "ha_sync.c"
         "time_sync.c"
         "ha_ui.c"
+       
         ${GUI_GUIDER_SOURCES}
     INCLUDE_DIRS
         "."

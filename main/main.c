@@ -55,9 +55,7 @@ static void ha_remote_state_sw(const char *state,
         } else if (strcmp(entity_id, "switch.cuco_cn_959326664_v3_on_p_2_1") == 0) {
             lvgl_id = 1;
         }
-        if(lv_scr_act() == guider_ui.HA_dark){
-            ha_ui_update_switch(lvgl_id, state, last_changed);
-        }
+        ha_ui_update_switch(lvgl_id, state, last_changed);
     }
 }
 
@@ -78,10 +76,7 @@ static void ha_remote_state_ac(const char *state,
         ESP_LOGI(TAG, "HA AC state update: %s (changed %s)", state, ts);
     }
 
-    if(lv_scr_act() == guider_ui.HA_dark){
-        ha_ui_update_climate(0, temperature, state, last_changed);
-    }
-
+    ha_ui_update_climate(0, temperature, state, last_changed);
 }
 
 static void ha_remote_state_weather(const char *state,
@@ -100,9 +95,7 @@ static void ha_remote_state_weather(const char *state,
     } else {
         ESP_LOGI(TAG, "HA weather state update: %s (changed %s)", state, ts);
     }
-    if(lv_scr_act() == guider_ui.HA_dark){
-        ha_ui_update_weather(temperature, state, last_changed);
-    }
+    ha_ui_update_weather(temperature, state, last_changed);
 }
 
 static void ha_remote_state_generic(const char *state,
@@ -131,15 +124,16 @@ static void ha_remote_state_generic(const char *state,
 
     token = strtok(id, delim);
     token = strtok(NULL, delim);
-    if(lv_scr_act() == guider_ui.HA_dark){
-        if(strcmp(token, "humidity") == 0)
-        {
-            ha_ui_update_hum_sensor(state, last_changed);
-        }
-        else if(strcmp(token, "temperature") == 0)
-        {
-            ha_ui_update_temp_sensor(state, last_changed);
-        }
+    if (!token) {
+        return;
+    }
+    if(strcmp(token, "humidity") == 0)
+    {
+        ha_ui_update_sensor(state, last_changed, 1);
+    }
+    else if(strcmp(token, "temperature") == 0)
+    {
+        ha_ui_update_sensor(state, last_changed, 2);
     }
 }
 
@@ -289,6 +283,8 @@ static void cdc_task(void *arg)
 
 void app_main(void)
 {
+    ha_ui_sync_data_init();
+
     // SNTP sync performs networking and logging; give it a real stack to avoid corruption.
     start_sntp_task();
 
