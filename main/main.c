@@ -19,6 +19,9 @@
 #include "time_sync.h"
 #include "ha_ui.h"
 
+// for benchmarking
+// #include "lv_demos.h"
+
 #define TAG "app_main"
 #define HA_TOKEN_PLACEHOLDER "YOUR_LONG_LIVED_ACCESS_TOKEN"
 #define HA_EXTRA_ENTITY_SLOTS 5
@@ -243,6 +246,8 @@ static void lvgl_task(void *arg)
     if (wdt_err != ESP_OK) {
         ESP_LOGW(TAG, "Failed to add LVGL task to WDT (%s)", esp_err_to_name(wdt_err));
     }
+
+    // lv_demo_benchmark();
 
     while (1) {
         while (metrics_queue_pop(&latest_metrics)) {
