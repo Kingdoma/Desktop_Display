@@ -10,13 +10,14 @@
 #include "events_init.h"
 #include <stdio.h>
 #include "lvgl.h"
+#include "ha_sync.h"
 
 #if LV_USE_GUIDER_SIMULATOR && LV_USE_FREEMASTER
 #include "freemaster_client.h"
 #endif
 
-uint8_t idx;
 static char buf[4]; /* max 3 bytes for number plus 1 null terminating byte */
+
 typedef struct {
     int8_t status;
     uint8_t temp;
@@ -26,6 +27,7 @@ ac_info_t ac = {
     .status = -1,
     .temp = 26
 };
+
 uint8_t idx;
 
 static void Monitor_dark_event_handler (lv_event_t *e)
@@ -73,6 +75,37 @@ void events_init_Monitor_dark (lv_ui *ui)
     lv_obj_add_event_cb(ui->Monitor_dark_menu, Monitor_dark_menu_event_handler, LV_EVENT_ALL, ui);
 }
 
+static void HA_dark_sw_2_event_handler (lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    switch (code) {
+    case LV_EVENT_VALUE_CHANGED:
+    {
+        const bool on = lv_obj_has_state(guider_ui.HA_dark_sw_2, LV_STATE_CHECKED);
+        ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_SWITCH_2, on ? "on" : "off");
+
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+static void HA_dark_sw_1_event_handler (lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    switch (code) {
+    case LV_EVENT_VALUE_CHANGED:
+    {
+        const bool on = lv_obj_has_state(guider_ui.HA_dark_sw_1, LV_STATE_CHECKED);
+        ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_SWITCH_1, on ? "on" : "off");
+        break;
+    }
+    default:
+        break;
+    }
+}
+
 static void HA_dark_temp_slider_event_handler (lv_event_t *e)
 {
     lv_event_code_t code = lv_event_get_code(e);
@@ -85,8 +118,9 @@ static void HA_dark_temp_slider_event_handler (lv_event_t *e)
         ac.temp = lv_slider_get_value(guider_ui.HA_dark_temp_slider);
         if(ac.status)
         {
-            // update to ha server
-            // sync_to_ha_server(AC);
+            char buf[8];
+            snprintf(buf, sizeof(buf), "%ld", (long)lv_slider_get_value(guider_ui.HA_dark_temp_slider));
+            ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, buf);
         }
 
         break;
@@ -116,7 +150,7 @@ static void HA_dark_ac_off_event_handler (lv_event_t *e)
             lv_obj_set_style_bg_color(guider_ui.HA_dark_temp_slider, lv_color_hex(0x686868), LV_PART_INDICATOR|LV_STATE_DEFAULT);
 
             // update to ha server
-            // sync_to_ha_server(ac);
+            ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, "off");
 
             ac.status = 0;
         }
@@ -147,7 +181,7 @@ static void HA_dark_ac_cool_event_handler (lv_event_t *e)
             lv_obj_set_style_bg_color(guider_ui.HA_dark_temp_slider, lv_color_hex(0x2195f6), LV_PART_INDICATOR|LV_STATE_DEFAULT);
 
             // update to ha server
-            // sync_to_ha_server(ac);
+            ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, "cool");
 
             ac.status = 1;
         }
@@ -178,7 +212,7 @@ static void HA_dark_ac_heat_event_handler (lv_event_t *e)
             lv_obj_set_style_bg_color(guider_ui.HA_dark_temp_slider, lv_color_hex(0xea7b32), LV_PART_INDICATOR|LV_STATE_DEFAULT);
 
             // update to ha server
-            // sync_to_ha_server(AC);
+            ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, "heat");
 
             ac.status = 2;
         }
@@ -209,6 +243,8 @@ static void HA_dark_menu_event_handler (lv_event_t *e)
 
 void events_init_HA_dark (lv_ui *ui)
 {
+    lv_obj_add_event_cb(ui->HA_dark_sw_2, HA_dark_sw_2_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->HA_dark_sw_1, HA_dark_sw_1_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->HA_dark_temp_slider, HA_dark_temp_slider_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->HA_dark_ac_off, HA_dark_ac_off_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->HA_dark_ac_cool, HA_dark_ac_cool_event_handler, LV_EVENT_ALL, ui);
@@ -220,41 +256,4 @@ void events_init_HA_dark (lv_ui *ui)
 void events_init(lv_ui *ui)
 {
 
-}
-
-
-// Switch 1 toggle
-static void HA_dark_sw_1_event_handler(lv_event_t *e)
-{
-    if (lv_event_get_code(e) != LV_EVENT_VALUE_CHANGED) {
-        return;
-    }
-    const bool on = lv_obj_has_state(guider_ui.HA_dark_sw_1, LV_STATE_CHECKED);
-    ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_SWITCH_1, on ? "on" : "off");
-}
-
-// Switch 2 toggle
-static void HA_dark_sw_2_event_handler(lv_event_t *e)
-{
-    if (lv_event_get_code(e) != LV_EVENT_VALUE_CHANGED) {
-        return;
-    }
-    const bool on = lv_obj_has_state(guider_ui.HA_dark_sw_2, LV_STATE_CHECKED);
-    ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_SWITCH_2, on ? "on" : "off");
-}
-
-// AC mode buttons
-static void HA_dark_ac_off_event_handler(lv_event_t *e) { if (lv_event_get_code(e) == LV_EVENT_CLICKED) ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, "off"); }
-static void HA_dark_ac_cool_event_handler(lv_event_t *e){ if (lv_event_get_code(e) == LV_EVENT_CLICKED) ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, "cool"); }
-static void HA_dark_ac_heat_event_handler(lv_event_t *e){ if (lv_event_get_code(e) == LV_EVENT_CLICKED) ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, "heat"); }
-
-// AC temperature slider (sends the value as state; see note below)
-static void HA_dark_temp_slider_event_handler(lv_event_t *e)
-{
-    if (lv_event_get_code(e) != LV_EVENT_VALUE_CHANGED) {
-        return;
-    }
-    char buf[8];
-    snprintf(buf, sizeof(buf), "%ld", (long)lv_slider_get_value(guider_ui.HA_dark_temp_slider));
-    ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, buf);
 }

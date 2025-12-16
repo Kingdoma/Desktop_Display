@@ -10,6 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <strings.h>
 #include "esp_http_client.h"
 #include "esp_websocket_client.h"
 #include "esp_event.h"
@@ -68,6 +69,12 @@ static ha_sync_ctx_t g_ctx = {0};
 static EventGroupHandle_t g_net_events;
 static esp_event_handler_instance_t g_ip_handler;
 static esp_event_handler_instance_t g_wifi_handler;
+static uint32_t g_ws_msg_id = 2; // 1 is used for subscribe_events
+
+/* Websocket helpers (defined later). */
+static void ws_send_text(const char *text);
+static bool ws_ready(void);
+static uint32_t ws_next_id(void);
 
 static bool json_get_temperature(cJSON *state_obj, float *out_temp)
 {
@@ -289,6 +296,58 @@ static esp_err_t ha_push_state(const char *entity_id, const char *state)
         return ESP_ERR_INVALID_ARG;
     }
 
+    /* Prefer HA websocket call_service if available; fall back to REST PUT. */
+    if (ws_ready()) {
+        const char *dot = strchr(entity_id, '.');
+        if (dot && dot > entity_id) {
+            char domain[24] = {0};
+            size_t dlen = (size_t)(dot - entity_id);
+            if (dlen >= sizeof(domain)) {
+                dlen = sizeof(domain) - 1;
+            }
+            memcpy(domain, entity_id, dlen);
+
+            char payload[256];
+            const uint32_t id = ws_next_id();
+            const char *service = NULL;
+            char extra[80] = {0};
+
+            /* Climate: hvac_mode vs set_temperature */
+            if (strcmp(domain, "climate") == 0) {
+                if (strcmp(state, "heat") == 0 || strcmp(state, "cool") == 0 ||
+                    strcmp(state, "auto") == 0 || strcmp(state, "off") == 0 ||
+                    strcmp(state, "dry") == 0  || strcmp(state, "fan_only") == 0) {
+                    service = "set_hvac_mode";
+                    snprintf(extra, sizeof(extra), ",\"hvac_mode\":\"%s\"", state);
+                } else {
+                    /* Treat as temperature setpoint */
+                    float temp = strtof(state, NULL);
+                    service = "set_temperature";
+                    snprintf(extra, sizeof(extra), ",\"temperature\":%.1f", temp);
+                }
+            } else {
+                /* Generic on/off map to turn_on/turn_off */
+                if (strcasecmp(state, "on") == 0) {
+                    service = "turn_on";
+                } else if (strcasecmp(state, "off") == 0) {
+                    service = "turn_off";
+                }
+            }
+
+            if (service) {
+                int n = snprintf(payload, sizeof(payload),
+                                 "{\"id\":%u,\"type\":\"call_service\",\"domain\":\"%s\",\"service\":\"%s\",\"service_data\":{\"entity_id\":\"%s\"%s}}",
+                                 (unsigned)id, domain, service, entity_id, extra);
+                if (n > 0 && n < (int)sizeof(payload)) {
+                    ws_send_text(payload);
+                    return ESP_OK;
+                } else {
+                    ESP_LOGW(HA_TAG, "WS payload too long for %s", entity_id);
+                }
+            }
+        }
+    }
+
     char url[256];
     int written = snprintf(url, sizeof(url), "%s/api/states/%s", g_ctx.base_url, entity_id);
     if (written <= 0 || written >= (int)sizeof(url)) {
@@ -419,6 +478,16 @@ static void ws_send_auth(void)
 static void ws_send_subscribe(void)
 {
     ws_send_text("{\"id\":1,\"type\":\"subscribe_events\",\"event_type\":\"state_changed\"}");
+}
+
+static bool ws_ready(void)
+{
+    return g_ctx.ws && g_ctx.ws_authed && esp_websocket_client_is_connected(g_ctx.ws);
+}
+
+static uint32_t ws_next_id(void)
+{
+    return g_ws_msg_id++;
 }
 
 static void stop_websocket(void)
