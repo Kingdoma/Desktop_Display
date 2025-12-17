@@ -8,10 +8,10 @@
 extern "C" {
 #endif
 
-/* Start the SNTP synchronization task (spawns its own FreeRTOS task). */
-void start_sntp_task(void);
+// sntp task
+void sntp_task(void *arg);
 
-/* Update date/time fields in metrics using the current system clock. */
+// Update date/time fields in metrics using the current system clock
 bool update_wall_clock(system_metrics_t *metrics);
 
 #ifdef __cplusplus

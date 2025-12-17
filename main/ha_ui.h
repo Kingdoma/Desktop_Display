@@ -43,6 +43,7 @@ typedef struct {
     ha_ui_sensor_t *hum_card;
     ha_ui_sensor_t *temp_card;
     ha_ui_printer_t *printer_card;
+    bool update;
 } ha_ui_element_t;
 
 /* Shared HA state that can be read from the LVGL task. */

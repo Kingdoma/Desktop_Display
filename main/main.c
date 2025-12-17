@@ -22,6 +22,9 @@
 // for benchmarking
 // #include "lv_demos.h"
 
+// for heap tracking
+#include "esp_heap_task_info.h"
+
 #define TAG "app_main"
 #define HA_TOKEN_PLACEHOLDER "YOUR_LONG_LIVED_ACCESS_TOKEN"
 #define HA_EXTRA_ENTITY_SLOTS 5
@@ -250,10 +253,7 @@ static void lvgl_task(void *arg)
     // lv_demo_benchmark();
 
     while (1) {
-        while (metrics_queue_pop(&latest_metrics)) {
-            needs_ui_update = true;
-        }
-
+        // time data need update
         const TickType_t now = xTaskGetTickCount();
         if ((now - last_time_update) >= pdMS_TO_TICKS(1000)) {
             if (update_wall_clock(&latest_metrics)) {
@@ -262,14 +262,31 @@ static void lvgl_task(void *arg)
             last_time_update = now;
         }
 
-        if (needs_ui_update) {
-            custom_update_metrics(&guider_ui, &latest_metrics);
-            needs_ui_update = false;
+        // pc info need update
+        if (metrics_queue_pop(&latest_metrics)) {
+            needs_ui_update = true;
         }
+
+        // ha info need update
+        if (sync_data->update == true){
+            sync_data->update = false;
+            needs_ui_update = true;
+        }
+
+        // If at Monitor panel then update the metrics and time
+        if (screen_is_active(guider_ui.Monitor_dark) && needs_ui_update) {
+            monitor_panel_update(&guider_ui, &latest_metrics);
+        }
+        // If at HA panel then update the homeassistant entry data and time
+        else if (screen_is_active(guider_ui.HA_dark) && needs_ui_update) {
+            ha_panel_update(&guider_ui, &latest_metrics);
+        }
+
         lv_timer_handler();
         if (wdt_err == ESP_OK) {
             esp_task_wdt_reset();
         }
+
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
@@ -290,14 +307,15 @@ void app_main(void)
 {
     ha_ui_sync_data_init();
 
-    // SNTP sync performs networking and logging; give it a real stack to avoid corruption.
-    start_sntp_task();
+    xTaskCreate(sntp_task, "sntp_task", 4096, NULL, 2, NULL);
 
     xTaskCreate(lvgl_task, "lvgl_task", 4096, NULL, 2, NULL);
 
     xTaskCreate(cdc_task, "cdc_task", 4096, NULL, 2, NULL);
 
     start_ha_sync();
+
+    // heap_caps_print_all_task_stat_overview(stdout);
 
     ESP_LOGI(TAG, "LVGL task started");
 }

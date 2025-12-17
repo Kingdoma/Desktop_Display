@@ -58,7 +58,7 @@ static int16_t clamp_percent(float value)
     return (int16_t)(value + 0.5f);
 }
 
-static bool screen_is_active(const lv_obj_t *screen)
+bool screen_is_active(const lv_obj_t *screen)
 {
     return screen && lv_obj_is_valid(screen) && lv_scr_act() == screen;
 }
@@ -337,7 +337,7 @@ static void update_sensor_card(lv_obj_t *info, const ha_ui_sensor_t *data)
     lv_spangroup_refr_mode(info);
 }
 
-static void monitor_panel_update(lv_ui *ui, const system_metrics_t *metrics)
+void monitor_panel_update(lv_ui *ui, const system_metrics_t *metrics)
 {
     const int16_t cpu_usage = clamp_percent(metrics->cpu_usage_percent);
     if (ui->Monitor_dark_arc_1) {
@@ -431,7 +431,7 @@ static void monitor_panel_update(lv_ui *ui, const system_metrics_t *metrics)
     }
 }
 
-static void ha_panel_update(lv_ui *ui, const system_metrics_t *metrics)
+void ha_panel_update(lv_ui *ui, const system_metrics_t *metrics)
 {
     if (ui->HA_dark_date && lv_obj_is_valid(ui->HA_dark_date)) {
         lv_span_t *day_span = lv_spangroup_get_child(ui->HA_dark_date, 0);
@@ -475,23 +475,6 @@ static void ha_panel_update(lv_ui *ui, const system_metrics_t *metrics)
     update_climate_card(ui, sync_data->ac_card);
     update_sensor_card(ui->HA_dark_hum_info, sync_data->hum_card);
     update_sensor_card(ui->HA_dark_temp_info, sync_data->temp_card);
-}
-
-void custom_update_metrics(lv_ui *ui, const system_metrics_t *metrics)
-{
-    if (!ui || !metrics) {
-        return;
-    }
-
-    // If at Monitor panel then update the metrics and time
-    if (screen_is_active(ui->Monitor_dark)) {
-        monitor_panel_update(ui, metrics);
-    }
-    // If at HA panel then update the homeassistant entry data and time
-    else if (screen_is_active(ui->HA_dark)) {
-        ha_panel_update(ui, metrics);
-    }
-
 }
 
 void scrollable_disable(lv_obj_t *obj){

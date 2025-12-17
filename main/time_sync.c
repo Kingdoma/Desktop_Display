@@ -59,7 +59,7 @@ static void sntp_time_sync(void)
     esp_netif_sntp_deinit();
 }
 
-static void sntp_task(void *arg)
+void sntp_task(void *arg)
 {
     (void)arg;
     ESP_LOGI(TIME_SYNC_TAG, "Start SNTP sync task");
@@ -67,11 +67,6 @@ static void sntp_task(void *arg)
     tzset();
     sntp_time_sync();
     vTaskDelete(NULL);
-}
-
-void start_sntp_task(void)
-{
-    xTaskCreate(sntp_task, "sntp_task", 4096, NULL, 2, NULL);
 }
 
 bool update_wall_clock(system_metrics_t *metrics)

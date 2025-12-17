@@ -19,6 +19,17 @@ static ha_ui_element_t g_elements;
 
 ha_ui_element_t *sync_data = NULL;
 
+
+
+static void last_change_update(char *target, const char *last_changed)
+{
+    if (last_changed && last_changed[0]) {
+        strlcpy(target, last_changed, sizeof(target));
+    } else {
+        target[0] = '\0';
+    }
+}
+
 void ha_ui_sync_data_init(void)
 {
     memset(&g_sw_1, 0, sizeof(g_sw_1));
@@ -39,6 +50,7 @@ void ha_ui_sync_data_init(void)
     g_elements.printer_card = &g_printer;
 
     sync_data = &g_elements;
+    sync_data->update = false;
 }
 
 void ha_ui_set_ui(lv_ui *ui)
@@ -49,10 +61,6 @@ void ha_ui_set_ui(lv_ui *ui)
 
 void ha_ui_update_switch(uint8_t lvgl_id, const char *state, const char *last_changed)
 {
-    if (!state || !sync_data) {
-        return;
-    }
-
     const bool is_on = (state[0] == 'o' || state[0] == 'O') && (state[1] == 'n' || state[1] == 'N');
     ha_ui_sw_t *target = NULL;
     switch (lvgl_id) {
@@ -71,66 +79,40 @@ void ha_ui_update_switch(uint8_t lvgl_id, const char *state, const char *last_ch
         return;
     }
 
+    // update to ha_ui_element_t
     target->switch_on = is_on;
-    if (last_changed && last_changed[0]) {
-        strlcpy(target->last_changed, last_changed, sizeof(target->last_changed));
-    } else {
-        target->last_changed[0] = '\0';
-    }
+    last_change_update(target->last_changed, last_changed);
+    sync_data->update = true;
 }
 
 void ha_ui_update_climate(uint8_t lvgl_id, const float temperature, const char *state, const char *last_changed)
 {
-    (void)lvgl_id;
-    if (!state || !sync_data || !sync_data->ac_card) {
-        return;
-    }
-
+    // update to ha_ui_element_t
     sync_data->ac_card->temperature = temperature;
     strlcpy(sync_data->ac_card->mode, state, sizeof(sync_data->ac_card->mode));
-    if (last_changed && last_changed[0]) {
-        strlcpy(sync_data->ac_card->last_changed, last_changed, sizeof(sync_data->ac_card->last_changed));
-    } else {
-        sync_data->ac_card->last_changed[0] = '\0';
-    }
+    last_change_update(sync_data->ac_card->last_changed, last_changed);
+    sync_data->update = true;
 }
 
 void ha_ui_update_printer(uint8_t lvgl_id, const char *state, const char *last_changed)
 {
-    (void)lvgl_id;
-    if (!state || !sync_data || !sync_data->printer_card) {
-        return;
-    }
-
+    // update to ha_ui_element_t
     strlcpy(sync_data->printer_card->mode, state, sizeof(sync_data->printer_card->mode));
-    if (last_changed && last_changed[0]) {
-        strlcpy(sync_data->printer_card->last_changed, last_changed, sizeof(sync_data->printer_card->last_changed));
-    } else {
-        sync_data->printer_card->last_changed[0] = '\0';
-    }
+    last_change_update(sync_data->printer_card->last_changed, last_changed);
+    sync_data->update = true;
 }
 
 void ha_ui_update_weather(const float temperature, const char *state, const char *last_changed)
 {
-    if (!state || !sync_data || !sync_data->weahter_card) {
-        return;
-    }
-
+    // update to ha_ui_element_t
     sync_data->weahter_card->temperature = temperature;
     strlcpy(sync_data->weahter_card->weather, state, sizeof(sync_data->weahter_card->weather));
-    if (last_changed && last_changed[0]) {
-        strlcpy(sync_data->weahter_card->last_changed, last_changed, sizeof(sync_data->weahter_card->last_changed));
-    } else {
-        sync_data->weahter_card->last_changed[0] = '\0';
-    }
+    last_change_update(sync_data->weahter_card->last_changed, last_changed);
+    sync_data->update = true;
 }
 
 void ha_ui_update_sensor(const char *state, const char *last_changed, int8_t type)
 {
-    if (!state || !sync_data) {
-        return;
-    }
-
     ha_ui_sensor_t *target = NULL;
     switch (type) {
     case 1:
@@ -148,10 +130,8 @@ void ha_ui_update_sensor(const char *state, const char *last_changed, int8_t typ
         return;
     }
 
+    // update to ha_ui_element_t
     strlcpy(target->data, state, sizeof(target->data));
-    if (last_changed && last_changed[0]) {
-        strlcpy(target->last_changed, last_changed, sizeof(target->last_changed));
-    } else {
-        target->last_changed[0] = '\0';
-    }
+    last_change_update(target->last_changed, last_changed);
+    sync_data->update = true;
 }
