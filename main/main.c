@@ -18,7 +18,7 @@
 #include "ha_sync.h"
 #include "time_sync.h"
 #include "ha_ui.h"
-
+#include "wifi.h"
 // for benchmarking
 // #include "lv_demos.h"
 
@@ -30,6 +30,12 @@
 #define HA_EXTRA_ENTITY_SLOTS 5
 #define HA_MAX_ENTITY_SLOTS (5 + HA_EXTRA_ENTITY_SLOTS)
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+
+app_message_t g_msg_recv;
+
+EventGroupHandle_t g_wifi_event_group;
+const int CONNECTED_BIT = BIT0;
+const int ESPTOUCH_DONE_BIT = BIT1;
 
 lv_ui guider_ui;
 
@@ -307,9 +313,11 @@ void app_main(void)
 {
     ha_ui_sync_data_init();
 
-    xTaskCreate(sntp_task, "sntp_task", 4096, NULL, 2, NULL);
+    wifi_connect();
 
     xTaskCreate(lvgl_task, "lvgl_task", 4096, NULL, 2, NULL);
+
+    xTaskCreate(sntp_task, "sntp_task", 4096, NULL, 2, NULL);
 
     xTaskCreate(cdc_task, "cdc_task", 4096, NULL, 2, NULL);
 

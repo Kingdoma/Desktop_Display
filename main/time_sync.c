@@ -11,6 +11,7 @@
 #include "nvs_flash.h"
 #include "protocol_examples_common.h"
 #include "time_sync.h"
+#include "app_main.h"
 
 #define TIME_SYNC_TAG "time_sync"
 
@@ -21,29 +22,16 @@ static void time_sync_notification_cb(struct timeval *tv)
 }
 
 static void sntp_time_sync(void)
-{
+{   
+    EventBits_t uxBits;
+    uxBits = xEventGroupWaitBits(g_wifi_event_group, CONNECTED_BIT, true, false, portMAX_DELAY);
+
+    while(!(uxBits & CONNECTED_BIT)) {
+        ESP_LOGI(TIME_SYNC_TAG, "Not connected to wifi");
+        vTaskDelay(pdMS_TO_TICKS(5000));
+    }
+
     ESP_LOGI(TIME_SYNC_TAG, "Initializing SNTP");
-
-    ESP_ERROR_CHECK(nvs_flash_init());
-
-    esp_err_t err = esp_netif_init();
-    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
-        ESP_LOGE(TIME_SYNC_TAG, "esp_netif_init failed: %s", esp_err_to_name(err));
-        return;
-    }
-
-    err = esp_event_loop_create_default();
-    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
-        ESP_LOGE(TIME_SYNC_TAG, "esp_event_loop_create_default failed: %s", esp_err_to_name(err));
-        return;
-    }
-
-    // connect to internet
-    err = example_connect();
-    if (err != ESP_OK && err != ESP_ERR_INVALID_STATE) {
-        ESP_LOGE(TIME_SYNC_TAG, "esp_wifi_connect failed: %s", esp_err_to_name(err));
-        return;
-    }
 
     esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG("pool.ntp.org");
     config.sync_cb = time_sync_notification_cb;

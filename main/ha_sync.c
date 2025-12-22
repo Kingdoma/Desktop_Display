@@ -6,6 +6,7 @@
  */
 
 #include "ha_sync.h"
+#include "app_main.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -14,7 +15,6 @@
 #include "esp_http_client.h"
 #include "esp_websocket_client.h"
 #include "esp_event.h"
-#include "esp_wifi.h"
 #include "esp_check.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
@@ -26,7 +26,6 @@
 #define HA_TAG "ha_sync"
 #define HA_HTTP_BUF_SIZE 2048
 #define HA_TASK_STACK_BYTES 8192
-#define WIFI_CONNECTED_BIT BIT0
 #define HA_ENTITY_ID_MAX_LEN 96
 #define HA_STATE_MAX_LEN 32
 #define HA_LAST_CHANGED_MAX_LEN 48
@@ -66,9 +65,6 @@ typedef struct {
 } ha_msg_t;
 
 static ha_sync_ctx_t g_ctx = {0};
-static EventGroupHandle_t g_net_events;
-static esp_event_handler_instance_t g_ip_handler;
-static esp_event_handler_instance_t g_wifi_handler;
 static uint32_t g_ws_msg_id = 2; // 1 is used for subscribe_events
 
 /* Websocket helpers (defined later). */
@@ -121,18 +117,6 @@ static void ha_free_ctx(void)
     g_ctx.entity_count = 0;
     g_ctx.task = NULL;
 
-    if (g_net_events) {
-        if (g_ip_handler) {
-            esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, g_ip_handler);
-            g_ip_handler = NULL;
-        }
-        if (g_wifi_handler) {
-            esp_event_handler_instance_unregister(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, g_wifi_handler);
-            g_wifi_handler = NULL;
-        }
-        vEventGroupDelete(g_net_events);
-        g_net_events = NULL;
-    }
 }
 
 static char *dup_string(const char *in)
@@ -403,41 +387,13 @@ static void enqueue_event(const char *entity_id,
     xQueueSend(g_ctx.queue, &msg, 0);
 }
 
-static void on_ip_event(void *arg, esp_event_base_t base, int32_t id, void *data)
-{
-    (void)arg;
-    (void)base;
-    (void)data;
-    if (id == IP_EVENT_STA_GOT_IP && g_net_events) {
-        xEventGroupSetBits(g_net_events, WIFI_CONNECTED_BIT);
-    }
-}
-
-static void on_wifi_event(void *arg, esp_event_base_t base, int32_t id, void *data)
-{
-    (void)arg;
-    (void)data;
-    if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED && g_net_events) {
-        xEventGroupClearBits(g_net_events, WIFI_CONNECTED_BIT);
-    }
-}
-
 static bool wait_for_wifi_connected(TickType_t wait_ticks)
 {
-    if (!g_net_events) {
-        return true; // assume ready if we couldn't create tracking
+    if (!g_wifi_event_group) {
+        return false;
     }
-    EventBits_t bits = xEventGroupWaitBits(g_net_events, WIFI_CONNECTED_BIT, pdFALSE, pdFALSE, wait_ticks);
-    if ((bits & WIFI_CONNECTED_BIT) != 0) {
-        return true;
-    }
-    // Poll WiFi state in case we missed the event (e.g., handler not yet registered).
-    wifi_ap_record_t ap = {0};
-    if (esp_wifi_sta_get_ap_info(&ap) == ESP_OK) {
-        xEventGroupSetBits(g_net_events, WIFI_CONNECTED_BIT);
-        return true;
-    }
-    return false;
+    EventBits_t bits = xEventGroupWaitBits(g_wifi_event_group, CONNECTED_BIT, pdFALSE, pdFALSE, wait_ticks);
+    return (bits & CONNECTED_BIT) != 0;
 }
 
 static esp_err_t enqueue_push(const char *entity_id, const char *state)
@@ -767,22 +723,11 @@ esp_err_t ha_sync_start(const ha_sync_config_t *config)
     g_ctx.poll_ms = config->poll_interval_ms ? config->poll_interval_ms : 5000;
     g_ctx.entity_count = config->entity_count;
     g_ctx.queue = xQueueCreate(8, sizeof(ha_msg_t));
-    g_net_events = xEventGroupCreate();
 
     if (!g_ctx.base_url || !g_ctx.entities || !g_ctx.auth_header || !g_ctx.auth_token || !g_ctx.queue) {
         ESP_LOGE(HA_TAG, "Failed to allocate HA sync resources");
         ha_free_ctx();
         return ESP_ERR_NO_MEM;
-    }
-
-    // Ensure the default event loop exists for WiFi/IP events.
-    esp_event_loop_create_default();
-    // Track WiFi connectivity so we don't hammer HA before network is ready.
-    esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, on_ip_event, NULL, &g_ip_handler);
-    esp_event_handler_instance_register(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, on_wifi_event, NULL, &g_wifi_handler);
-    wifi_ap_record_t ap = {0};
-    if (esp_wifi_sta_get_ap_info(&ap) == ESP_OK && g_net_events) {
-        xEventGroupSetBits(g_net_events, WIFI_CONNECTED_BIT);
     }
 
     for (size_t i = 0; i < config->entity_count; ++i) {

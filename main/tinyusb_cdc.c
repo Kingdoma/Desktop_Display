@@ -3,8 +3,6 @@
 #include "tinyusb_cdc.h"
 #include "metrics.h"
 
-app_message_t g_msg_recv;
-
 static const char *TAG = "tinyusb_cdc";
 static bool s_initialized = false;
 static uint8_t rx_buf[CONFIG_TINYUSB_CDC_RX_BUFSIZE + 1];
