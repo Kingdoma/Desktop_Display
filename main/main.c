@@ -282,10 +282,12 @@ static void lvgl_task(void *arg)
         // If at Monitor panel then update the metrics and time
         if (screen_is_active(guider_ui.Monitor_dark) && needs_ui_update) {
             monitor_panel_update(&guider_ui, &latest_metrics);
+            needs_ui_update = false;
         }
         // If at HA panel then update the homeassistant entry data and time
         else if (screen_is_active(guider_ui.HA_dark) && needs_ui_update) {
             ha_panel_update(&guider_ui, &latest_metrics);
+            needs_ui_update = false;
         }
 
         lv_timer_handler();
@@ -321,7 +323,7 @@ void app_main(void)
 
     xTaskCreate(cdc_task, "cdc_task", 4096, NULL, 2, NULL);
 
-    start_ha_sync();
+    // start_ha_sync();
 
     // heap_caps_print_all_task_stat_overview(stdout);
 
