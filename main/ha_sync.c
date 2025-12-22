@@ -612,7 +612,7 @@ static void ha_sync_task(void *arg)
     bool remote_has_temp = false;
     TickType_t next_ws_retry = 0;
 
-    while (!wait_for_wifi_connected(pdMS_TO_TICKS(30000))) {
+    while (!wait_for_wifi_connected(pdMS_TO_TICKS(15000))) {
         ESP_LOGW(HA_TAG, "Waiting for WiFi connection before HA sync...");
     }
 
