@@ -16,9 +16,9 @@
 
 
 
-int HA_dark_digital_clock_time_min_value = 25;
-int HA_dark_digital_clock_time_hour_value = 23;
-int HA_dark_digital_clock_time_sec_value = 50;
+int HA_dark_digital_clock_time_min_value = 48;
+int HA_dark_digital_clock_time_hour_value = 18;
+int HA_dark_digital_clock_time_sec_value = 11;
 void setup_scr_HA_dark(lv_ui *ui)
 {
     //Write codes HA_dark
@@ -971,7 +971,7 @@ void setup_scr_HA_dark(lv_ui *ui)
 
     //Write codes HA_dark_digital_clock_time
     static bool HA_dark_digital_clock_time_timer_enabled = false;
-    ui->HA_dark_digital_clock_time = lv_dclock_create(ui->HA_dark_time_card, "23:25:50");
+    ui->HA_dark_digital_clock_time = lv_dclock_create(ui->HA_dark_time_card, "18:48:11");
     if (!HA_dark_digital_clock_time_timer_enabled) {
         lv_timer_create(HA_dark_digital_clock_time_timer, 1000, NULL);
         HA_dark_digital_clock_time_timer_enabled = true;
@@ -1044,7 +1044,7 @@ void setup_scr_HA_dark(lv_ui *ui)
 
     //Write codes HA_dark_menu
     ui->HA_dark_menu = lv_dropdown_create(ui->HA_dark);
-    lv_dropdown_set_options(ui->HA_dark_menu, "HA\nPC");
+    lv_dropdown_set_options(ui->HA_dark_menu, "HA\nPC\nOP");
     lv_obj_set_pos(ui->HA_dark_menu, 27, 32);
     lv_obj_set_size(ui->HA_dark_menu, 59, 30);
 
@@ -1077,7 +1077,7 @@ void setup_scr_HA_dark(lv_ui *ui)
     static lv_style_t style_HA_dark_menu_extra_list_main_default;
     ui_init_style(&style_HA_dark_menu_extra_list_main_default);
 
-    lv_style_set_max_height(&style_HA_dark_menu_extra_list_main_default, 80);
+    lv_style_set_max_height(&style_HA_dark_menu_extra_list_main_default, 130);
     lv_style_set_text_color(&style_HA_dark_menu_extra_list_main_default, lv_color_hex(0xebebeb));
     lv_style_set_text_font(&style_HA_dark_menu_extra_list_main_default, &lv_font_montserratMedium_15);
     lv_style_set_text_opa(&style_HA_dark_menu_extra_list_main_default, 255);

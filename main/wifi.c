@@ -19,7 +19,7 @@ static void smartconfig_example_task(void * parm);
 static void wifi_init()
 {
     ESP_ERROR_CHECK(esp_netif_init());
-    
+
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
     esp_netif_t *sta_netif = esp_netif_create_default_wifi_sta();
@@ -148,4 +148,23 @@ void wifi_setting_clear()
 {
     ESP_LOGI(WIFI_TAG, "Clear the wifi setting");
     ESP_ERROR_CHECK( esp_wifi_restore() );
+}
+
+void wifi_diconnect()
+{
+    xEventGroupClearBits(g_wifi_event_group, CONNECTED_BIT);
+    ESP_LOGI(WIFI_TAG, "disconnecting");
+    ESP_ERROR_CHECK( esp_wifi_disconnect() );
+}
+
+void wifi_reconnect()
+{
+    xEventGroupClearBits(g_wifi_event_group, CONNECTED_BIT);
+    ESP_LOGI(WIFI_TAG, "reconnecting");
+    ESP_ERROR_CHECK( esp_wifi_disconnect() );
+
+    vTaskDelay(pdMS_TO_TICKS(50));
+    
+    ESP_ERROR_CHECK( esp_wifi_connect() );
+    xEventGroupSetBits(g_wifi_event_group, CONNECTED_BIT);
 }

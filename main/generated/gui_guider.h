@@ -115,6 +115,39 @@ typedef struct
 	lv_span_t *HA_dark_temp_span;
 	lv_obj_t *HA_dark_weather;
 	lv_obj_t *HA_dark_menu;
+	lv_obj_t *Setting_dark;
+	bool Setting_dark_del;
+	lv_obj_t *Setting_dark_wifi_cont;
+	lv_obj_t *Setting_dark_disconnect_btn;
+	lv_obj_t *Setting_dark_disconnect_btn_label;
+	lv_obj_t *Setting_dark_reconnect_btn;
+	lv_obj_t *Setting_dark_reconnect_btn_label;
+	lv_obj_t *Setting_dark_rest_btn;
+	lv_obj_t *Setting_dark_rest_btn_label;
+	lv_obj_t *Setting_dark_wifi_opt;
+	lv_obj_t *Setting_dark_wifi_info;
+	lv_span_t *Setting_dark_wifi_info_span;
+	lv_obj_t *Setting_dark_wifi_label;
+	lv_obj_t *Setting_dark_wifi_icon;
+	lv_obj_t *Setting_dark_usb_cont;
+	lv_obj_t *Setting_dark_usb_label;
+	lv_obj_t *Setting_dark_usb_info;
+	lv_span_t *Setting_dark_usb_info_span;
+	lv_obj_t *Setting_dark_usb_icon;
+	lv_obj_t *Setting_dark_ha_cont;
+	lv_obj_t *Setting_dark_ha_label;
+	lv_obj_t *Setting_dark_ha_info;
+	lv_span_t *Setting_dark_ha_info_span;
+	lv_obj_t *Setting_dark_ha_icon;
+	lv_obj_t *Setting_dark_sntp_cont;
+	lv_obj_t *Setting_dark_sntp_label;
+	lv_obj_t *Setting_dark_sntp_info;
+	lv_span_t *Setting_dark_sntp_info_span;
+	lv_obj_t *Setting_dark_sntp_icon;
+	lv_obj_t *Setting_dark_title;
+	lv_obj_t *Setting_dark_title_label;
+	lv_obj_t *Setting_dark_menu;
+	lv_obj_t *g_kb_top_layer;
 }lv_ui;
 
 typedef void (*ui_setup_scr_t)(lv_ui * ui);
@@ -140,18 +173,23 @@ extern lv_ui guider_ui;
 
 void setup_scr_Monitor_dark(lv_ui *ui);
 void setup_scr_HA_dark(lv_ui *ui);
+void setup_scr_Setting_dark(lv_ui *ui);
 LV_IMG_DECLARE(_download_alpha_13x13);
 LV_IMG_DECLARE(_upload_alpha_13x13);
 
 LV_IMG_DECLARE(_temperature_35x35);
 LV_IMG_DECLARE(_humidity_alpha_28x28);
-LV_IMG_DECLARE(_sun_alpha_60x60);
 LV_IMG_DECLARE(_cloudy_alpha_60x60);
-LV_IMG_DECLARE(_foog_alpha_60x60);
+LV_IMG_DECLARE(_snowy_alpha_60x60);
+LV_IMG_DECLARE(_storm_alpha_60x60);
 LV_IMG_DECLARE(_rainy_alpha_60x60);
 LV_IMG_DECLARE(_windy_alpha_60x60);
-LV_IMG_DECLARE(_storm_alpha_60x60);
-LV_IMG_DECLARE(_snowy_alpha_60x60);
+LV_IMG_DECLARE(_foog_alpha_60x60);
+LV_IMG_DECLARE(_sun_alpha_60x60);
+LV_IMG_DECLARE(_wifi_alpha_22x22);
+LV_IMG_DECLARE(_usb_alpha_22x22);
+LV_IMG_DECLARE(_home_alpha_23x23);
+LV_IMG_DECLARE(_clock_alpha_20x20);
 
 LV_FONT_DECLARE(lv_font_montserratMedium_17)
 LV_FONT_DECLARE(lv_font_montserratMedium_15)

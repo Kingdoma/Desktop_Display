@@ -9,4 +9,8 @@ void wifi_connect(void);
 
 void wifi_setting_clear();
 
+void wifi_diconnect();
+
+void wifi_reconnect();
+
 #endif /* WIFI_H */

@@ -41,7 +41,7 @@ void setup_scr_Monitor_dark(lv_ui *ui)
     //Write style for Monitor_dark_cont_time, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->Monitor_dark_cont_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->Monitor_dark_cont_time, 3, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui->Monitor_dark_cont_time, 181, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui->Monitor_dark_cont_time, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui->Monitor_dark_cont_time, lv_color_hex(0x323439), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->Monitor_dark_cont_time, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui->Monitor_dark_cont_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -154,7 +154,7 @@ void setup_scr_Monitor_dark(lv_ui *ui)
     //Write style for Monitor_dark_cont_net, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->Monitor_dark_cont_net, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->Monitor_dark_cont_net, 3, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui->Monitor_dark_cont_net, 181, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui->Monitor_dark_cont_net, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui->Monitor_dark_cont_net, lv_color_hex(0x323439), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->Monitor_dark_cont_net, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui->Monitor_dark_cont_net, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -387,7 +387,7 @@ void setup_scr_Monitor_dark(lv_ui *ui)
     //Write style for Monitor_dark_cont_cpu_monitor, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->Monitor_dark_cont_cpu_monitor, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->Monitor_dark_cont_cpu_monitor, 3, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui->Monitor_dark_cont_cpu_monitor, 181, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui->Monitor_dark_cont_cpu_monitor, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui->Monitor_dark_cont_cpu_monitor, lv_color_hex(0x323439), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->Monitor_dark_cont_cpu_monitor, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui->Monitor_dark_cont_cpu_monitor, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -660,7 +660,7 @@ void setup_scr_Monitor_dark(lv_ui *ui)
     //Write style for Monitor_dark_cont_gpu_monitor, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->Monitor_dark_cont_gpu_monitor, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->Monitor_dark_cont_gpu_monitor, 3, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui->Monitor_dark_cont_gpu_monitor, 181, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui->Monitor_dark_cont_gpu_monitor, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui->Monitor_dark_cont_gpu_monitor, lv_color_hex(0x323439), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->Monitor_dark_cont_gpu_monitor, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui->Monitor_dark_cont_gpu_monitor, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -949,7 +949,7 @@ void setup_scr_Monitor_dark(lv_ui *ui)
 
     //Write codes Monitor_dark_menu
     ui->Monitor_dark_menu = lv_dropdown_create(ui->Monitor_dark);
-    lv_dropdown_set_options(ui->Monitor_dark_menu, "PC\nHA");
+    lv_dropdown_set_options(ui->Monitor_dark_menu, "PC\nHA\nOP");
     lv_obj_set_pos(ui->Monitor_dark_menu, 17, 5);
     lv_obj_set_size(ui->Monitor_dark_menu, 52, 24);
 
@@ -982,7 +982,7 @@ void setup_scr_Monitor_dark(lv_ui *ui)
     static lv_style_t style_Monitor_dark_menu_extra_list_main_default;
     ui_init_style(&style_Monitor_dark_menu_extra_list_main_default);
 
-    lv_style_set_max_height(&style_Monitor_dark_menu_extra_list_main_default, 80);
+    lv_style_set_max_height(&style_Monitor_dark_menu_extra_list_main_default, 130);
     lv_style_set_text_color(&style_Monitor_dark_menu_extra_list_main_default, lv_color_hex(0xebebeb));
     lv_style_set_text_font(&style_Monitor_dark_menu_extra_list_main_default, &lv_font_montserratMedium_15);
     lv_style_set_text_opa(&style_Monitor_dark_menu_extra_list_main_default, 255);

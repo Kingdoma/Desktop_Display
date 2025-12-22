@@ -20,6 +20,7 @@ void events_init(lv_ui *ui);
 
 void events_init_Monitor_dark(lv_ui *ui);
 void events_init_HA_dark(lv_ui *ui);
+void events_init_Setting_dark(lv_ui *ui);
 
 #ifdef __cplusplus
 }
