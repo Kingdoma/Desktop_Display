@@ -323,7 +323,7 @@ void app_main(void)
 
     xTaskCreate(cdc_task, "cdc_task", 4096, NULL, 2, NULL);
 
-    // start_ha_sync();
+    start_ha_sync();
 
     // heap_caps_print_all_task_stat_overview(stdout);
 
