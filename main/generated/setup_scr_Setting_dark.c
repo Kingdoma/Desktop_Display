@@ -147,7 +147,7 @@ void setup_scr_Setting_dark(lv_ui *ui)
     ui->Setting_dark_wifi_info = lv_spangroup_create(ui->Setting_dark_wifi_cont);
     lv_spangroup_set_align(ui->Setting_dark_wifi_info, LV_TEXT_ALIGN_LEFT);
     lv_spangroup_set_overflow(ui->Setting_dark_wifi_info, LV_SPAN_OVERFLOW_CLIP);
-    lv_spangroup_set_mode(ui->Setting_dark_wifi_info, LV_SPAN_MODE_BREAK);
+    lv_spangroup_set_mode(ui->Setting_dark_wifi_info, LV_SPAN_MODE_FIXED);
     //create span
     ui->Setting_dark_wifi_info_span = lv_spangroup_new_span(ui->Setting_dark_wifi_info);
     lv_span_set_text(ui->Setting_dark_wifi_info_span, "Status : ");
@@ -160,7 +160,7 @@ void setup_scr_Setting_dark(lv_ui *ui)
     lv_style_set_text_decor(&ui->Setting_dark_wifi_info_span->style, LV_TEXT_DECOR_NONE);
     lv_style_set_text_font(&ui->Setting_dark_wifi_info_span->style, &lv_font_montserratMedium_16);
     lv_obj_set_pos(ui->Setting_dark_wifi_info, 14, 43);
-    lv_obj_set_size(ui->Setting_dark_wifi_info, 123, 28);
+    lv_obj_set_size(ui->Setting_dark_wifi_info, 175, 35);
 
     //Write style state: LV_STATE_DEFAULT for &style_Setting_dark_wifi_info_main_main_default
     static lv_style_t style_Setting_dark_wifi_info_main_main_default;
@@ -265,7 +265,7 @@ void setup_scr_Setting_dark(lv_ui *ui)
     ui->Setting_dark_usb_info = lv_spangroup_create(ui->Setting_dark_usb_cont);
     lv_spangroup_set_align(ui->Setting_dark_usb_info, LV_TEXT_ALIGN_LEFT);
     lv_spangroup_set_overflow(ui->Setting_dark_usb_info, LV_SPAN_OVERFLOW_CLIP);
-    lv_spangroup_set_mode(ui->Setting_dark_usb_info, LV_SPAN_MODE_BREAK);
+    lv_spangroup_set_mode(ui->Setting_dark_usb_info, LV_SPAN_MODE_FIXED);
     //create span
     ui->Setting_dark_usb_info_span = lv_spangroup_new_span(ui->Setting_dark_usb_info);
     lv_span_set_text(ui->Setting_dark_usb_info_span, "Status : ");
@@ -278,7 +278,7 @@ void setup_scr_Setting_dark(lv_ui *ui)
     lv_style_set_text_decor(&ui->Setting_dark_usb_info_span->style, LV_TEXT_DECOR_NONE);
     lv_style_set_text_font(&ui->Setting_dark_usb_info_span->style, &lv_font_montserratMedium_16);
     lv_obj_set_pos(ui->Setting_dark_usb_info, 16, 40);
-    lv_obj_set_size(ui->Setting_dark_usb_info, 199, 28);
+    lv_obj_set_size(ui->Setting_dark_usb_info, 199, 35);
 
     //Write style state: LV_STATE_DEFAULT for &style_Setting_dark_usb_info_main_main_default
     static lv_style_t style_Setting_dark_usb_info_main_main_default;
@@ -361,7 +361,7 @@ void setup_scr_Setting_dark(lv_ui *ui)
     ui->Setting_dark_ha_info = lv_spangroup_create(ui->Setting_dark_ha_cont);
     lv_spangroup_set_align(ui->Setting_dark_ha_info, LV_TEXT_ALIGN_LEFT);
     lv_spangroup_set_overflow(ui->Setting_dark_ha_info, LV_SPAN_OVERFLOW_CLIP);
-    lv_spangroup_set_mode(ui->Setting_dark_ha_info, LV_SPAN_MODE_BREAK);
+    lv_spangroup_set_mode(ui->Setting_dark_ha_info, LV_SPAN_MODE_FIXED);
     //create span
     ui->Setting_dark_ha_info_span = lv_spangroup_new_span(ui->Setting_dark_ha_info);
     lv_span_set_text(ui->Setting_dark_ha_info_span, "Status : ");
@@ -374,7 +374,7 @@ void setup_scr_Setting_dark(lv_ui *ui)
     lv_style_set_text_decor(&ui->Setting_dark_ha_info_span->style, LV_TEXT_DECOR_NONE);
     lv_style_set_text_font(&ui->Setting_dark_ha_info_span->style, &lv_font_montserratMedium_16);
     lv_obj_set_pos(ui->Setting_dark_ha_info, 16, 40);
-    lv_obj_set_size(ui->Setting_dark_ha_info, 199, 28);
+    lv_obj_set_size(ui->Setting_dark_ha_info, 199, 35);
 
     //Write style state: LV_STATE_DEFAULT for &style_Setting_dark_ha_info_main_main_default
     static lv_style_t style_Setting_dark_ha_info_main_main_default;
@@ -457,7 +457,7 @@ void setup_scr_Setting_dark(lv_ui *ui)
     ui->Setting_dark_sntp_info = lv_spangroup_create(ui->Setting_dark_sntp_cont);
     lv_spangroup_set_align(ui->Setting_dark_sntp_info, LV_TEXT_ALIGN_LEFT);
     lv_spangroup_set_overflow(ui->Setting_dark_sntp_info, LV_SPAN_OVERFLOW_CLIP);
-    lv_spangroup_set_mode(ui->Setting_dark_sntp_info, LV_SPAN_MODE_BREAK);
+    lv_spangroup_set_mode(ui->Setting_dark_sntp_info, LV_SPAN_MODE_FIXED);
     //create span
     ui->Setting_dark_sntp_info_span = lv_spangroup_new_span(ui->Setting_dark_sntp_info);
     lv_span_set_text(ui->Setting_dark_sntp_info_span, "Status : ");
@@ -470,7 +470,7 @@ void setup_scr_Setting_dark(lv_ui *ui)
     lv_style_set_text_decor(&ui->Setting_dark_sntp_info_span->style, LV_TEXT_DECOR_NONE);
     lv_style_set_text_font(&ui->Setting_dark_sntp_info_span->style, &lv_font_montserratMedium_16);
     lv_obj_set_pos(ui->Setting_dark_sntp_info, 16, 40);
-    lv_obj_set_size(ui->Setting_dark_sntp_info, 199, 28);
+    lv_obj_set_size(ui->Setting_dark_sntp_info, 199, 35);
 
     //Write style state: LV_STATE_DEFAULT for &style_Setting_dark_sntp_info_main_main_default
     static lv_style_t style_Setting_dark_sntp_info_main_main_default;

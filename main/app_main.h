@@ -13,7 +13,25 @@ typedef struct {
     uint8_t itf;                                        // Index of CDC device interface
 } app_message_t;
 
+typedef enum {
+    CONNECT,
+    DISCONNECT,
+    WAITING,
+    READY,
+    ERROR
+} APP_STATUS;
+
+typedef struct {
+    APP_STATUS wifi_staus;
+    APP_STATUS cdc_status;
+    APP_STATUS sntp_status;
+    APP_STATUS ha_status;
+    bool need_update;
+} app_module_status_t;
+
 extern app_message_t g_msg_recv;
+
+extern app_module_status_t g_module_status;
 
 extern EventGroupHandle_t g_wifi_event_group;
 

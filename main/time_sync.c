@@ -28,6 +28,10 @@ static void sntp_time_sync(void)
 
     while(!(uxBits & CONNECTED_BIT)) {
         ESP_LOGI(TIME_SYNC_TAG, "Not connected to wifi");
+
+        g_module_status.sntp_status = DISCONNECT;
+        g_module_status.need_update = true;
+
         vTaskDelay(pdMS_TO_TICKS(5000));
     }
 
@@ -42,6 +46,17 @@ static void sntp_time_sync(void)
     const int retry_count = 15;
     while (esp_netif_sntp_sync_wait(2000 / portTICK_PERIOD_MS) == ESP_ERR_TIMEOUT && ++retry < retry_count) {
         ESP_LOGI(TIME_SYNC_TAG, "Waiting for system time to be set... (%d/%d)", retry, retry_count);
+
+        g_module_status.sntp_status = WAITING;
+        g_module_status.need_update = true;
+    }
+    
+    if(retry > retry_count){
+        g_module_status.sntp_status = ERROR;
+        g_module_status.need_update = true;
+    }else{
+        g_module_status.sntp_status = READY;
+        g_module_status.need_update = true;
     }
 
     esp_netif_sntp_deinit();

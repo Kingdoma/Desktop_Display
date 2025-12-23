@@ -31,8 +31,14 @@
 #define HA_MAX_ENTITY_SLOTS (5 + HA_EXTRA_ENTITY_SLOTS)
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
-app_message_t g_msg_recv;
+app_module_status_t g_module_status = {
+    .wifi_staus = DISCONNECT,
+    .cdc_status = WAITING,
+    .sntp_status = WAITING,
+    .ha_status = WAITING
+};
 
+app_message_t g_msg_recv;
 EventGroupHandle_t g_wifi_event_group;
 const int CONNECTED_BIT = BIT0;
 const int ESPTOUCH_DONE_BIT = BIT1;
@@ -168,16 +174,28 @@ static void start_ha_sync(void)
 {
     if (!CONFIG_HA_SYNC_ENABLE) {
         ESP_LOGI(TAG, "HA sync disabled (CONFIG_HA_SYNC_ENABLE=n)");
+
+        g_module_status.ha_status = ERROR;
+        g_module_status.need_update = true;
+
         return;
     }
 
     if (strlen(CONFIG_HA_BASE_URL) == 0) {
         ESP_LOGW(TAG, "HA sync disabled: CONFIG_HA_BASE_URL is empty");
+
+        g_module_status.ha_status = ERROR;
+        g_module_status.need_update = true;
+
         return;
     }
 
     if (strlen(CONFIG_HA_AUTH_TOKEN) == 0 || strcmp(CONFIG_HA_AUTH_TOKEN, HA_TOKEN_PLACEHOLDER) == 0) {
         ESP_LOGW(TAG, "HA sync disabled: set CONFIG_HA_AUTH_TOKEN to your long-lived access token");
+        
+        g_module_status.ha_status = ERROR;
+        g_module_status.need_update = true;
+
         return;
     }
 
@@ -219,6 +237,10 @@ static void start_ha_sync(void)
     esp_err_t err = ha_sync_start(&cfg);
     if (err != ESP_OK) {
         ESP_LOGW(TAG, "Failed to start HA sync: %s", esp_err_to_name(err));
+
+        g_module_status.ha_status = ERROR;
+        g_module_status.need_update = true;
+        
     }
 }
 
@@ -279,6 +301,11 @@ static void lvgl_task(void *arg)
             needs_ui_update = true;
         }
 
+        // setting info need update
+        if (g_module_status.need_update) {
+            needs_ui_update = true;
+        }
+
         // If at Monitor panel then update the metrics and time
         if (screen_is_active(guider_ui.Monitor_dark) && needs_ui_update) {
             monitor_panel_update(&guider_ui, &latest_metrics);
@@ -287,6 +314,10 @@ static void lvgl_task(void *arg)
         // If at HA panel then update the homeassistant entry data and time
         else if (screen_is_active(guider_ui.HA_dark) && needs_ui_update) {
             ha_panel_update(&guider_ui, &latest_metrics);
+            needs_ui_update = false;
+        }
+        else if (screen_is_active(guider_ui.Setting_dark) && needs_ui_update){
+            setting_panel_update(&guider_ui);
             needs_ui_update = false;
         }
 
@@ -303,6 +334,9 @@ static void cdc_task(void *arg)
 {
     ESP_LOGI(TAG, "Initialize tinyusb cdc");
     ESP_ERROR_CHECK(tinyusb_cdc_driver_init());
+
+    g_module_status.cdc_status = READY;
+    g_module_status.need_update = true;
 
     const TickType_t delay = pdMS_TO_TICKS(10);
     while (1) {

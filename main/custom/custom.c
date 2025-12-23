@@ -20,6 +20,7 @@
 #include "lvgl.h"
 #include "custom.h"
 #include "ha_ui.h"
+#include "app_main.h"
 
 /*********************
  *      DEFINES
@@ -85,6 +86,44 @@ static void spangroup_set(const lv_obj_t* obj, uint8_t idx, float data, uint8_t 
 
     lv_span_set_text(span, data_text);
     return;
+}
+
+static void spangroup_set_status(const lv_obj_t* obj, APP_STATUS status)
+{   
+    lv_span_t* span;
+    span = lv_spangroup_get_child(obj, 1);
+
+    switch (status)
+    {
+    case CONNECT:
+        lv_span_set_text(span, "Connect");
+        lv_style_set_text_color(&span->style, lv_color_hex(0x64e09e));
+        break;
+
+    case DISCONNECT:
+        lv_span_set_text(span, "Disconnect");
+        lv_style_set_text_color(&span->style, lv_color_hex(0xffe460));
+        break;
+
+    case WAITING:
+        lv_span_set_text(span, "Waiting");
+        lv_style_set_text_color(&span->style, lv_color_hex(0xffe460));
+        break;
+
+    case READY:
+        lv_span_set_text(span, "Ready");
+        lv_style_set_text_color(&span->style, lv_color_hex(0x64e09e));
+        break;
+
+    case ERROR:
+        lv_span_set_text(span, "Error");
+        lv_style_set_text_color(&span->style, lv_color_hex(0xff0027));
+        break;
+    
+    default:
+        ESP_LOGW(HA_UI_TAG,"Unknow Status %d",status);
+        break;
+    }
 }
 
 static time_t timegm_compat(struct tm *tm)
@@ -475,6 +514,13 @@ void ha_panel_update(lv_ui *ui, const system_metrics_t *metrics)
     update_climate_card(ui, sync_data->ac_card);
     update_sensor_card(ui->HA_dark_hum_info, sync_data->hum_card);
     update_sensor_card(ui->HA_dark_temp_info, sync_data->temp_card);
+}
+
+void setting_panel_update(lv_ui *ui){
+    spangroup_set_status(ui->Setting_dark_wifi_info, g_module_status.wifi_staus);
+    spangroup_set_status(ui->Setting_dark_usb_info, g_module_status.cdc_status);
+    spangroup_set_status(ui->Setting_dark_sntp_info, g_module_status.sntp_status);
+    spangroup_set_status(ui->Setting_dark_ha_info, g_module_status.ha_status);
 }
 
 void scrollable_disable(lv_obj_t *obj){

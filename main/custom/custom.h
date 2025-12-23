@@ -28,6 +28,7 @@ void custom_init(lv_ui *ui);
 bool screen_is_active(const lv_obj_t *screen);
 void monitor_panel_update(lv_ui *ui, const system_metrics_t *metrics);
 void ha_panel_update(lv_ui *ui, const system_metrics_t *metrics);
+void setting_panel_update(lv_ui *ui);
 void scrollable_disable(lv_obj_t *obj);
 
 #ifdef __cplusplus

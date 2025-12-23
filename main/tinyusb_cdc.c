@@ -35,9 +35,16 @@ void tinyusb_cdc_rx_callback(int itf, cdcacm_event_t *event)
         };
 
         memcpy(tx_msg.buf, rx_buf, rx_size);
+
+        g_module_status.cdc_status = CONNECT;
+        g_module_status.need_update = true;
+
         xQueueSend(app_queue, &tx_msg, 0);
     } else {
         ESP_LOGE(TAG, "Read Error");
+
+        g_module_status.cdc_status = ERROR;
+        g_module_status.need_update = true;
     }
 }
 
@@ -159,6 +166,10 @@ esp_err_t tinyusb_cdc_rec(void){
             esp_err_t err = tinyusb_cdcacm_write_flush(g_msg_recv.itf, 0);
             if (err != ESP_OK) {
                 ESP_LOGE(TAG, "CDC ACM write flush error: %s", esp_err_to_name(err));
+
+                g_module_status.cdc_status = ERROR;
+                g_module_status.need_update = true;
+        
                 return err;
             }
         }

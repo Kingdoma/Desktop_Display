@@ -576,6 +576,10 @@ static esp_err_t start_websocket(void)
     int n = snprintf(ws_uri, sizeof(ws_uri), "%s://%s/api/websocket", scheme, host);
     if (n <= 0 || n >= (int)sizeof(ws_uri)) {
         ESP_LOGE(HA_TAG, "WS URI too long");
+        
+        g_module_status.ha_status = ERROR;
+        g_module_status.need_update = true;
+
         return ESP_ERR_INVALID_SIZE;
     }
 
@@ -587,6 +591,10 @@ static esp_err_t start_websocket(void)
     g_ctx.ws = esp_websocket_client_init(&cfg);
     if (!g_ctx.ws) {
         ESP_LOGE(HA_TAG, "Failed to init websocket");
+
+        g_module_status.ha_status = ERROR;
+        g_module_status.need_update = true;
+
         return ESP_FAIL;
     }
 
@@ -595,12 +603,20 @@ static esp_err_t start_websocket(void)
     esp_err_t err = esp_websocket_client_start(g_ctx.ws);
     if (err != ESP_OK) {
         ESP_LOGE(HA_TAG, "Failed to start websocket: %s", esp_err_to_name(err));
+
+        g_module_status.ha_status = ERROR;
+        g_module_status.need_update = true;
+
         esp_websocket_client_destroy(g_ctx.ws);
         g_ctx.ws = NULL;
         return err;
     }
 
     ESP_LOGI(HA_TAG, "WS connecting to %s", ws_uri);
+
+    g_module_status.ha_status = CONNECT;
+    g_module_status.need_update = true;
+
     return ESP_OK;
 }
 
@@ -614,6 +630,9 @@ static void ha_sync_task(void *arg)
 
     while (!wait_for_wifi_connected(pdMS_TO_TICKS(15000))) {
         ESP_LOGW(HA_TAG, "Waiting for WiFi connection before HA sync...");
+        
+        g_module_status.ha_status = WAITING;
+        g_module_status.need_update = true;
     }
 
     // Initial pull to seed local state
@@ -662,6 +681,8 @@ static void ha_sync_task(void *arg)
         } else if (g_ctx.ws && !esp_websocket_client_is_connected(g_ctx.ws) && now >= next_ws_retry) {
             ESP_LOGW(HA_TAG, "WS disconnected; restarting");
             stop_websocket();
+            g_module_status.ha_status = DISCONNECT;
+            g_module_status.need_update = true;
             next_ws_retry = now + pdMS_TO_TICKS(2000);
         }
 

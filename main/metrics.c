@@ -5,6 +5,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 
+#include "app_main.h"
+
 #define METRICS_QUEUE_LENGTH 1
 
 static QueueHandle_t s_metrics_queue;
@@ -24,16 +26,25 @@ static inline float tenths_to_float(int16_t value)
 bool metrics_decode_packet(const uint8_t *data, size_t len, system_metrics_t *out)
 {
     if (!data || !out) {
+        g_module_status.cdc_status = ERROR;
+        g_module_status.need_update = true;
+
         return false;
     }
 
     if (len != sizeof(pc_metrics_packet_t)) {
+        g_module_status.cdc_status = ERROR;
+        g_module_status.need_update = true;
+
         return false;
     }
 
     const pc_metrics_packet_t *packet = (const pc_metrics_packet_t *)data;
 
     if (packet->magic != METRICS_PACKET_MAGIC || packet->version != METRICS_PACKET_VERSION) {
+        g_module_status.cdc_status = ERROR;
+        g_module_status.need_update = true;
+
         return false;
     }
 
@@ -55,11 +66,17 @@ bool metrics_decode_packet(const uint8_t *data, size_t len, system_metrics_t *ou
 bool metrics_queue_push(const system_metrics_t *metrics)
 {
     if (!metrics) {
+        g_module_status.cdc_status = ERROR;
+        g_module_status.need_update = true;
+
         return false;
     }
 
     metrics_queue_init();
     if (!s_metrics_queue) {
+        g_module_status.cdc_status = ERROR;
+        g_module_status.need_update = true;
+        
         return false;
     }
 
