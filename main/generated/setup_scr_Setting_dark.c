@@ -77,7 +77,7 @@ void setup_scr_Setting_dark(lv_ui *ui)
     //Write codes Setting_dark_reconnect_btn
     ui->Setting_dark_reconnect_btn = lv_btn_create(ui->Setting_dark_wifi_cont);
     ui->Setting_dark_reconnect_btn_label = lv_label_create(ui->Setting_dark_reconnect_btn);
-    lv_label_set_text(ui->Setting_dark_reconnect_btn_label, "Reconnect");
+    lv_label_set_text(ui->Setting_dark_reconnect_btn_label, "Restart");
     lv_label_set_long_mode(ui->Setting_dark_reconnect_btn_label, LV_LABEL_LONG_WRAP);
     lv_obj_align(ui->Setting_dark_reconnect_btn_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->Setting_dark_reconnect_btn, 0, LV_STATE_DEFAULT);
@@ -100,7 +100,7 @@ void setup_scr_Setting_dark(lv_ui *ui)
     //Write codes Setting_dark_rest_btn
     ui->Setting_dark_rest_btn = lv_btn_create(ui->Setting_dark_wifi_cont);
     ui->Setting_dark_rest_btn_label = lv_label_create(ui->Setting_dark_rest_btn);
-    lv_label_set_text(ui->Setting_dark_rest_btn_label, "Rest");
+    lv_label_set_text(ui->Setting_dark_rest_btn_label, "Clear Setting");
     lv_label_set_long_mode(ui->Setting_dark_rest_btn_label, LV_LABEL_LONG_WRAP);
     lv_obj_align(ui->Setting_dark_rest_btn_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->Setting_dark_rest_btn, 0, LV_STATE_DEFAULT);
