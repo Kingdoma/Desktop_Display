@@ -478,8 +478,19 @@ static esp_err_t settings_post_handler(httpd_req_t *req)
     }
 
     free(body);
+    httpd_resp_set_status(req, "303 See Other");
+    httpd_resp_set_hdr(req, "Location", "/");
+    httpd_resp_set_hdr(req, "Cache-Control", "no-store");
     httpd_resp_sendstr(req, "Saved. Rebooting...");
     xTaskCreate(restart_task, "restart_task", 2048, NULL, 1, NULL);
+    return ESP_OK;
+}
+
+static esp_err_t settings_get_handler(httpd_req_t *req)
+{
+    httpd_resp_set_status(req, "302 Found");
+    httpd_resp_set_hdr(req, "Location", "/");
+    httpd_resp_sendstr(req, "Redirecting...");
     return ESP_OK;
 }
 
@@ -505,6 +516,18 @@ void web_server_start(void)
         .handler = root_get_handler,
         .user_ctx = NULL,
     };
+    httpd_uri_t root_post = {
+        .uri = "/",
+        .method = HTTP_POST,
+        .handler = settings_post_handler,
+        .user_ctx = NULL,
+    };
+    httpd_uri_t settings_get = {
+        .uri = "/settings",
+        .method = HTTP_GET,
+        .handler = settings_get_handler,
+        .user_ctx = NULL,
+    };
     httpd_uri_t settings = {
         .uri = "/settings",
         .method = HTTP_POST,
@@ -513,6 +536,8 @@ void web_server_start(void)
     };
 
     httpd_register_uri_handler(s_server, &root);
+    httpd_register_uri_handler(s_server, &root_post);
+    httpd_register_uri_handler(s_server, &settings_get);
     httpd_register_uri_handler(s_server, &settings);
 
     ESP_LOGI(WEB_SERVER_TAG, "Settings server started");
