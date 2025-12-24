@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Device Settings</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f5f6f8;margin:0;padding:24px;color:#111}
+    h1{font-size:20px;margin:0 0 12px}
+    h2{font-size:16px;margin:16px 0 8px}
+    form{background:#fff;padding:16px;border-radius:12px;box-shadow:0 4px 18px rgba(0,0,0,.08);max-width:520px}
+    label{display:block;font-weight:600;margin:12px 0 6px}
+    input{width:100%;padding:8px 10px;border:1px solid #c7cbd1;border-radius:8px;font-size:14px}
+    button{margin-top:16px;background:#1f6feb;border:0;color:#fff;padding:10px 14px;border-radius:8px;font-size:14px}
+    p{margin:8px 0 0;color:#555;font-size:13px}
+  </style>
+</head>
+<body>
+  <h1>Device Settings</h1>
+  <form method="post" action="/settings">
+    <h2>Home Assistant</h2>
+    <label>Base URL</label>
+    <input name="base_url" value="{{BASE_URL}}">
+    <label>Long-lived token</label>
+    <input type="password" name="auth_token" value="{{AUTH_TOKEN}}">
+    <label>Poll interval (ms)</label>
+    <input name="poll_interval_ms" value="{{POLL_INTERVAL_MS}}">
+    <label>Switch 1 entity ID</label>
+    <input name="entity_switch_1" value="{{ENTITY_SWITCH_1}}">
+    <label>Switch 2 entity ID</label>
+    <input name="entity_switch_2" value="{{ENTITY_SWITCH_2}}">
+    <label>AC entity ID</label>
+    <input name="entity_ac" value="{{ENTITY_AC}}">
+    <label>Weather entity ID</label>
+    <input name="entity_weather" value="{{ENTITY_WEATHER}}">
+    <label>Extra entity ID 1</label>
+    <input name="entity_extra_1" value="{{ENTITY_EXTRA_1}}">
+    <label>Extra entity ID 2</label>
+    <input name="entity_extra_2" value="{{ENTITY_EXTRA_2}}">
+    <label>Extra entity ID 3</label>
+    <input name="entity_extra_3" value="{{ENTITY_EXTRA_3}}">
+    <label>Extra entity ID 4</label>
+    <input name="entity_extra_4" value="{{ENTITY_EXTRA_4}}">
+    <label>Extra entity ID 5</label>
+    <input name="entity_extra_5" value="{{ENTITY_EXTRA_5}}">
+    <h2>Time</h2>
+    <label>SNTP server</label>
+    <input name="sntp_server" value="{{SNTP_SERVER}}">
+    <label>Time zone</label>
+    <input name="time_zone" value="{{TIME_ZONE}}">
+    <button type="submit">Save and reboot</button>
+    <p>Changes are saved to flash and applied after reboot.</p>
+  </form>
+</body>
+</html>

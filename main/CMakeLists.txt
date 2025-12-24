@@ -10,9 +10,11 @@ idf_component_register(
         "tinyusb_cdc.c"
         "metrics.c"
         "ha_sync.c"
+        "ha_settings.c"
         "time_sync.c"
         "ha_ui.c"
         "wifi.c"
+        "web_server.c"
         ${GUI_GUIDER_SOURCES}
         
     INCLUDE_DIRS
@@ -23,9 +25,10 @@ idf_component_register(
         "generated/guider_fonts"
         "generated/guider_customer_fonts"
 
-    # EMBED_TXTFILES
-    #     xiaozhi_cert.pem
+    EMBED_TXTFILES
+        "web/settings.html"
     )
 
 target_compile_definitions(${COMPONENT_LIB} PRIVATE LV_LVGL_H_INCLUDE_SIMPLE=1)
-target_compile_options(${COMPONENT_LIB} PRIVATE -include "${CMAKE_CURRENT_SOURCE_DIR}/gui_guider_support.h")
+target_compile_options(${COMPONENT_LIB} PRIVATE
+    $<$<COMPILE_LANGUAGE:C>:-include "${CMAKE_CURRENT_SOURCE_DIR}/gui_guider_support.h">)

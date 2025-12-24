@@ -12,6 +12,7 @@
 #include "protocol_examples_common.h"
 #include "time_sync.h"
 #include "app_main.h"
+#include "ha_settings.h"
 
 #define TIME_SYNC_TAG "time_sync"
 
@@ -37,7 +38,13 @@ static void sntp_time_sync(void)
 
     ESP_LOGI(TIME_SYNC_TAG, "Initializing SNTP");
 
-    esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG("pool.ntp.org");
+    const ha_settings_t *settings = ha_settings_get();
+    const char *sntp_server = "pool.ntp.org";
+    if (settings && settings->sntp_server[0] != '\0') {
+        sntp_server = settings->sntp_server;
+    }
+
+    esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG(sntp_server);
     config.sync_cb = time_sync_notification_cb;
     esp_netif_sntp_init(&config);
 
@@ -66,7 +73,12 @@ void sntp_task(void *arg)
 {
     (void)arg;
     ESP_LOGI(TIME_SYNC_TAG, "Start SNTP sync task");
-    setenv("TZ", "CST-8", 1);
+    const ha_settings_t *settings = ha_settings_get();
+    const char *tz = "CST-8";
+    if (settings && settings->time_zone[0] != '\0') {
+        tz = settings->time_zone;
+    }
+    setenv("TZ", tz, 1);
     tzset();
     sntp_time_sync();
     vTaskDelete(NULL);

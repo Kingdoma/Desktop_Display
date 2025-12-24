@@ -19,6 +19,8 @@
 #include "time_sync.h"
 #include "ha_ui.h"
 #include "wifi.h"
+#include "ha_settings.h"
+#include "web_server.h"
 // for benchmarking
 // #include "lv_demos.h"
 
@@ -67,8 +69,9 @@ static void ha_remote_state_sw(const char *state,
     }
 
     if (entity_id) {
+        const ha_settings_t *settings = ha_settings_get();
         uint8_t lvgl_id = 1;
-        if (strcmp(entity_id, CONFIG_HA_ENTITY_ID_SWITCH_2) == 0) {
+        if (settings && strcmp(entity_id, settings->entity_switch_2) == 0) {
             lvgl_id = 2;
         } else if (strcmp(entity_id, "switch.cuco_cn_959326664_v3_on_p_2_1") == 0) {
             lvgl_id = 1;
@@ -136,9 +139,9 @@ static void ha_remote_state_generic(const char *state,
     const char *delim = "_";
     char *token;
 
-    char id[20];
+    char id[HA_SETTINGS_MAX_ENTITY_ID];
 
-    strcpy(id, entity_id);
+    strlcpy(id, entity_id, sizeof(id));
 
     token = strtok(id, delim);
     token = strtok(NULL, delim);
@@ -172,6 +175,7 @@ static void try_add_entity(ha_entity_config_t *entities,
 
 static void start_ha_sync(void)
 {
+    const ha_settings_t *settings = ha_settings_get();
     if (!CONFIG_HA_SYNC_ENABLE) {
         ESP_LOGI(TAG, "HA sync disabled (CONFIG_HA_SYNC_ENABLE=n)");
 
@@ -181,7 +185,7 @@ static void start_ha_sync(void)
         return;
     }
 
-    if (strlen(CONFIG_HA_BASE_URL) == 0) {
+    if (strlen(settings->base_url) == 0) {
         ESP_LOGW(TAG, "HA sync disabled: CONFIG_HA_BASE_URL is empty");
 
         g_module_status.ha_status = ERROR;
@@ -190,7 +194,7 @@ static void start_ha_sync(void)
         return;
     }
 
-    if (strlen(CONFIG_HA_AUTH_TOKEN) == 0 || strcmp(CONFIG_HA_AUTH_TOKEN, HA_TOKEN_PLACEHOLDER) == 0) {
+    if (strlen(settings->auth_token) == 0 || strcmp(settings->auth_token, HA_TOKEN_PLACEHOLDER) == 0) {
         ESP_LOGW(TAG, "HA sync disabled: set CONFIG_HA_AUTH_TOKEN to your long-lived access token");
         
         g_module_status.ha_status = ERROR;
@@ -202,23 +206,15 @@ static void start_ha_sync(void)
     ha_entity_config_t entities[HA_MAX_ENTITY_SLOTS];
     size_t entity_count = 0;
 
-    try_add_entity(entities, HA_MAX_ENTITY_SLOTS, &entity_count, CONFIG_HA_ENTITY_ID_SWITCH_1, ha_remote_state_sw);
-    try_add_entity(entities, HA_MAX_ENTITY_SLOTS, &entity_count, CONFIG_HA_ENTITY_ID_SWITCH_2, ha_remote_state_sw);
+    try_add_entity(entities, HA_MAX_ENTITY_SLOTS, &entity_count, settings->entity_switch_1, ha_remote_state_sw);
+    try_add_entity(entities, HA_MAX_ENTITY_SLOTS, &entity_count, settings->entity_switch_2, ha_remote_state_sw);
 
-    try_add_entity(entities, HA_MAX_ENTITY_SLOTS, &entity_count, CONFIG_HA_ENTITY_ID_AC, ha_remote_state_ac);
+    try_add_entity(entities, HA_MAX_ENTITY_SLOTS, &entity_count, settings->entity_ac, ha_remote_state_ac);
     
-    try_add_entity(entities, HA_MAX_ENTITY_SLOTS, &entity_count, CONFIG_HA_ENTITY_ID_WEATHER, ha_remote_state_weather);
+    try_add_entity(entities, HA_MAX_ENTITY_SLOTS, &entity_count, settings->entity_weather, ha_remote_state_weather);
 
-    const char *extra_entities[] = {
-        CONFIG_HA_ENTITY_ID_1,
-        CONFIG_HA_ENTITY_ID_2,
-        CONFIG_HA_ENTITY_ID_3,
-        CONFIG_HA_ENTITY_ID_4,
-        CONFIG_HA_ENTITY_ID_5,
-    };
-
-    for (size_t i = 0; i < ARRAY_SIZE(extra_entities); ++i) {
-        try_add_entity(entities, HA_MAX_ENTITY_SLOTS, &entity_count, extra_entities[i], ha_remote_state_generic);
+    for (size_t i = 0; i < HA_SETTINGS_EXTRA_COUNT; ++i) {
+        try_add_entity(entities, HA_MAX_ENTITY_SLOTS, &entity_count, settings->entity_extra[i], ha_remote_state_generic);
     }
 
     if (entity_count == 0) {
@@ -227,9 +223,9 @@ static void start_ha_sync(void)
     }
 
     ha_sync_config_t cfg = {
-        .base_url = CONFIG_HA_BASE_URL,
-        .auth_token = CONFIG_HA_AUTH_TOKEN,
-        .poll_interval_ms = (uint32_t)CONFIG_HA_POLL_INTERVAL_MS,
+        .base_url = settings->base_url,
+        .auth_token = settings->auth_token,
+        .poll_interval_ms = settings->poll_interval_ms,
         .entities = entities,
         .entity_count = entity_count,
     };
@@ -349,7 +345,11 @@ void app_main(void)
 {
     ha_ui_sync_data_init();
 
+    ha_settings_init();
+
     wifi_connect();
+
+    web_server_start();
 
     xTaskCreate(lvgl_task, "lvgl_task", 4096, NULL, 2, NULL);
 

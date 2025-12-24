@@ -12,6 +12,7 @@
 #include "lvgl.h"
 #include "ha_sync.h"
 #include "wifi.h"
+#include "ha_settings.h"
 
 #if LV_USE_GUIDER_SIMULATOR && LV_USE_FREEMASTER
 #include "freemaster_client.h"
@@ -87,7 +88,10 @@ static void HA_dark_sw_2_event_handler (lv_event_t *e)
         lv_obj_t * status_obj = lv_event_get_target(e);
         int status = lv_obj_has_state(status_obj, LV_STATE_CHECKED) ? true : false;
         const bool on = lv_obj_has_state(guider_ui.HA_dark_sw_2, LV_STATE_CHECKED);
-        // ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_SWITCH_2, on ? "on" : "off");
+        // const ha_settings_t *settings = ha_settings_get();
+        // if (settings && settings->entity_switch_2[0] != '\0') {
+        //     ha_sync_set_local_state(settings->entity_switch_2, on ? "on" : "off");
+        // }
 
         break;
     }
@@ -105,7 +109,10 @@ static void HA_dark_sw_1_event_handler (lv_event_t *e)
         lv_obj_t * status_obj = lv_event_get_target(e);
         int status = lv_obj_has_state(status_obj, LV_STATE_CHECKED) ? true : false;
         const bool on = lv_obj_has_state(guider_ui.HA_dark_sw_1, LV_STATE_CHECKED);
-        // ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_SWITCH_1, on ? "on" : "off");
+        // const ha_settings_t *settings = ha_settings_get();
+        // if (settings && settings->entity_switch_1[0] != '\0') {
+        //     ha_sync_set_local_state(settings->entity_switch_1, on ? "on" : "off");
+        // }
         break;
     }
     default:
@@ -127,7 +134,10 @@ static void HA_dark_temp_slider_event_handler (lv_event_t *e)
         {
             char buf[8];
             snprintf(buf, sizeof(buf), "%ld", (long)lv_slider_get_value(guider_ui.HA_dark_temp_slider));
-            ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, buf);
+            const ha_settings_t *settings = ha_settings_get();
+            if (settings && settings->entity_ac[0] != '\0') {
+                ha_sync_set_local_state(settings->entity_ac, buf);
+            }
         }
 
         break;
@@ -157,7 +167,10 @@ static void HA_dark_ac_off_event_handler (lv_event_t *e)
             lv_obj_set_style_bg_color(guider_ui.HA_dark_temp_slider, lv_color_hex(0x686868), LV_PART_INDICATOR|LV_STATE_DEFAULT);
 
             // update to ha server
-            ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, "off");
+            const ha_settings_t *settings = ha_settings_get();
+            if (settings && settings->entity_ac[0] != '\0') {
+                ha_sync_set_local_state(settings->entity_ac, "off");
+            }
 
             ac.status = 0;
         }
@@ -188,7 +201,10 @@ static void HA_dark_ac_cool_event_handler (lv_event_t *e)
             lv_obj_set_style_bg_color(guider_ui.HA_dark_temp_slider, lv_color_hex(0x2195f6), LV_PART_INDICATOR|LV_STATE_DEFAULT);
 
             // update to ha server
-            ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, "cool");
+            const ha_settings_t *settings = ha_settings_get();
+            if (settings && settings->entity_ac[0] != '\0') {
+                ha_sync_set_local_state(settings->entity_ac, "cool");
+            }
 
             ac.status = 1;
         }
@@ -219,7 +235,10 @@ static void HA_dark_ac_heat_event_handler (lv_event_t *e)
             lv_obj_set_style_bg_color(guider_ui.HA_dark_temp_slider, lv_color_hex(0xea7b32), LV_PART_INDICATOR|LV_STATE_DEFAULT);
 
             // update to ha server
-            ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, "heat");
+            const ha_settings_t *settings = ha_settings_get();
+            if (settings && settings->entity_ac[0] != '\0') {
+                ha_sync_set_local_state(settings->entity_ac, "heat");
+            }
 
             ac.status = 2;
         }
