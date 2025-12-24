@@ -260,7 +260,7 @@ static esp_err_t send_template(httpd_req_t *req,
                                size_t tmpl_len,
                                const ha_settings_t *settings)
 {
-    char replace_buf[WEB_SERVER_MAX_ESCAPED];
+    static char replace_buf[WEB_SERVER_MAX_ESCAPED];
 
     const char *cursor = tmpl;
     size_t remaining = tmpl_len;
@@ -419,11 +419,17 @@ static esp_err_t settings_post_handler(httpd_req_t *req)
         return ESP_FAIL;
     }
 
-    char body[WEB_SERVER_MAX_BODY + 1];
+    char *body = (char *)malloc((size_t)req->content_len + 1);
+    if (!body) {
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Out of memory");
+        return ESP_FAIL;
+    }
+
     int received = 0;
     while (received < req->content_len) {
         int r = httpd_req_recv(req, body + received, req->content_len - received);
         if (r <= 0) {
+            free(body);
             return ESP_FAIL;
         }
         received += r;
@@ -460,15 +466,18 @@ static esp_err_t settings_post_handler(httpd_req_t *req)
     }
 
     if (!changed) {
+        free(body);
         httpd_resp_sendstr(req, "No changes detected.");
         return ESP_OK;
     }
 
     if (!ha_settings_save(&updated)) {
+        free(body);
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Save failed");
         return ESP_FAIL;
     }
 
+    free(body);
     httpd_resp_sendstr(req, "Saved. Rebooting...");
     xTaskCreate(restart_task, "restart_task", 2048, NULL, 1, NULL);
     return ESP_OK;
@@ -482,6 +491,7 @@ void web_server_start(void)
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.max_uri_handlers = 8;
+    config.stack_size = 8192;
 
     esp_err_t err = httpd_start(&s_server, &config);
     if (err != ESP_OK) {
