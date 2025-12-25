@@ -19,13 +19,14 @@ typedef enum {
     WAITING,
     READY,
     ERROR
-} APP_STATUS;
+} app_status_t;
 
 typedef struct {
-    APP_STATUS wifi_staus;
-    APP_STATUS cdc_status;
-    APP_STATUS sntp_status;
-    APP_STATUS ha_status;
+    app_status_t wifi_staus;
+    app_status_t cdc_status;
+    app_status_t sntp_status;
+    app_status_t ha_status;
+    app_status_t web_status;
     bool need_update;
 } app_module_status_t;
 

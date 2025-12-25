@@ -124,11 +124,12 @@ typedef struct
 	lv_obj_t *Setting_dark_reconnect_btn_label;
 	lv_obj_t *Setting_dark_rest_btn;
 	lv_obj_t *Setting_dark_rest_btn_label;
-	lv_obj_t *Setting_dark_wifi_opt;
 	lv_obj_t *Setting_dark_wifi_info;
 	lv_span_t *Setting_dark_wifi_info_span;
 	lv_obj_t *Setting_dark_wifi_label;
 	lv_obj_t *Setting_dark_wifi_icon;
+	lv_obj_t *Setting_dark_wifi_ip;
+	lv_span_t *Setting_dark_wifi_ip_span;
 	lv_obj_t *Setting_dark_usb_cont;
 	lv_obj_t *Setting_dark_usb_label;
 	lv_obj_t *Setting_dark_usb_info;
@@ -139,6 +140,13 @@ typedef struct
 	lv_obj_t *Setting_dark_ha_info;
 	lv_span_t *Setting_dark_ha_info_span;
 	lv_obj_t *Setting_dark_ha_icon;
+	lv_obj_t *Setting_dark_web_cont;
+	lv_obj_t *Setting_dark_web_label;
+	lv_obj_t *Setting_dark_web_info;
+	lv_span_t *Setting_dark_web_info_span;
+	lv_obj_t *Setting_dark_web_icon;
+	lv_obj_t *Setting_dark_web_swtich;
+	lv_obj_t *Setting_dark_web_swtich_label;
 	lv_obj_t *Setting_dark_sntp_cont;
 	lv_obj_t *Setting_dark_sntp_label;
 	lv_obj_t *Setting_dark_sntp_info;
@@ -189,6 +197,8 @@ LV_IMG_DECLARE(_sun_alpha_60x60);
 LV_IMG_DECLARE(_wifi_alpha_22x22);
 LV_IMG_DECLARE(_usb_alpha_22x22);
 LV_IMG_DECLARE(_home_alpha_23x23);
+LV_IMG_DECLARE(_web_alpha_21x21);
+LV_IMG_DECLARE(_powerbtn_alpha_40x40);
 LV_IMG_DECLARE(_clock_alpha_20x20);
 
 LV_FONT_DECLARE(lv_font_montserratMedium_17)

@@ -37,7 +37,9 @@ app_module_status_t g_module_status = {
     .wifi_staus = DISCONNECT,
     .cdc_status = WAITING,
     .sntp_status = WAITING,
-    .ha_status = WAITING
+    .ha_status = WAITING,
+    .web_status = DISCONNECT,
+    .need_update = false
 };
 
 app_message_t g_msg_recv;
@@ -349,7 +351,7 @@ void app_main(void)
 
     wifi_connect();
 
-    web_server_start();
+    // web_server_start();
 
     xTaskCreate(lvgl_task, "lvgl_task", 4096, NULL, 2, NULL);
 

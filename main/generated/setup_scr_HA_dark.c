@@ -951,7 +951,7 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_style_set_text_color(&ui->HA_dark_date_span->style, lv_color_hex(0xe6e6e6));
     lv_style_set_text_decor(&ui->HA_dark_date_span->style, LV_TEXT_DECOR_NONE);
     lv_style_set_text_font(&ui->HA_dark_date_span->style, &lv_font_montserratMedium_17);
-    lv_obj_set_pos(ui->HA_dark_date, 14, 77);
+    lv_obj_set_pos(ui->HA_dark_date, 14, 75);
     lv_obj_set_size(ui->HA_dark_date, 155, 17);
 
     //Write style state: LV_STATE_DEFAULT for &style_HA_dark_date_main_main_default
@@ -976,7 +976,7 @@ void setup_scr_HA_dark(lv_ui *ui)
         lv_timer_create(HA_dark_digital_clock_time_timer, 1000, NULL);
         HA_dark_digital_clock_time_timer_enabled = true;
     }
-    lv_obj_set_pos(ui->HA_dark_digital_clock_time, 16, 40);
+    lv_obj_set_pos(ui->HA_dark_digital_clock_time, 16, 36);
     lv_obj_set_size(ui->HA_dark_digital_clock_time, 123, 33);
 
     //Write style for HA_dark_digital_clock_time, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -1009,7 +1009,7 @@ void setup_scr_HA_dark(lv_ui *ui)
     lv_style_set_text_color(&ui->HA_dark_temp_span->style, lv_color_hex(0xe6e6e6));
     lv_style_set_text_decor(&ui->HA_dark_temp_span->style, LV_TEXT_DECOR_NONE);
     lv_style_set_text_font(&ui->HA_dark_temp_span->style, &lv_font_montserratMedium_22);
-    lv_obj_set_pos(ui->HA_dark_temp, 176, 68);
+    lv_obj_set_pos(ui->HA_dark_temp, 176, 66);
     lv_obj_set_size(ui->HA_dark_temp, 77, 27);
 
     //Write style state: LV_STATE_DEFAULT for &style_HA_dark_temp_main_main_default
@@ -1045,7 +1045,7 @@ void setup_scr_HA_dark(lv_ui *ui)
     //Write codes HA_dark_menu
     ui->HA_dark_menu = lv_dropdown_create(ui->HA_dark);
     lv_dropdown_set_options(ui->HA_dark_menu, "HA\nPC\nOP");
-    lv_obj_set_pos(ui->HA_dark_menu, 27, 32);
+    lv_obj_set_pos(ui->HA_dark_menu, 27, 27);
     lv_obj_set_size(ui->HA_dark_menu, 59, 30);
 
     //Write style for HA_dark_menu, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.

@@ -10,11 +10,13 @@
 #include "esp_netif.h"
 #include "esp_smartconfig.h"
 #include "esp_mac.h"
+#include "lwip/inet.h"
 #include "wifi.h"
 
 #define WIFI_TAG "wifi_connect"
 
 static TaskHandle_t s_smartconfig_task = NULL;
+static char s_wifi_ip[16] = "";
 static void smartconfig_example_task(void * parm);
 static void start_smartconfig_task(bool force);
 
@@ -40,12 +42,20 @@ static void event_handler(void* arg, esp_event_base_t event_base, int32_t event_
         // reconnect
         g_module_status.wifi_staus = DISCONNECT;
         g_module_status.need_update = true;
+        s_wifi_ip[0] = '\0';
 
         esp_wifi_connect();
         xEventGroupClearBits(g_wifi_event_group, CONNECTED_BIT);
 
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         // set connected
+        ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
+        if (event) {
+            ip4addr_ntoa_r((const ip4_addr_t *)&event->ip_info.ip, s_wifi_ip, sizeof(s_wifi_ip));
+            ESP_LOGI(WIFI_TAG, "Got IP: %s", s_wifi_ip);
+        } else {
+            s_wifi_ip[0] = '\0';
+        }
         xEventGroupSetBits(g_wifi_event_group, CONNECTED_BIT);
 
         g_module_status.wifi_staus = CONNECT;
@@ -205,4 +215,9 @@ void wifi_reconnect()
 {
     ESP_LOGI(WIFI_TAG, "restarting");
     esp_restart();
+}
+
+const char *wifi_get_ip(void)
+{
+    return s_wifi_ip;
 }

@@ -1,1 +1,1 @@
-GEN_CSRCS += _download_alpha_13x13.c _upload_alpha_13x13.c _temperature_35x35.c _humidity_alpha_28x28.c _cloudy_alpha_60x60.c _wifi_alpha_22x22.c _usb_alpha_22x22.c _home_alpha_23x23.c _clock_alpha_20x20.c
+GEN_CSRCS += _download_alpha_13x13.c _upload_alpha_13x13.c _temperature_35x35.c _humidity_alpha_28x28.c _cloudy_alpha_60x60.c _wifi_alpha_22x22.c _usb_alpha_22x22.c _home_alpha_23x23.c _web_alpha_21x21.c _powerbtn_alpha_40x40.c _clock_alpha_20x20.c

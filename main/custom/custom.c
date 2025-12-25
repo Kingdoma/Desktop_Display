@@ -21,6 +21,7 @@
 #include "custom.h"
 #include "ha_ui.h"
 #include "app_main.h"
+#include "wifi.h"
 
 /*********************
  *      DEFINES
@@ -88,7 +89,7 @@ static void spangroup_set(const lv_obj_t* obj, uint8_t idx, float data, uint8_t 
     return;
 }
 
-static void spangroup_set_status(const lv_obj_t* obj, APP_STATUS status)
+static void spangroup_set_status(const lv_obj_t* obj, app_status_t status)
 {   
     lv_span_t* span;
     span = lv_spangroup_get_child(obj, 1);
@@ -521,6 +522,22 @@ void setting_panel_update(lv_ui *ui){
     spangroup_set_status(ui->Setting_dark_usb_info, g_module_status.cdc_status);
     spangroup_set_status(ui->Setting_dark_sntp_info, g_module_status.sntp_status);
     spangroup_set_status(ui->Setting_dark_ha_info, g_module_status.ha_status);
+    spangroup_set_status(ui->Setting_dark_web_info, g_module_status.web_status);
+
+    if (ui && ui->Setting_dark_wifi_ip && lv_obj_is_valid(ui->Setting_dark_wifi_ip)) {
+        lv_span_t *span = lv_spangroup_get_child(ui->Setting_dark_wifi_ip, 1);
+        if (span) {
+            const char *ip = "--";
+            if (g_module_status.wifi_staus == CONNECT) {
+                const char *current = wifi_get_ip();
+                if (current && current[0] != '\0') {
+                    ip = current;
+                }
+            }
+            lv_span_set_text(span, ip);
+            lv_spangroup_refr_mode(ui->Setting_dark_wifi_ip);
+        }
+    }
 }
 
 void scrollable_disable(lv_obj_t *obj){

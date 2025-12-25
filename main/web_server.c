@@ -11,6 +11,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "ha_settings.h"
+#include "app_main.h"
 
 #define WEB_SERVER_TAG "web_server"
 #define WEB_SERVER_MAX_BODY 1536
@@ -502,11 +503,15 @@ void web_server_start(void)
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.max_uri_handlers = 8;
-    config.stack_size = 8192;
+    config.stack_size = 6144;
 
     esp_err_t err = httpd_start(&s_server, &config);
     if (err != ESP_OK) {
         ESP_LOGW(WEB_SERVER_TAG, "Failed to start server (%s)", esp_err_to_name(err));
+
+        g_module_status.web_status = ERROR;
+        g_module_status.need_update = true;
+
         return;
     }
 
@@ -541,4 +546,33 @@ void web_server_start(void)
     httpd_register_uri_handler(s_server, &settings);
 
     ESP_LOGI(WEB_SERVER_TAG, "Settings server started");
+
+    g_module_status.web_status = READY;
+    g_module_status.need_update = true;
+}
+
+void web_server_stop(void)
+{
+    if (!s_server) {
+        return;
+    }
+
+    esp_err_t err = httpd_stop(s_server);
+    if (err != ESP_OK) {
+        ESP_LOGW(WEB_SERVER_TAG, "Failed to stop server (%s)", esp_err_to_name(err));
+        g_module_status.web_status = ERROR;
+        g_module_status.need_update = true;
+        return;
+    }
+
+    s_server = NULL;
+    ESP_LOGI(WEB_SERVER_TAG, "Settings server stopped");
+
+    g_module_status.web_status = DISCONNECT;
+    g_module_status.need_update = true;
+}
+
+bool web_server_is_running(void)
+{
+    return s_server != NULL;
 }

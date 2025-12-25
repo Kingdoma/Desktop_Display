@@ -13,4 +13,6 @@ void wifi_diconnect();
 
 void wifi_reconnect();
 
+const char *wifi_get_ip(void);
+
 #endif /* WIFI_H */
