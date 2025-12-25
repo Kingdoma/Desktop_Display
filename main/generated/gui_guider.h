@@ -130,6 +130,8 @@ typedef struct
 	lv_obj_t *Setting_dark_wifi_icon;
 	lv_obj_t *Setting_dark_wifi_ip;
 	lv_span_t *Setting_dark_wifi_ip_span;
+	lv_obj_t *Setting_dark_ota_btn;
+	lv_obj_t *Setting_dark_ota_btn_label;
 	lv_obj_t *Setting_dark_usb_cont;
 	lv_obj_t *Setting_dark_usb_label;
 	lv_obj_t *Setting_dark_usb_info;

@@ -59,8 +59,8 @@ void setup_scr_Setting_dark(lv_ui *ui)
     lv_obj_align(ui->Setting_dark_disconnect_btn_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->Setting_dark_disconnect_btn, 0, LV_STATE_DEFAULT);
     lv_obj_set_width(ui->Setting_dark_disconnect_btn_label, LV_PCT(100));
-    lv_obj_set_pos(ui->Setting_dark_disconnect_btn, 12, 151);
-    lv_obj_set_size(ui->Setting_dark_disconnect_btn, 160, 33);
+    lv_obj_set_pos(ui->Setting_dark_disconnect_btn, 14, 128);
+    lv_obj_set_size(ui->Setting_dark_disconnect_btn, 160, 30);
 
     //Write style for Setting_dark_disconnect_btn, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->Setting_dark_disconnect_btn, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -82,8 +82,8 @@ void setup_scr_Setting_dark(lv_ui *ui)
     lv_obj_align(ui->Setting_dark_reconnect_btn_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->Setting_dark_reconnect_btn, 0, LV_STATE_DEFAULT);
     lv_obj_set_width(ui->Setting_dark_reconnect_btn_label, LV_PCT(100));
-    lv_obj_set_pos(ui->Setting_dark_reconnect_btn, 12, 198);
-    lv_obj_set_size(ui->Setting_dark_reconnect_btn, 160, 33);
+    lv_obj_set_pos(ui->Setting_dark_reconnect_btn, 14, 168);
+    lv_obj_set_size(ui->Setting_dark_reconnect_btn, 160, 30);
 
     //Write style for Setting_dark_reconnect_btn, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->Setting_dark_reconnect_btn, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -105,8 +105,8 @@ void setup_scr_Setting_dark(lv_ui *ui)
     lv_obj_align(ui->Setting_dark_rest_btn_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->Setting_dark_rest_btn, 0, LV_STATE_DEFAULT);
     lv_obj_set_width(ui->Setting_dark_rest_btn_label, LV_PCT(100));
-    lv_obj_set_pos(ui->Setting_dark_rest_btn, 12, 104);
-    lv_obj_set_size(ui->Setting_dark_rest_btn, 160, 33);
+    lv_obj_set_pos(ui->Setting_dark_rest_btn, 14, 88);
+    lv_obj_set_size(ui->Setting_dark_rest_btn, 160, 30);
 
     //Write style for Setting_dark_rest_btn, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->Setting_dark_rest_btn, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -136,7 +136,7 @@ void setup_scr_Setting_dark(lv_ui *ui)
     lv_style_set_text_color(&ui->Setting_dark_wifi_info_span->style, lv_color_hex(0xff0027));
     lv_style_set_text_decor(&ui->Setting_dark_wifi_info_span->style, LV_TEXT_DECOR_NONE);
     lv_style_set_text_font(&ui->Setting_dark_wifi_info_span->style, &lv_font_montserratMedium_16);
-    lv_obj_set_pos(ui->Setting_dark_wifi_info, 14, 43);
+    lv_obj_set_pos(ui->Setting_dark_wifi_info, 14, 41);
     lv_obj_set_size(ui->Setting_dark_wifi_info, 177, 24);
 
     //Write style state: LV_STATE_DEFAULT for &style_Setting_dark_wifi_info_main_main_default
@@ -202,13 +202,13 @@ void setup_scr_Setting_dark(lv_ui *ui)
     lv_span_set_text(ui->Setting_dark_wifi_ip_span, "IP : ");
     lv_style_set_text_color(&ui->Setting_dark_wifi_ip_span->style, lv_color_hex(0xCBCBCD));
     lv_style_set_text_decor(&ui->Setting_dark_wifi_ip_span->style, LV_TEXT_DECOR_NONE);
-    lv_style_set_text_font(&ui->Setting_dark_wifi_ip_span->style, &lv_font_montserratMedium_16);
+    lv_style_set_text_font(&ui->Setting_dark_wifi_ip_span->style, &lv_font_montserratMedium_15);
     ui->Setting_dark_wifi_ip_span = lv_spangroup_new_span(ui->Setting_dark_wifi_ip);
     lv_span_set_text(ui->Setting_dark_wifi_ip_span, "192.168.222.222");
     lv_style_set_text_color(&ui->Setting_dark_wifi_ip_span->style, lv_color_hex(0xebebeb));
     lv_style_set_text_decor(&ui->Setting_dark_wifi_ip_span->style, LV_TEXT_DECOR_NONE);
-    lv_style_set_text_font(&ui->Setting_dark_wifi_ip_span->style, &lv_font_montserratMedium_16);
-    lv_obj_set_pos(ui->Setting_dark_wifi_ip, 14, 74);
+    lv_style_set_text_font(&ui->Setting_dark_wifi_ip_span->style, &lv_font_montserratMedium_15);
+    lv_obj_set_pos(ui->Setting_dark_wifi_ip, 14, 64);
     lv_obj_set_size(ui->Setting_dark_wifi_ip, 177, 29);
 
     //Write style state: LV_STATE_DEFAULT for &style_Setting_dark_wifi_ip_main_main_default
@@ -225,6 +225,29 @@ void setup_scr_Setting_dark(lv_ui *ui)
     lv_style_set_shadow_width(&style_Setting_dark_wifi_ip_main_main_default, 0);
     lv_obj_add_style(ui->Setting_dark_wifi_ip, &style_Setting_dark_wifi_ip_main_main_default, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_spangroup_refr_mode(ui->Setting_dark_wifi_ip);
+
+    //Write codes Setting_dark_ota_btn
+    ui->Setting_dark_ota_btn = lv_btn_create(ui->Setting_dark_wifi_cont);
+    ui->Setting_dark_ota_btn_label = lv_label_create(ui->Setting_dark_ota_btn);
+    lv_label_set_text(ui->Setting_dark_ota_btn_label, "OTA");
+    lv_label_set_long_mode(ui->Setting_dark_ota_btn_label, LV_LABEL_LONG_WRAP);
+    lv_obj_align(ui->Setting_dark_ota_btn_label, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_set_style_pad_all(ui->Setting_dark_ota_btn, 0, LV_STATE_DEFAULT);
+    lv_obj_set_width(ui->Setting_dark_ota_btn_label, LV_PCT(100));
+    lv_obj_set_pos(ui->Setting_dark_ota_btn, 14, 208);
+    lv_obj_set_size(ui->Setting_dark_ota_btn, 160, 30);
+
+    //Write style for Setting_dark_ota_btn, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_bg_opa(ui->Setting_dark_ota_btn, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->Setting_dark_ota_btn, lv_color_hex(0x4F5159), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_dir(ui->Setting_dark_ota_btn, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui->Setting_dark_ota_btn, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->Setting_dark_ota_btn, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->Setting_dark_ota_btn, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->Setting_dark_ota_btn, lv_color_hex(0xCBCBCD), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->Setting_dark_ota_btn, &lv_font_montserratMedium_16, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui->Setting_dark_ota_btn, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui->Setting_dark_ota_btn, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes Setting_dark_usb_cont
     ui->Setting_dark_usb_cont = lv_obj_create(ui->Setting_dark);
@@ -508,14 +531,15 @@ void setup_scr_Setting_dark(lv_ui *ui)
     lv_obj_set_size(ui->Setting_dark_web_icon, 21, 21);
 
     //Write style for Setting_dark_web_icon, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_radius(ui->Setting_dark_web_icon, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_clip_corner(ui->Setting_dark_web_icon, true, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_img_recolor_opa(ui->Setting_dark_web_icon, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_img_recolor(ui->Setting_dark_web_icon, lv_color_hex(0xebebeb), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_img_opa(ui->Setting_dark_web_icon, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->Setting_dark_web_icon, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(ui->Setting_dark_web_icon, true, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes Setting_dark_web_swtich
     ui->Setting_dark_web_swtich = lv_imgbtn_create(ui->Setting_dark_web_cont);
+    lv_obj_add_flag(ui->Setting_dark_web_swtich, LV_OBJ_FLAG_CHECKABLE);
     lv_imgbtn_set_src(ui->Setting_dark_web_swtich, LV_IMGBTN_STATE_RELEASED, NULL, &_powerbtn_alpha_40x40, NULL);
     ui->Setting_dark_web_swtich_label = lv_label_create(ui->Setting_dark_web_swtich);
     lv_label_set_text(ui->Setting_dark_web_swtich_label, "");
