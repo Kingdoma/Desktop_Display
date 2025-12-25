@@ -157,6 +157,17 @@ typedef struct
 	lv_obj_t *Setting_dark_title;
 	lv_obj_t *Setting_dark_title_label;
 	lv_obj_t *Setting_dark_menu;
+	lv_obj_t *Setting_dark_ota_window;
+	lv_obj_t *Setting_dark_ota_cancel_btn;
+	lv_obj_t *Setting_dark_ota_cancel_btn_label;
+	lv_obj_t *Setting_dark_ota_ok_btn;
+	lv_obj_t *Setting_dark_ota_ok_btn_label;
+	lv_obj_t *Setting_dark_ota_label;
+	lv_obj_t *OTA;
+	bool OTA_del;
+	lv_obj_t *OTA_bar_1;
+	lv_obj_t *OTA_label_1;
+	lv_obj_t *OTA_label_2;
 	lv_obj_t *g_kb_top_layer;
 }lv_ui;
 
@@ -184,6 +195,7 @@ extern lv_ui guider_ui;
 void setup_scr_Monitor_dark(lv_ui *ui);
 void setup_scr_HA_dark(lv_ui *ui);
 void setup_scr_Setting_dark(lv_ui *ui);
+void setup_scr_OTA(lv_ui *ui);
 LV_IMG_DECLARE(_download_alpha_13x13);
 LV_IMG_DECLARE(_upload_alpha_13x13);
 
@@ -215,6 +227,7 @@ LV_FONT_DECLARE(lv_font_montserratMedium_16)
 LV_FONT_DECLARE(lv_font_montserratMedium_25)
 LV_FONT_DECLARE(lv_font_montserratMedium_30)
 LV_FONT_DECLARE(lv_font_montserratMedium_22)
+LV_FONT_DECLARE(lv_font_montserratMedium_40)
 
 
 #ifdef __cplusplus

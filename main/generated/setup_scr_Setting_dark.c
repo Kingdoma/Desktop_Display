@@ -766,6 +766,96 @@ void setup_scr_Setting_dark(lv_ui *ui)
     lv_style_set_bg_grad_dir(&style_Setting_dark_menu_extra_list_main_default, LV_GRAD_DIR_NONE);
     lv_obj_add_style(lv_dropdown_get_list(ui->Setting_dark_menu), &style_Setting_dark_menu_extra_list_main_default, LV_PART_MAIN|LV_STATE_DEFAULT);
 
+    //Write codes Setting_dark_ota_window
+    ui->Setting_dark_ota_window = lv_obj_create(ui->Setting_dark);
+    lv_obj_set_pos(ui->Setting_dark_ota_window, 72, 111);
+    lv_obj_set_size(ui->Setting_dark_ota_window, 349, 111);
+    lv_obj_set_scrollbar_mode(ui->Setting_dark_ota_window, LV_SCROLLBAR_MODE_OFF);
+
+    //Write style for Setting_dark_ota_window, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_border_width(ui->Setting_dark_ota_window, 2, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui->Setting_dark_ota_window, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(ui->Setting_dark_ota_window, lv_color_hex(0x2195f6), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_side(ui->Setting_dark_ota_window, LV_BORDER_SIDE_FULL, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->Setting_dark_ota_window, 12, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui->Setting_dark_ota_window, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->Setting_dark_ota_window, lv_color_hex(0x585858), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_dir(ui->Setting_dark_ota_window, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui->Setting_dark_ota_window, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui->Setting_dark_ota_window, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui->Setting_dark_ota_window, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui->Setting_dark_ota_window, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->Setting_dark_ota_window, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+
+    //Write codes Setting_dark_ota_cancel_btn
+    ui->Setting_dark_ota_cancel_btn = lv_btn_create(ui->Setting_dark_ota_window);
+    ui->Setting_dark_ota_cancel_btn_label = lv_label_create(ui->Setting_dark_ota_cancel_btn);
+    lv_label_set_text(ui->Setting_dark_ota_cancel_btn_label, "Cancel");
+    lv_label_set_long_mode(ui->Setting_dark_ota_cancel_btn_label, LV_LABEL_LONG_WRAP);
+    lv_obj_align(ui->Setting_dark_ota_cancel_btn_label, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_set_style_pad_all(ui->Setting_dark_ota_cancel_btn, 0, LV_STATE_DEFAULT);
+    lv_obj_set_width(ui->Setting_dark_ota_cancel_btn_label, LV_PCT(100));
+    lv_obj_set_pos(ui->Setting_dark_ota_cancel_btn, 261, 74);
+    lv_obj_set_size(ui->Setting_dark_ota_cancel_btn, 70, 23);
+
+    //Write style for Setting_dark_ota_cancel_btn, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_bg_opa(ui->Setting_dark_ota_cancel_btn, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->Setting_dark_ota_cancel_btn, lv_color_hex(0x585858), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_dir(ui->Setting_dark_ota_cancel_btn, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui->Setting_dark_ota_cancel_btn, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->Setting_dark_ota_cancel_btn, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->Setting_dark_ota_cancel_btn, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->Setting_dark_ota_cancel_btn, lv_color_hex(0xADC6FF), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->Setting_dark_ota_cancel_btn, &lv_font_montserratMedium_18, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui->Setting_dark_ota_cancel_btn, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui->Setting_dark_ota_cancel_btn, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
+
+    //Write codes Setting_dark_ota_ok_btn
+    ui->Setting_dark_ota_ok_btn = lv_btn_create(ui->Setting_dark_ota_window);
+    ui->Setting_dark_ota_ok_btn_label = lv_label_create(ui->Setting_dark_ota_ok_btn);
+    lv_label_set_text(ui->Setting_dark_ota_ok_btn_label, "Confirm");
+    lv_label_set_long_mode(ui->Setting_dark_ota_ok_btn_label, LV_LABEL_LONG_WRAP);
+    lv_obj_align(ui->Setting_dark_ota_ok_btn_label, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_set_style_pad_all(ui->Setting_dark_ota_ok_btn, 0, LV_STATE_DEFAULT);
+    lv_obj_set_width(ui->Setting_dark_ota_ok_btn_label, LV_PCT(100));
+    lv_obj_set_pos(ui->Setting_dark_ota_ok_btn, 163, 74);
+    lv_obj_set_size(ui->Setting_dark_ota_ok_btn, 83, 23);
+
+    //Write style for Setting_dark_ota_ok_btn, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_bg_opa(ui->Setting_dark_ota_ok_btn, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->Setting_dark_ota_ok_btn, lv_color_hex(0x585858), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_dir(ui->Setting_dark_ota_ok_btn, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui->Setting_dark_ota_ok_btn, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->Setting_dark_ota_ok_btn, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->Setting_dark_ota_ok_btn, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->Setting_dark_ota_ok_btn, lv_color_hex(0xADC6FF), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->Setting_dark_ota_ok_btn, &lv_font_montserratMedium_18, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui->Setting_dark_ota_ok_btn, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui->Setting_dark_ota_ok_btn, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
+
+    //Write codes Setting_dark_ota_label
+    ui->Setting_dark_ota_label = lv_label_create(ui->Setting_dark_ota_window);
+    lv_label_set_text(ui->Setting_dark_ota_label, "Confrim OTA Process");
+    lv_label_set_long_mode(ui->Setting_dark_ota_label, LV_LABEL_LONG_WRAP);
+    lv_obj_set_pos(ui->Setting_dark_ota_label, 13, 23);
+    lv_obj_set_size(ui->Setting_dark_ota_label, 234, 32);
+
+    //Write style for Setting_dark_ota_label, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_border_width(ui->Setting_dark_ota_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->Setting_dark_ota_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->Setting_dark_ota_label, lv_color_hex(0xf0f0f0), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->Setting_dark_ota_label, &lv_font_montserratMedium_20, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui->Setting_dark_ota_label, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_letter_space(ui->Setting_dark_ota_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_line_space(ui->Setting_dark_ota_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui->Setting_dark_ota_label, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui->Setting_dark_ota_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui->Setting_dark_ota_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui->Setting_dark_ota_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui->Setting_dark_ota_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui->Setting_dark_ota_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->Setting_dark_ota_label, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+
     //The custom code of Setting_dark.
 
 
