@@ -284,7 +284,7 @@ static void update_weather_card(lv_ui *ui, const ha_ui_weather_t *data)
         return;
     }
 
-    if(strcmp(data->weather, "sunny") == 0){
+    if(strcmp(data->weather, "sunny") == 0 || strcmp(data->weather, "clear-night") == 0){
         lv_img_set_src(ui->HA_dark_weather, &_sun_alpha_60x60);
     }
     else if (strcmp(data->weather, "cloudy") == 0 || strcmp(data->weather, "partlycloudy") == 0)
