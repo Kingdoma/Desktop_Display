@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include "app_main.h"
 
-#define ADVANCED_WIFI_SETTING
+// #define ADVANCED_WIFI_SETTING
 
 #ifdef ADVANCED_WIFI_SETTING
 // Override these for your network when enabling static IP.
