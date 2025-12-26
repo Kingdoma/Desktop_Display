@@ -17,8 +17,58 @@
 
 static TaskHandle_t s_smartconfig_task = NULL;
 static char s_wifi_ip[16] = "";
+static esp_netif_t *s_sta_netif = NULL;
 static void smartconfig_example_task(void * parm);
 static void start_smartconfig_task(bool force);
+
+#ifdef ADVANCED_WIFI_SETTING
+static bool parse_ipv4(const char *addr_str, ip4_addr_t *out)
+{
+    if (!addr_str || !out) {
+        return false;
+    }
+    return ip4addr_aton(addr_str, out) != 0;
+}
+
+static void apply_advanced_ip_settings(void)
+{
+    if (!s_sta_netif) {
+        ESP_LOGW(WIFI_TAG, "STA netif not ready for advanced IP settings");
+        return;
+    }
+
+    ip4_addr_t ip = {0};
+    ip4_addr_t gw = {0};
+    ip4_addr_t netmask = {0};
+
+    if (!parse_ipv4(ADVANCED_WIFI_IP, &ip) ||
+        !parse_ipv4(ADVANCED_WIFI_GATEWAY, &gw) ||
+        !parse_ipv4(ADVANCED_WIFI_NETMASK, &netmask)) {
+        ESP_LOGW(WIFI_TAG, "Invalid static IP settings");
+        return;
+    }
+
+    esp_netif_ip_info_t ip_info = {
+        .ip = ip,
+        .netmask = netmask,
+        .gw = gw,
+    };
+
+    esp_err_t err = esp_netif_dhcpc_stop(s_sta_netif);
+    if (err != ESP_OK && err != ESP_ERR_ESP_NETIF_DHCP_ALREADY_STOPPED) {
+        ESP_LOGW(WIFI_TAG, "Failed to stop DHCP client (%s)", esp_err_to_name(err));
+        return;
+    }
+    err = esp_netif_set_ip_info(s_sta_netif, &ip_info);
+    if (err != ESP_OK) {
+        ESP_LOGW(WIFI_TAG, "Failed to set static IP info (%s)", esp_err_to_name(err));
+        return;
+    }
+
+    ESP_LOGI(WIFI_TAG, "Static IP: %s, GW: %s, NETMASK: %s",
+             ADVANCED_WIFI_IP, ADVANCED_WIFI_GATEWAY, ADVANCED_WIFI_NETMASK);
+}
+#endif
 
 static void wifi_init()
 {
@@ -26,8 +76,12 @@ static void wifi_init()
 
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    esp_netif_t *sta_netif = esp_netif_create_default_wifi_sta();
-    assert(sta_netif);
+    s_sta_netif = esp_netif_create_default_wifi_sta();
+    assert(s_sta_netif);
+
+#ifdef ADVANCED_WIFI_SETTING
+    apply_advanced_ip_settings();
+#endif
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
