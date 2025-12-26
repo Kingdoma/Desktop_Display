@@ -659,6 +659,9 @@ static void ha_sync_task(void *arg)
         }
     }
 
+    g_module_status.ha_status = READY;
+    g_module_status.need_update = true;
+
     for (;;) {
         TickType_t now = xTaskGetTickCount();
 
