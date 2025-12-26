@@ -339,19 +339,19 @@ static void update_weather_card(lv_ui *ui, const ha_ui_weather_t *data)
     {
         lv_img_set_src(ui->HA_dark_weather, &_foog_alpha_60x60);
     }
-    else if (strcmp(data->weather, "windy") == 0)
+    else if (strcmp(data->weather, "windy") == 0 || strcmp(data->weather, "windy-variant") == 0)
     {
         lv_img_set_src(ui->HA_dark_weather, &_windy_alpha_60x60);
     }
-    else if (strcmp(data->weather, "rainy") == 0)
+    else if (strcmp(data->weather, "rainy") == 0 || strcmp(data->weather, "pouring") == 0)
     {
         lv_img_set_src(ui->HA_dark_weather, &_rainy_alpha_60x60);
     }
-    else if (strcmp(data->weather, "storm") == 0)
+    else if (strcmp(data->weather, "lightning") == 0 || strcmp(data->weather, "lightning-rainy") == 0)
     {
         lv_img_set_src(ui->HA_dark_weather, &_storm_alpha_60x60);
     }
-    else if (strcmp(data->weather, "snowy") == 0)
+    else if (strcmp(data->weather, "snowy") == 0 || strcmp(data->weather, "snowy-rainy") == 0 || strcmp(data->weather, "hail") == 0)
     {
         lv_img_set_src(ui->HA_dark_weather, &_snowy_alpha_60x60);
     }else{
