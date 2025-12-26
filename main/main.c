@@ -43,6 +43,7 @@ app_module_status_t g_module_status = {
 };
 
 app_message_t g_msg_recv;
+system_metrics_t g_latest_metrics = {0};
 EventGroupHandle_t g_wifi_event_group;
 const int CONNECTED_BIT = BIT0;
 const int ESPTOUCH_DONE_BIT = BIT1;
@@ -267,10 +268,16 @@ static void lvgl_task(void *arg)
 
     metrics_queue_init();
 
-    system_metrics_t latest_metrics = {0};
-    latest_metrics.day_of_week = -1;
+    g_latest_metrics.day_of_week = -1;
+    
     TickType_t last_time_update = xTaskGetTickCount();
-    bool needs_ui_update = update_wall_clock(&latest_metrics);
+    update_wall_clock(&g_latest_metrics);
+
+    lv_obj_t *last_screen = lv_scr_act();
+    time_ui_mark_screen_loaded(last_screen);
+    bool needs_ui_update = true;
+
+    // task watch dog setting
     esp_err_t wdt_err = esp_task_wdt_add(NULL);
     if (wdt_err != ESP_OK) {
         ESP_LOGW(TAG, "Failed to add LVGL task to WDT (%s)", esp_err_to_name(wdt_err));
@@ -279,17 +286,27 @@ static void lvgl_task(void *arg)
     // lv_demo_benchmark();
 
     while (1) {
+        // determain the whether lv_screen changed
+        lv_obj_t *active_screen = lv_scr_act();
+        if (active_screen != last_screen) {
+            time_ui_mark_screen_loaded(active_screen);
+            needs_ui_update = true;
+            last_screen = active_screen;
+        }
+
         // time data need update
         const TickType_t now = xTaskGetTickCount();
         if ((now - last_time_update) >= pdMS_TO_TICKS(1000)) {
-            if (update_wall_clock(&latest_metrics)) {
-                needs_ui_update = true;
+            if (update_wall_clock(&g_latest_metrics)) {
+                if (time_ui_should_update(active_screen)) {
+                    needs_ui_update = true;
+                }
             }
             last_time_update = now;
         }
 
         // pc info need update
-        if (metrics_queue_pop(&latest_metrics)) {
+        if (metrics_queue_pop(&g_latest_metrics)) {
             needs_ui_update = true;
         }
 
@@ -306,12 +323,12 @@ static void lvgl_task(void *arg)
 
         // If at Monitor panel then update the metrics and time
         if (screen_is_active(guider_ui.Monitor_dark) && needs_ui_update) {
-            monitor_panel_update(&guider_ui, &latest_metrics);
+            monitor_panel_update(&guider_ui, &g_latest_metrics);
             needs_ui_update = false;
         }
         // If at HA panel then update the homeassistant entry data and time
         else if (screen_is_active(guider_ui.HA_dark) && needs_ui_update) {
-            ha_panel_update(&guider_ui, &latest_metrics);
+            ha_panel_update(&guider_ui, &g_latest_metrics);
             needs_ui_update = false;
         }
         else if (screen_is_active(guider_ui.Setting_dark) && needs_ui_update){
