@@ -87,7 +87,7 @@ esp_err_t display_driver_init(display_driver_handles_t *out_handles)
 
     static const st7796_lcd_init_cmd_t lcd_init_cmds[] = {
     // {cmd, { data }, data_size, delay_ms}
-        {0x35, (uint8_t []){0x01}, 1, 0},
+        {0x35, (uint8_t []){0x00}, 1, 0},
         {0x36, (uint8_t []){0x28}, 1, 0},
         {0xf0, (uint8_t []){0xc3}, 1, 0},
         {0xf0, (uint8_t []){0x96}, 1, 0},
