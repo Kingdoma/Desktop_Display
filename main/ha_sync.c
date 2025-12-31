@@ -323,8 +323,8 @@ static esp_err_t ha_push_state(const char *entity_id, const char *state)
                                  "{\"id\":%u,\"type\":\"call_service\",\"domain\":\"%s\",\"service\":\"%s\",\"service_data\":{\"entity_id\":\"%s\"%s}}",
                                  (unsigned)id, domain, service, entity_id, extra);
 
-                ESP_LOG_I(HA_TAG, "Update to HA");
-                ESP_LOG_I(HA_TAG, "Entry: %s, service: %s, data: %s", entity_id, service, extra);
+                ESP_LOGI(HA_TAG, "Update to HA");
+                ESP_LOGI(HA_TAG, "Entry: %s, service: %s, data: %s", entity_id, service, extra);
 
                 if (n > 0 && n < (int)sizeof(payload)) {
                     ws_send_text(payload);

@@ -135,7 +135,7 @@ esp_err_t display_driver_init(display_driver_handles_t *out_handles)
     display_wait_for_power(120);
     ESP_RETURN_ON_ERROR(esp_lcd_panel_init(s_panel_handle), TAG, "panel init failed");
     display_wait_for_power(20);
-    ESP_RETURN_ON_ERROR(esp_lcd_panel_swap_xy(s_panel_handle, true), TAG, "panel swap xy failed");
+    ESP_RETURN_ON_ERROR(esp_lcd_panel_swap_xy(s_panel_handle, false), TAG, "panel swap xy failed");
     ESP_RETURN_ON_ERROR(esp_lcd_panel_mirror(s_panel_handle, EXAMPLE_LCD_MIRROR_X, EXAMPLE_LCD_MIRROR_Y), TAG,
                         "panel mirror failed");
     ESP_RETURN_ON_ERROR(esp_lcd_panel_disp_on_off(s_panel_handle, true), TAG, "panel on failed");
@@ -223,7 +223,6 @@ IRAM_ATTR static void display_te_isr_handler(void *arg)
 
 static esp_err_t display_init_te_signal(void)
 {
-#if EXAMPLE_PIN_NUM_LCD_TE >= 0
     if(s_te_ready == NULL) {
         return ESP_ERR_INVALID_STATE;
     }
@@ -248,7 +247,6 @@ static esp_err_t display_init_te_signal(void)
     ESP_RETURN_ON_ERROR(esp_lcd_panel_io_tx_param(s_panel_io, 0x35, &te_mode, 1), TAG, "te enable failed");
     s_te_enabled = true;
     ESP_LOGI(TAG, "TE sync enabled on GPIO %d", EXAMPLE_PIN_NUM_LCD_TE);
-#endif
     return ESP_OK;
 }
 #endif
