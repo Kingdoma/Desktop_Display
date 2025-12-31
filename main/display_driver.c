@@ -29,6 +29,26 @@ static lv_color_t s_buf2[EXAMPLE_LCD_H_RES * EXAMPLE_LCD_BUFFER_LINES];
 static bool s_initialized;
 static bool s_te_enabled;
 
+static const st7796_lcd_init_cmd_t lcd_init_cmds[] = {
+// {cmd, { data }, data_size, delay_ms}
+#if EXAMPLE_LCD_TE
+    {0x35, (uint8_t []){0x00}, 1, 0},
+#endif
+    {0x36, (uint8_t []){0x28}, 1, 0},
+    {0xf0, (uint8_t []){0xc3}, 1, 0},
+    {0xf0, (uint8_t []){0x96}, 1, 0},
+    {0xb4, (uint8_t []){0x01}, 1, 0},
+    {0xb7, (uint8_t []){0xc6}, 1, 0},
+    {0xe8, (uint8_t []){0x40, 0x8a, 0x00, 0x00, 0x29, 0x19, 0xa5, 0x33}, 8, 0},
+    {0xc1, (uint8_t []){0x06}, 1, 0},
+    {0xc2, (uint8_t []){0xa7}, 1, 0},
+    {0xc5, (uint8_t []){0x18}, 1, 0},
+    {0xe0, (uint8_t []){0xf0, 0x09, 0x0b, 0x06, 0x04, 0x15, 0x2f, 0x54, 0x42, 0x3c, 0x17, 0x14, 0x18, 0x1b}, 14, 0},
+    {0xe1, (uint8_t []){0xf0, 0x09, 0x0b, 0x06, 0x04, 0x03, 0x2d, 0x43, 0x42, 0x3b, 0x16, 0x14, 0x17, 0x1b}, 14, 0},
+    {0xf0, (uint8_t []){0x3c}, 1, 0},
+    {0xf0, (uint8_t []){0x69}, 1, 0},
+};
+
 static void display_wait_for_power(uint32_t delay_ms);
 static esp_err_t display_init_touch(void);
 static esp_err_t display_init_te_signal(void);
@@ -95,10 +115,16 @@ esp_err_t display_driver_init(display_driver_handles_t *out_handles)
     ESP_RETURN_ON_ERROR(esp_lcd_new_panel_io_i80(s_i80_bus, &io_config, &s_panel_io), TAG,
                         "install panel IO failed");
 
+    st7796_vendor_config_t vendor_config = {  // Uncomment these lines if use custom initialization commands
+        .init_cmds = lcd_init_cmds,
+        .init_cmds_size = sizeof(lcd_init_cmds) / sizeof(st7796_lcd_init_cmd_t),
+    };
+
     const esp_lcd_panel_dev_config_t panel_config = {
         .reset_gpio_num = EXAMPLE_PIN_NUM_LCD_RST,
         .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR,
         .bits_per_pixel = EXAMPLE_LCD_BIT_PER_PIXEL,
+        .vendor_config = &vendor_config,
     };
     ESP_RETURN_ON_ERROR(esp_lcd_new_panel_st7796(s_panel_io, &panel_config, &s_panel_handle), TAG,
                         "install st7796 panel failed");

@@ -49,6 +49,9 @@
 #define EXAMPLE_PIN_NUM_LCD_DATA15     (GPIO_NUM_NC)
 #define EXAMPLE_PIN_NUM_LCD_RST        (GPIO_NUM_NC)  
 #define EXAMPLE_PIN_NUM_BK_LIGHT       (GPIO_NUM_48)
-#define EXAMPLE_BK_LIGHT_ON_LEVEL      (1)                         
+#define EXAMPLE_BK_LIGHT_ON_LEVEL      (1)       
+#define EXAMPLE_PIN_NUM_LCD_TE         (GPIO_NUM_10)
+#define EXAMPLE_LCD_TE                 true
+
 
 #endif /* DISPLAY_CONFIG_H */

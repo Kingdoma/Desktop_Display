@@ -78,6 +78,7 @@ void init_scr_del_flag(lv_ui *ui)
     ui->Monitor_dark_del = true;
     ui->HA_dark_del = true;
     ui->Setting_dark_del = true;
+    ui->OTA_del = true;
 }
 
 void setup_ui(lv_ui *ui)

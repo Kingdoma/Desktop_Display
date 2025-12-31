@@ -322,6 +322,10 @@ static esp_err_t ha_push_state(const char *entity_id, const char *state)
                 int n = snprintf(payload, sizeof(payload),
                                  "{\"id\":%u,\"type\":\"call_service\",\"domain\":\"%s\",\"service\":\"%s\",\"service_data\":{\"entity_id\":\"%s\"%s}}",
                                  (unsigned)id, domain, service, entity_id, extra);
+
+                ESP_LOG_I(HA_TAG, "Update to HA");
+                ESP_LOG_I(HA_TAG, "Entry: %s, service: %s, data: %s", entity_id, service, extra);
+
                 if (n > 0 && n < (int)sizeof(payload)) {
                     ws_send_text(payload);
                     return ESP_OK;
@@ -417,7 +421,12 @@ static void ws_send_text(const char *text)
     if (!g_ctx.ws || !text) {
         return;
     }
-    esp_websocket_client_send_text(g_ctx.ws, text, strlen(text), pdMS_TO_TICKS(1000));
+    int ret;
+    ret = esp_websocket_client_send_text(g_ctx.ws, text, strlen(text), pdMS_TO_TICKS(1000));
+    if(!ret){
+        ESP_LOGE(HA_TAG, "Websocket send error");
+        return;
+    }
 }
 
 static void ws_send_auth(void)
@@ -658,6 +667,9 @@ static void ha_sync_task(void *arg)
             ESP_LOGW(HA_TAG, "Disabling polling for missing entity: %s", g_ctx.entities[i].entity_id);
         }
     }
+
+    g_module_status.ha_status = READY;
+    g_module_status.need_update = true;
 
     for (;;) {
         TickType_t now = xTaskGetTickCount();

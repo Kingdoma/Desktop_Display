@@ -6,6 +6,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
 #include "sdkconfig.h"
+#include "metrics.h"
 
 typedef struct {
     uint8_t buf[CONFIG_TINYUSB_CDC_RX_BUFSIZE + 1];     // Data buffer
@@ -31,6 +32,8 @@ typedef struct {
 } app_module_status_t;
 
 extern app_message_t g_msg_recv;
+
+extern system_metrics_t g_latest_metrics;
 
 extern app_module_status_t g_module_status;
 

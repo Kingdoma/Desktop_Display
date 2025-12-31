@@ -15,6 +15,7 @@ idf_component_register(
         "ha_ui.c"
         "wifi.c"
         "web_server.c"
+        "ota.c"
         ${GUI_GUIDER_SOURCES}
         
     INCLUDE_DIRS

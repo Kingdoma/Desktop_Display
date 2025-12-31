@@ -92,3 +92,8 @@ I (126633) app_main: HA state update (sensor.6_humidity): 47 (changed 2025-12-11
 I (126655) app_main: HA state update (sensor.6_temperature): 23.4 (changed 2025-12-11T14:07:23.806806+00:00)
 I (126673) app_main: HA state update (sensor.5_humidity): 42 (changed 2025-12-11T14:06:00.150303+00:00)
 I (126692) app_main: HA state update (sensor.5_temperature): 19.8 (changed 2025-12-11T14:12:15.853921+00:00)
+
+known bug:
+ha setting keep at waiting
+sntp keep waiting for system time to be set
+web restart slow

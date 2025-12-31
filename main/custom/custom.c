@@ -39,6 +39,8 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
+static bool monitor_time_pending = true;
+static bool ha_time_pending = true;
 
 /**
  * Create a demo application
@@ -63,6 +65,48 @@ static int16_t clamp_percent(float value)
 bool screen_is_active(const lv_obj_t *screen)
 {
     return screen && lv_obj_is_valid(screen) && lv_scr_act() == screen;
+}
+
+void time_ui_mark_screen_loaded(const lv_obj_t *screen)
+{
+    if (!screen) {
+        return;
+    }
+
+    if (screen == guider_ui.Monitor_dark) {
+        monitor_time_pending = true;
+    } else if (screen == guider_ui.HA_dark) {
+        ha_time_pending = true;
+    }
+}
+
+bool time_ui_should_update(const lv_obj_t *screen)
+{
+    if (!screen) {
+        return false;
+    }
+
+    if (screen == guider_ui.Monitor_dark) {
+        return monitor_time_pending;
+    }
+    if (screen == guider_ui.HA_dark) {
+        return ha_time_pending;
+    }
+
+    return false;
+}
+
+void time_ui_mark_updated(const lv_obj_t *screen)
+{
+    if (!screen) {
+        return;
+    }
+
+    if (screen == guider_ui.Monitor_dark) {
+        monitor_time_pending = false;
+    } else if (screen == guider_ui.HA_dark) {
+        ha_time_pending = false;
+    }
 }
 
 static void spangroup_set(const lv_obj_t* obj, uint8_t idx, float data, uint8_t digits)
@@ -284,7 +328,7 @@ static void update_weather_card(lv_ui *ui, const ha_ui_weather_t *data)
         return;
     }
 
-    if(strcmp(data->weather, "sunny") == 0){
+    if(strcmp(data->weather, "sunny") == 0 || strcmp(data->weather, "clear-night") == 0){
         lv_img_set_src(ui->HA_dark_weather, &_sun_alpha_60x60);
     }
     else if (strcmp(data->weather, "cloudy") == 0 || strcmp(data->weather, "partlycloudy") == 0)
@@ -295,19 +339,19 @@ static void update_weather_card(lv_ui *ui, const ha_ui_weather_t *data)
     {
         lv_img_set_src(ui->HA_dark_weather, &_foog_alpha_60x60);
     }
-    else if (strcmp(data->weather, "windy") == 0)
+    else if (strcmp(data->weather, "windy") == 0 || strcmp(data->weather, "windy-variant") == 0)
     {
         lv_img_set_src(ui->HA_dark_weather, &_windy_alpha_60x60);
     }
-    else if (strcmp(data->weather, "rainy") == 0)
+    else if (strcmp(data->weather, "rainy") == 0 || strcmp(data->weather, "pouring") == 0)
     {
         lv_img_set_src(ui->HA_dark_weather, &_rainy_alpha_60x60);
     }
-    else if (strcmp(data->weather, "storm") == 0)
+    else if (strcmp(data->weather, "lightning") == 0 || strcmp(data->weather, "lightning-rainy") == 0)
     {
         lv_img_set_src(ui->HA_dark_weather, &_storm_alpha_60x60);
     }
-    else if (strcmp(data->weather, "snowy") == 0)
+    else if (strcmp(data->weather, "snowy") == 0 || strcmp(data->weather, "snowy-rainy") == 0 || strcmp(data->weather, "hail") == 0)
     {
         lv_img_set_src(ui->HA_dark_weather, &_snowy_alpha_60x60);
     }else{
@@ -426,83 +470,91 @@ void monitor_panel_update(lv_ui *ui, const system_metrics_t *metrics)
         spangroup_set(ui->Monitor_dark_gram_data, 1, gram_usage, 0);
     }
 
-    if (metrics->has_date && ui->Monitor_dark_datetext_date) {
-        lv_label_set_text_fmt(ui->Monitor_dark_datetext_date, "%04u/%02u/%02u",
-                            (unsigned)metrics->year,
-                            (unsigned)metrics->month,
-                            (unsigned)metrics->day);
-    }
-    
-    if (metrics->has_day_of_week && ui->Monitor_dark_weekday) {
-        static const char *const day_names[] = {
-            "Sunday",
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-        };
-        if (metrics->day_of_week >= 0 && metrics->day_of_week <= 6) {
-            lv_label_set_text(ui->Monitor_dark_weekday, day_names[metrics->day_of_week]);
+    if (time_ui_should_update(ui->Monitor_dark) && metrics->has_time) {
+        if (metrics->has_date && ui->Monitor_dark_datetext_date) {
+            lv_label_set_text_fmt(ui->Monitor_dark_datetext_date, "%04u/%02u/%02u",
+                                (unsigned)metrics->year,
+                                (unsigned)metrics->month,
+                                (unsigned)metrics->day);
         }
-    }
 
-    if (metrics->has_time && ui->Monitor_dark_digital_clock_time) {
-        const bool is_pm = metrics->hour >= 12;
-        uint8_t hour12 = metrics->hour % 12;
-        if(metrics->hour && hour12 == 0) {
-            hour12 = 12;
+        if (metrics->has_day_of_week && ui->Monitor_dark_weekday) {
+            static const char *const day_names[] = {
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+            };
+            if (metrics->day_of_week >= 0 && metrics->day_of_week <= 6) {
+                lv_label_set_text(ui->Monitor_dark_weekday, day_names[metrics->day_of_week]);
+            }
         }
-        
-        const char *suffix = is_pm ? "PM" : "AM";
-        lv_dclock_set_text_fmt(ui->Monitor_dark_digital_clock_time, "%u:%02u:%02u %s",
-                            (unsigned)hour12,
-                            (unsigned)metrics->minute,
-                            (unsigned)metrics->second,
-                            suffix);
 
-        Monitor_dark_digital_clock_time_hour_value = hour12;
-        Monitor_dark_digital_clock_time_min_value = metrics->minute;
-        Monitor_dark_digital_clock_time_sec_value = metrics->second;
-        Monitor_dark_digital_clock_time_meridiem[0] = suffix[0];
-        Monitor_dark_digital_clock_time_meridiem[1] = suffix[1];
-        Monitor_dark_digital_clock_time_meridiem[2] = '\0';
+        if (ui->Monitor_dark_digital_clock_time) {
+            const bool is_pm = metrics->hour >= 12;
+            uint8_t hour12 = metrics->hour % 12;
+            if(metrics->hour && hour12 == 0) {
+                hour12 = 12;
+            }
+
+            const char *suffix = is_pm ? "PM" : "AM";
+            lv_dclock_set_text_fmt(ui->Monitor_dark_digital_clock_time, "%u:%02u:%02u %s",
+                                (unsigned)hour12,
+                                (unsigned)metrics->minute,
+                                (unsigned)metrics->second,
+                                suffix);
+
+            Monitor_dark_digital_clock_time_hour_value = hour12;
+            Monitor_dark_digital_clock_time_min_value = metrics->minute;
+            Monitor_dark_digital_clock_time_sec_value = metrics->second;
+            Monitor_dark_digital_clock_time_meridiem[0] = suffix[0];
+            Monitor_dark_digital_clock_time_meridiem[1] = suffix[1];
+            Monitor_dark_digital_clock_time_meridiem[2] = '\0';
+        }
+
+        time_ui_mark_updated(ui->Monitor_dark);
     }
 }
 
 void ha_panel_update(lv_ui *ui, const system_metrics_t *metrics)
 {
-    if (ui->HA_dark_date && lv_obj_is_valid(ui->HA_dark_date)) {
-        lv_span_t *day_span = lv_spangroup_get_child(ui->HA_dark_date, 0);
-        lv_span_t *date_span = lv_spangroup_get_child(ui->HA_dark_date, 2);
+    if (time_ui_should_update(ui->HA_dark) && metrics->has_time) {
+        if (ui->HA_dark_date && lv_obj_is_valid(ui->HA_dark_date)) {
+            lv_span_t *day_span = lv_spangroup_get_child(ui->HA_dark_date, 0);
+            lv_span_t *date_span = lv_spangroup_get_child(ui->HA_dark_date, 2);
 
-        if (metrics->has_day_of_week && day_span && metrics->day_of_week >= 0 && metrics->day_of_week <= 6) {
-            static const char *const day_names[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
-            lv_span_set_text(day_span, day_names[metrics->day_of_week]);
+            if (metrics->has_day_of_week && day_span && metrics->day_of_week >= 0 && metrics->day_of_week <= 6) {
+                static const char *const day_names[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+                lv_span_set_text(day_span, day_names[metrics->day_of_week]);
+            }
+
+            if (metrics->has_date && date_span) {
+                char date_text[16];
+                snprintf(date_text, sizeof(date_text), "%04u/%02u/%u",
+                            (unsigned)metrics->year,
+                            (unsigned)metrics->month,
+                            (unsigned)metrics->day);
+                lv_span_set_text(date_span, date_text);
+            }
+
+            // lv_spangroup_refr_mode(ui->HA_dark_date);
         }
 
-        if (metrics->has_date && date_span) {
-            char date_text[16];
-            snprintf(date_text, sizeof(date_text), "%04u/%02u/%u",
-                        (unsigned)metrics->year,
-                        (unsigned)metrics->month,
-                        (unsigned)metrics->day);
-            lv_span_set_text(date_span, date_text);
+        if (ui->HA_dark_digital_clock_time && lv_obj_is_valid(ui->HA_dark_digital_clock_time)) {
+            lv_dclock_set_text_fmt(ui->HA_dark_digital_clock_time, "%u:%02u:%02u",
+                                    (unsigned)metrics->hour,
+                                    (unsigned)metrics->minute,
+                                    (unsigned)metrics->second);
+
+            HA_dark_digital_clock_time_hour_value = metrics->hour;
+            HA_dark_digital_clock_time_min_value = metrics->minute;
+            HA_dark_digital_clock_time_sec_value = metrics->second;
         }
 
-        // lv_spangroup_refr_mode(ui->HA_dark_date);
-    }
-
-    if (metrics->has_time && ui->HA_dark_digital_clock_time && lv_obj_is_valid(ui->HA_dark_digital_clock_time)) {
-        lv_dclock_set_text_fmt(ui->HA_dark_digital_clock_time, "%u:%02u:%02u",
-                                (unsigned)metrics->hour,
-                                (unsigned)metrics->minute,
-                                (unsigned)metrics->second);
-
-        HA_dark_digital_clock_time_hour_value = metrics->hour;
-        HA_dark_digital_clock_time_min_value = metrics->minute;
-        HA_dark_digital_clock_time_sec_value = metrics->second;
+        time_ui_mark_updated(ui->HA_dark);
     }
 
     if (!sync_data) {

@@ -26,6 +26,9 @@ extern int HA_dark_digital_clock_time_sec_value;
 
 void custom_init(lv_ui *ui);
 bool screen_is_active(const lv_obj_t *screen);
+void time_ui_mark_screen_loaded(const lv_obj_t *screen);
+bool time_ui_should_update(const lv_obj_t *screen);
+void time_ui_mark_updated(const lv_obj_t *screen);
 void monitor_panel_update(lv_ui *ui, const system_metrics_t *metrics);
 void ha_panel_update(lv_ui *ui, const system_metrics_t *metrics);
 void setting_panel_update(lv_ui *ui);
