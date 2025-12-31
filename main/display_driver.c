@@ -51,11 +51,13 @@ static const st7796_lcd_init_cmd_t lcd_init_cmds[] = {
 
 static void display_wait_for_power(uint32_t delay_ms);
 static esp_err_t display_init_touch(void);
+#if EXAMPLE_LCD_TE
 static esp_err_t display_init_te_signal(void);
+IRAM_ATTR static void display_te_isr_handler(void *arg);
+#endif
 IRAM_ATTR static bool display_panel_trans_done(esp_lcd_panel_io_handle_t panel_io,
                                                esp_lcd_panel_io_event_data_t *edata,
                                                void *user_ctx);
-IRAM_ATTR static void display_te_isr_handler(void *arg);
 static void display_lvgl_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_map);
 static void display_lvgl_touch_read(lv_indev_drv_t *drv, lv_indev_data_t *data);
 
@@ -74,7 +76,7 @@ esp_err_t display_driver_init(display_driver_handles_t *out_handles)
     if(s_flush_ready == NULL) {
         return ESP_ERR_NO_MEM;
     }
-#if EXAMPLE_PIN_NUM_LCD_TE >= 0
+#if EXAMPLE_LCD_TE
     s_te_ready = xSemaphoreCreateBinary();
     if(s_te_ready == NULL) {
         return ESP_ERR_NO_MEM;
@@ -137,8 +139,9 @@ esp_err_t display_driver_init(display_driver_handles_t *out_handles)
     ESP_RETURN_ON_ERROR(esp_lcd_panel_mirror(s_panel_handle, EXAMPLE_LCD_MIRROR_X, EXAMPLE_LCD_MIRROR_Y), TAG,
                         "panel mirror failed");
     ESP_RETURN_ON_ERROR(esp_lcd_panel_disp_on_off(s_panel_handle, true), TAG, "panel on failed");
+#if EXAMPLE_LCD_TE
     ESP_RETURN_ON_ERROR(display_init_te_signal(), TAG, "panel TE init failed");
-
+#endif
     ESP_RETURN_ON_ERROR(display_init_touch(), TAG, "touch init failed");
 
     lv_disp_draw_buf_init(&s_disp_buf, s_buf1, s_buf2, EXAMPLE_LCD_H_RES * EXAMPLE_LCD_BUFFER_LINES);
@@ -205,6 +208,7 @@ IRAM_ATTR static bool display_panel_trans_done(esp_lcd_panel_io_handle_t panel_i
     return high_task_wakeup == pdTRUE;
 }
 
+#if EXAMPLE_LCD_TE
 IRAM_ATTR static void display_te_isr_handler(void *arg)
 {
     (void)arg;
@@ -247,16 +251,21 @@ static esp_err_t display_init_te_signal(void)
 #endif
     return ESP_OK;
 }
+#endif
 
 static void display_lvgl_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_map)
 {
     esp_lcd_panel_handle_t panel_handle = (esp_lcd_panel_handle_t)disp_drv->user_data;
+
+#if EXAMPLE_LCD_TE
     if(s_te_enabled && s_te_ready) {
         xSemaphoreTake(s_te_ready, 0);
         if(xSemaphoreTake(s_te_ready, pdMS_TO_TICKS(50)) != pdTRUE) {
             ESP_LOGW(TAG, "TE wait timeout");
         }
     }
+#endif
+
     esp_err_t err = esp_lcd_panel_draw_bitmap(panel_handle,
                                               area->x1,
                                               area->y1,
