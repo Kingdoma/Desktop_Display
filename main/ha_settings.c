@@ -13,7 +13,7 @@
 #define HA_SETTINGS_DEFAULT_SNTP_SERVER "pool.ntp.org"
 #define HA_SETTINGS_DEFAULT_TIME_ZONE "CST-8"
 
-static ha_settings_t g_settings;
+static ha_settings_t s_settings;
 
 static void settings_set_defaults(ha_settings_t *settings)
 {
@@ -122,7 +122,7 @@ static void settings_load_from_nvs(ha_settings_t *settings)
 
 void ha_settings_init(void)
 {
-    settings_set_defaults(&g_settings);
+    settings_set_defaults(&s_settings);
 
     esp_err_t err = nvs_flash_init_partition(HA_SETTINGS_PARTITION);
     if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
@@ -134,12 +134,12 @@ void ha_settings_init(void)
         return;
     }
 
-    settings_load_from_nvs(&g_settings);
+    settings_load_from_nvs(&s_settings);
 }
 
 const ha_settings_t *ha_settings_get(void)
 {
-    return &g_settings;
+    return &s_settings;
 }
 
 bool ha_settings_save(const ha_settings_t *settings)
@@ -199,6 +199,6 @@ bool ha_settings_save(const ha_settings_t *settings)
         return false;
     }
 
-    g_settings = *settings;
+    s_settings = *settings;
     return true;
 }

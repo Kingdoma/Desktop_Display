@@ -15,6 +15,7 @@
 #include "ota.h"
 #include "ha_sync.h"
 #include "ha_ui.h"
+#include "ha_settings.h"
 
 #if LV_USE_GUIDER_SIMULATOR && LV_USE_FREEMASTER
 #include "freemaster_client.h"
@@ -32,6 +33,8 @@ ac_info_t ac = {
     .status = -1,
     .temp = 26
 };
+
+const static ha_settings_t *s_settings;
 
 static bool event_is_user(lv_event_t *e)
 {
@@ -105,12 +108,10 @@ static void HA_dark_sw_2_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_VALUE_CHANGED:
     {
-        lv_obj_t * status_obj = lv_event_get_target(e);
-        int status = lv_obj_has_state(status_obj, LV_STATE_CHECKED) ? true : false;
         const bool on = lv_obj_has_state(guider_ui.HA_dark_sw_2, LV_STATE_CHECKED);
         if (event_is_user(e)) {
             ha_ui_update_switch(2, on ? "on" : "off", NULL);
-            ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_SWITCH_2, on ? "on" : "off");
+            ha_sync_set_local_state(s_settings->entity_switch_2, on ? "on" : "off");
         }
 
         break;
@@ -126,12 +127,10 @@ static void HA_dark_sw_1_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_VALUE_CHANGED:
     {
-        lv_obj_t * status_obj = lv_event_get_target(e);
-        int status = lv_obj_has_state(status_obj, LV_STATE_CHECKED) ? true : false;
         const bool on = lv_obj_has_state(guider_ui.HA_dark_sw_1, LV_STATE_CHECKED);
         if (event_is_user(e)) {
             ha_ui_update_switch(1, on ? "on" : "off", NULL);
-            ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_SWITCH_1, on ? "on" : "off");
+            ha_sync_set_local_state(s_settings->entity_switch_1, on ? "on" : "off");
         }
         break;
     }
@@ -160,7 +159,7 @@ static void HA_dark_temp_slider_event_handler (lv_event_t *e)
                     mode = sync_data->ac_card->mode;
                 }
                 ha_ui_update_climate(0, (float)ac.temp, mode, NULL);
-                ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, buf);
+                ha_sync_set_local_state(s_settings->entity_ac, buf);
             }
         }
 
@@ -193,7 +192,7 @@ static void HA_dark_ac_off_event_handler (lv_event_t *e)
             // update to ha server
             if (event_is_user(e)) {
                 ha_ui_update_climate(0, (float)lv_slider_get_value(guider_ui.HA_dark_temp_slider), "off", NULL);
-                ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, "off");
+                ha_sync_set_local_state(s_settings->entity_ac, "off");
             }
 
             ac.status = 0;
@@ -227,7 +226,7 @@ static void HA_dark_ac_cool_event_handler (lv_event_t *e)
             // update to ha server
             if (event_is_user(e)) {
                 ha_ui_update_climate(0, (float)lv_slider_get_value(guider_ui.HA_dark_temp_slider), "cool", NULL);
-                ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, "cool");
+                ha_sync_set_local_state(s_settings->entity_ac, "cool");
             }
 
             ac.status = 1;
@@ -261,7 +260,7 @@ static void HA_dark_ac_heat_event_handler (lv_event_t *e)
             // update to ha server
             if (event_is_user(e)) {
                 ha_ui_update_climate(0, (float)lv_slider_get_value(guider_ui.HA_dark_temp_slider), "heat", NULL);
-                ha_sync_set_local_state(CONFIG_HA_ENTITY_ID_AC, "heat");
+                ha_sync_set_local_state(s_settings->entity_ac, "heat");
             }
 
             ac.status = 2;
@@ -279,7 +278,6 @@ static void HA_dark_menu_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_VALUE_CHANGED:
     {
-        uint16_t id = lv_dropdown_get_selected(guider_ui.HA_dark_menu);
         idx = lv_dropdown_get_selected(guider_ui.HA_dark_menu);
         if(idx == 1) {
             ui_load_scr_animation(&guider_ui, &guider_ui.Monitor_dark, guider_ui.Monitor_dark_del, &guider_ui.HA_dark_del, setup_scr_Monitor_dark, LV_SCR_LOAD_ANIM_NONE, 200, 200, false, true);
@@ -399,7 +397,6 @@ static void Setting_dark_menu_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_VALUE_CHANGED:
     {
-        uint16_t id = lv_dropdown_get_selected(guider_ui.Setting_dark_menu);
         idx = lv_dropdown_get_selected(guider_ui.Setting_dark_menu);
         if(idx == 1) {
             ui_load_scr_animation(&guider_ui, &guider_ui.Monitor_dark, guider_ui.Monitor_dark_del, &guider_ui.Setting_dark_del, setup_scr_Monitor_dark, LV_SCR_LOAD_ANIM_NONE, 200, 200, false, true);
@@ -459,5 +456,5 @@ void events_init_Setting_dark (lv_ui *ui)
 
 void events_init(lv_ui *ui)
 {
-
+    s_settings = ha_settings_get();
 }
