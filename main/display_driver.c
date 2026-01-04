@@ -135,7 +135,7 @@ esp_err_t display_driver_init(display_driver_handles_t *out_handles)
     display_wait_for_power(120);
     ESP_RETURN_ON_ERROR(esp_lcd_panel_init(s_panel_handle), TAG, "panel init failed");
     display_wait_for_power(20);
-    ESP_RETURN_ON_ERROR(esp_lcd_panel_swap_xy(s_panel_handle, false), TAG, "panel swap xy failed");
+    ESP_RETURN_ON_ERROR(esp_lcd_panel_swap_xy(s_panel_handle, true), TAG, "panel swap xy failed");
     ESP_RETURN_ON_ERROR(esp_lcd_panel_mirror(s_panel_handle, EXAMPLE_LCD_MIRROR_X, EXAMPLE_LCD_MIRROR_Y), TAG,
                         "panel mirror failed");
     ESP_RETURN_ON_ERROR(esp_lcd_panel_disp_on_off(s_panel_handle, true), TAG, "panel on failed");
