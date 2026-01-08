@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
+#include "freertos/semphr.h"
 #include "sdkconfig.h"
 #include "metrics.h"
 
@@ -38,6 +39,7 @@ extern system_metrics_t g_latest_metrics;
 extern app_module_status_t g_module_status;
 
 extern EventGroupHandle_t g_wifi_event_group;
+extern SemaphoreHandle_t g_net_lock;
 
 extern const int CONNECTED_BIT;
 extern const int ESPTOUCH_DONE_BIT;

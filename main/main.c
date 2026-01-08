@@ -4,6 +4,7 @@
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/semphr.h"
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_timer.h"
@@ -46,6 +47,7 @@ app_module_status_t g_module_status = {
 app_message_t g_msg_recv;
 system_metrics_t g_latest_metrics = {0};
 EventGroupHandle_t g_wifi_event_group;
+SemaphoreHandle_t g_net_lock;
 const int CONNECTED_BIT = BIT0;
 const int ESPTOUCH_DONE_BIT = BIT1;
 
@@ -367,6 +369,11 @@ void app_main(void)
     ha_ui_sync_data_init();
 
     ha_settings_init();
+
+    g_net_lock = xSemaphoreCreateMutex();
+    if (!g_net_lock) {
+        ESP_LOGW(TAG, "Failed to create net lock");
+    }
 
     wifi_connect();
 

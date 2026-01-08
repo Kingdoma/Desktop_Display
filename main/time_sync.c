@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/semphr.h"
 #include "esp_log.h"
 #include "esp_err.h"
 #include "esp_event.h"
@@ -38,6 +39,11 @@ static void sntp_time_sync(void)
 
     ESP_LOGI(TIME_SYNC_TAG, "Initializing SNTP");
 
+    bool net_locked = false;
+    if (g_net_lock && xSemaphoreTake(g_net_lock, portMAX_DELAY) == pdTRUE) {
+        net_locked = true;
+    }
+
     const ha_settings_t *settings = ha_settings_get();
     const char *sntp_server = "pool.ntp.org";
     if (settings && settings->sntp_server[0] != '\0') {
@@ -67,6 +73,10 @@ static void sntp_time_sync(void)
     }
 
     esp_netif_sntp_deinit();
+
+    if (net_locked) {
+        xSemaphoreGive(g_net_lock);
+    }
 }
 
 void sntp_task(void *arg)

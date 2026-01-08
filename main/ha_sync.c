@@ -19,6 +19,7 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/semphr.h"
 #include "freertos/queue.h"
 #include "freertos/event_groups.h"
 #include "cJSON.h"
@@ -49,6 +50,8 @@ typedef struct {
     esp_websocket_client_handle_t ws;
     bool ws_authed;
     bool ws_subscribed;
+    bool ws_auth_sent;
+    uint32_t ws_subscribe_id;
 } ha_sync_ctx_t;
 
 typedef enum {
@@ -439,12 +442,17 @@ static void ws_send_auth(void)
     char msg[256];
     snprintf(msg, sizeof(msg), "{\"type\":\"auth\",\"access_token\":\"%s\"}", g_ctx.auth_token);
     ws_send_text(msg);
+    g_ctx.ws_auth_sent = true;
 }
 
 static void ws_send_subscribe(void)
 {
     g_ctx.ws_subscribed = false;
-    ws_send_text("{\"id\":1,\"type\":\"subscribe_events\",\"event_type\":\"state_changed\"}");
+    g_ctx.ws_subscribe_id = ws_next_id();
+    char msg[128];
+    snprintf(msg, sizeof(msg), "{\"id\":%u,\"type\":\"subscribe_events\",\"event_type\":\"state_changed\"}",
+             (unsigned)g_ctx.ws_subscribe_id);
+    ws_send_text(msg);
 }
 
 static bool ws_ready(void)
@@ -465,6 +473,8 @@ static void stop_websocket(void)
         g_ctx.ws = NULL;
         g_ctx.ws_authed = false;
         g_ctx.ws_subscribed = false;
+        g_ctx.ws_auth_sent = false;
+        g_ctx.ws_subscribe_id = 0;
     }
 }
 
@@ -485,10 +495,14 @@ static void handle_ws_payload(const char *payload)
     cJSON *type = cJSON_GetObjectItemCaseSensitive(root, "type");
     if (cJSON_IsString(type) && type->valuestring) {
         if (strcmp(type->valuestring, "auth_required") == 0) {
-            ws_send_auth();
+            ESP_LOGI(HA_TAG, "WS auth required");
+            if (!g_ctx.ws_auth_sent) {
+                ws_send_auth();
+            }
         } else if (strcmp(type->valuestring, "auth_ok") == 0) {
             g_ctx.ws_authed = true;
             g_ctx.ws_subscribed = false;
+            g_ctx.ws_auth_sent = true;
             ws_send_subscribe();
             ESP_LOGI(HA_TAG, "WS authenticated");
             g_module_status.ha_status = CONNECT;
@@ -498,12 +512,13 @@ static void handle_ws_payload(const char *payload)
             ESP_LOGE(HA_TAG, "WS auth invalid: %s", cJSON_IsString(msg) ? msg->valuestring : "unknown");
             g_ctx.ws_authed = false;
             g_ctx.ws_subscribed = false;
+            g_ctx.ws_auth_sent = false;
             g_module_status.ha_status = ERROR;
             g_module_status.need_update = true;
         } else if (strcmp(type->valuestring, "result") == 0) {
             cJSON *id = cJSON_GetObjectItemCaseSensitive(root, "id");
             cJSON *success = cJSON_GetObjectItemCaseSensitive(root, "success");
-            if (cJSON_IsNumber(id) && id->valueint == 1) {
+            if (cJSON_IsNumber(id) && (uint32_t)id->valueint == g_ctx.ws_subscribe_id) {
                 if (cJSON_IsTrue(success)) {
                     g_ctx.ws_subscribed = true;
                     ESP_LOGI(HA_TAG, "WS subscribed to state_changed");
@@ -571,11 +586,15 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
         ESP_LOGI(HA_TAG, "WS connected");
         g_ctx.ws_authed = false;
         g_ctx.ws_subscribed = false;
+        g_ctx.ws_auth_sent = false;
+        g_ctx.ws_subscribe_id = 0;
+        ws_send_auth();
         break;
     case WEBSOCKET_EVENT_DISCONNECTED:
         ESP_LOGW(HA_TAG, "WS disconnected");
         g_ctx.ws_authed = false;
         g_ctx.ws_subscribed = false;
+        g_ctx.ws_auth_sent = false;
         break;
     case WEBSOCKET_EVENT_DATA: {
         const uint8_t opcode = (uint8_t)(data->op_code & 0x0F);
@@ -689,7 +708,6 @@ static void ha_sync_task(void *arg)
     float remote_temp = 0.0f;
     bool remote_has_temp = false;
     TickType_t next_ws_retry = 0;
-    TickType_t next_poll = 0;
     TickType_t next_sub_retry = 0;
 
     while (!wait_for_wifi_connected(pdMS_TO_TICKS(15000))) {
@@ -728,10 +746,6 @@ static void ha_sync_task(void *arg)
 
     ESP_LOGI(HA_TAG, "HA sync loop start (poll_ms=%u)", (unsigned)g_ctx.poll_ms);
 
-    if (g_ctx.poll_ms > 0) {
-        next_poll = xTaskGetTickCount() + pdMS_TO_TICKS(g_ctx.poll_ms);
-    }
-
     for (;;) {
         TickType_t now = xTaskGetTickCount();
 
@@ -746,12 +760,22 @@ static void ha_sync_task(void *arg)
 
         // Ensure websocket is running; retry with backoff.
         if (!g_ctx.ws && now >= next_ws_retry) {
+            bool net_locked = false;
+            if (g_net_lock && xSemaphoreTake(g_net_lock, 0) == pdTRUE) {
+                net_locked = true;
+            } else if (g_net_lock) {
+                next_ws_retry = now + pdMS_TO_TICKS(2000);
+                continue;
+            }
             ESP_LOGI(HA_TAG, "WS start attempt (base_url=%s)", g_ctx.base_url ? g_ctx.base_url : "");
             if (start_websocket() != ESP_OK) {
                 next_ws_retry = now + pdMS_TO_TICKS(2000);
             } else {
                 next_ws_retry = now + pdMS_TO_TICKS(5000);
                 next_sub_retry = now + pdMS_TO_TICKS(1000);
+            }
+            if (net_locked) {
+                xSemaphoreGive(g_net_lock);
             }
         } else if (g_ctx.ws && !esp_websocket_client_is_connected(g_ctx.ws) && now >= next_ws_retry) {
             ESP_LOGW(HA_TAG, "WS disconnected; restarting");
