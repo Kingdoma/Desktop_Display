@@ -16,10 +16,13 @@
 #include "ha_sync.h"
 #include "ha_ui.h"
 #include "ha_settings.h"
+#include "esp_log.h"
 
 #if LV_USE_GUIDER_SIMULATOR && LV_USE_FREEMASTER
 #include "freemaster_client.h"
 #endif
+
+#define EVENT_TAG "ui_event"
 
 uint8_t idx;
 
@@ -109,10 +112,10 @@ static void HA_dark_sw_2_event_handler (lv_event_t *e)
     case LV_EVENT_VALUE_CHANGED:
     {
         const bool on = lv_obj_has_state(guider_ui.HA_dark_sw_2, LV_STATE_CHECKED);
-        if (event_is_user(e)) {
-            ha_ui_update_switch(2, on ? "on" : "off", NULL);
-            ha_sync_set_local_state(s_settings->entity_switch_2, on ? "on" : "off");
-        }
+        ESP_LOGI(EVENT_TAG,"sw_2 pressed");
+        ha_ui_update_switch(2, on ? "on" : "off", NULL);
+        ha_sync_set_local_state(s_settings->entity_switch_2, on ? "on" : "off");
+
 
         break;
     }
@@ -128,10 +131,9 @@ static void HA_dark_sw_1_event_handler (lv_event_t *e)
     case LV_EVENT_VALUE_CHANGED:
     {
         const bool on = lv_obj_has_state(guider_ui.HA_dark_sw_1, LV_STATE_CHECKED);
-        if (event_is_user(e)) {
-            ha_ui_update_switch(1, on ? "on" : "off", NULL);
-            ha_sync_set_local_state(s_settings->entity_switch_1, on ? "on" : "off");
-        }
+        ESP_LOGI(EVENT_TAG,"sw_1 pressed");
+        ha_ui_update_switch(1, on ? "on" : "off", NULL);
+        ha_sync_set_local_state(s_settings->entity_switch_1, on ? "on" : "off");
         break;
     }
     default:

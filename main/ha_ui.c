@@ -63,6 +63,7 @@ void ha_ui_update_switch(uint8_t lvgl_id, const char *state, const char *last_ch
 {
     const bool is_on = (state[0] == 'o' || state[0] == 'O') && (state[1] == 'n' || state[1] == 'N');
     ha_ui_sw_t *target = NULL;
+    ESP_LOGI(HA_UI_TAG, "sw_%d, state: %d", (int)lvgl_id, is_on);
     switch (lvgl_id) {
     case 1:
         target = sync_data->sw_1;
