@@ -25,7 +25,7 @@ static void time_sync_notification_cb(struct timeval *tv)
 static void sntp_time_sync(void)
 {   
     EventBits_t uxBits;
-    uxBits = xEventGroupWaitBits(g_wifi_event_group, CONNECTED_BIT, true, false, portMAX_DELAY);
+    uxBits = xEventGroupWaitBits(g_wifi_event_group, CONNECTED_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
 
     while(!(uxBits & CONNECTED_BIT)) {
         ESP_LOGI(TIME_SYNC_TAG, "Not connected to wifi");

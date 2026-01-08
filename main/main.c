@@ -9,6 +9,7 @@
 #include "esp_timer.h"
 #include "lvgl.h"
 #include "generated/gui_guider.h"
+#include "generated/events_init.h"
 #include "custom/custom.h"
 #include "display_driver.h"
 #include "tinyusb_cdc.h"
@@ -259,6 +260,7 @@ static void lvgl_task(void *arg)
     ESP_ERROR_CHECK(esp_timer_start_periodic(tick_timer, 1000)); // 1 ms tick
 
     setup_ui(&guider_ui);
+    events_init(&guider_ui);
     custom_init(&guider_ui);
     ha_ui_set_ui(&guider_ui);
 

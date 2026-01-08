@@ -48,6 +48,7 @@ typedef struct {
     QueueHandle_t queue;
     esp_websocket_client_handle_t ws;
     bool ws_authed;
+    bool ws_subscribed;
 } ha_sync_ctx_t;
 
 typedef enum {
@@ -442,12 +443,13 @@ static void ws_send_auth(void)
 
 static void ws_send_subscribe(void)
 {
+    g_ctx.ws_subscribed = false;
     ws_send_text("{\"id\":1,\"type\":\"subscribe_events\",\"event_type\":\"state_changed\"}");
 }
 
 static bool ws_ready(void)
 {
-    return g_ctx.ws && g_ctx.ws_authed && esp_websocket_client_is_connected(g_ctx.ws);
+    return g_ctx.ws && g_ctx.ws_authed && g_ctx.ws_subscribed && esp_websocket_client_is_connected(g_ctx.ws);
 }
 
 static uint32_t ws_next_id(void)
@@ -462,6 +464,7 @@ static void stop_websocket(void)
         esp_websocket_client_destroy(g_ctx.ws);
         g_ctx.ws = NULL;
         g_ctx.ws_authed = false;
+        g_ctx.ws_subscribed = false;
     }
 }
 
@@ -485,8 +488,41 @@ static void handle_ws_payload(const char *payload)
             ws_send_auth();
         } else if (strcmp(type->valuestring, "auth_ok") == 0) {
             g_ctx.ws_authed = true;
+            g_ctx.ws_subscribed = false;
             ws_send_subscribe();
             ESP_LOGI(HA_TAG, "WS authenticated");
+            g_module_status.ha_status = CONNECT;
+            g_module_status.need_update = true;
+        } else if (strcmp(type->valuestring, "auth_invalid") == 0) {
+            cJSON *msg = cJSON_GetObjectItemCaseSensitive(root, "message");
+            ESP_LOGE(HA_TAG, "WS auth invalid: %s", cJSON_IsString(msg) ? msg->valuestring : "unknown");
+            g_ctx.ws_authed = false;
+            g_ctx.ws_subscribed = false;
+            g_module_status.ha_status = ERROR;
+            g_module_status.need_update = true;
+        } else if (strcmp(type->valuestring, "result") == 0) {
+            cJSON *id = cJSON_GetObjectItemCaseSensitive(root, "id");
+            cJSON *success = cJSON_GetObjectItemCaseSensitive(root, "success");
+            if (cJSON_IsNumber(id) && id->valueint == 1) {
+                if (cJSON_IsTrue(success)) {
+                    g_ctx.ws_subscribed = true;
+                    ESP_LOGI(HA_TAG, "WS subscribed to state_changed");
+                } else if (cJSON_IsFalse(success)) {
+                    cJSON *err = cJSON_GetObjectItemCaseSensitive(root, "error");
+                    cJSON *msg = err ? cJSON_GetObjectItemCaseSensitive(err, "message") : NULL;
+                    g_ctx.ws_subscribed = false;
+                    ESP_LOGW(HA_TAG, "WS subscribe failed: %s", cJSON_IsString(msg) ? msg->valuestring : "unknown");
+                }
+            }
+        } else if (strcmp(type->valuestring, "ping") == 0) {
+            cJSON *id = cJSON_GetObjectItemCaseSensitive(root, "id");
+            if (cJSON_IsNumber(id)) {
+                char pong[64];
+                snprintf(pong, sizeof(pong), "{\"type\":\"pong\",\"id\":%d}", id->valueint);
+                ws_send_text(pong);
+            } else {
+                ws_send_text("{\"type\":\"pong\"}");
+            }
         } else if (strcmp(type->valuestring, "event") == 0) {
             if (!g_ctx.ws_authed) {
                 goto cleanup;
@@ -534,12 +570,29 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
     case WEBSOCKET_EVENT_CONNECTED:
         ESP_LOGI(HA_TAG, "WS connected");
         g_ctx.ws_authed = false;
+        g_ctx.ws_subscribed = false;
         break;
     case WEBSOCKET_EVENT_DISCONNECTED:
         ESP_LOGW(HA_TAG, "WS disconnected");
         g_ctx.ws_authed = false;
+        g_ctx.ws_subscribed = false;
         break;
     case WEBSOCKET_EVENT_DATA: {
+        const uint8_t opcode = (uint8_t)(data->op_code & 0x0F);
+        if (opcode == 0x8) { // close
+            if (data->data_len >= 2 && data->payload_offset == 0) {
+                const uint8_t *bytes = (const uint8_t *)data->data_ptr;
+                uint16_t code = (uint16_t)((bytes[0] << 8) | bytes[1]);
+                ESP_LOGW(HA_TAG, "WS close frame (code=%u)", (unsigned)code);
+            } else {
+                ESP_LOGW(HA_TAG, "WS close frame");
+            }
+            break;
+        }
+        if (opcode != 0x1 && opcode != 0x0) {
+            // Ignore non-text frames (binary/ping/pong).
+            break;
+        }
         // Handle fragmented frames: accumulate until full payload is received.
         size_t total_len = data->payload_len;
         size_t offset = data->payload_offset;
@@ -636,6 +689,8 @@ static void ha_sync_task(void *arg)
     float remote_temp = 0.0f;
     bool remote_has_temp = false;
     TickType_t next_ws_retry = 0;
+    TickType_t next_poll = 0;
+    TickType_t next_sub_retry = 0;
 
     while (!wait_for_wifi_connected(pdMS_TO_TICKS(15000))) {
         ESP_LOGW(HA_TAG, "Waiting for WiFi connection before HA sync...");
@@ -671,6 +726,12 @@ static void ha_sync_task(void *arg)
     g_module_status.ha_status = READY;
     g_module_status.need_update = true;
 
+    ESP_LOGI(HA_TAG, "HA sync loop start (poll_ms=%u)", (unsigned)g_ctx.poll_ms);
+
+    if (g_ctx.poll_ms > 0) {
+        next_poll = xTaskGetTickCount() + pdMS_TO_TICKS(g_ctx.poll_ms);
+    }
+
     for (;;) {
         TickType_t now = xTaskGetTickCount();
 
@@ -685,10 +746,12 @@ static void ha_sync_task(void *arg)
 
         // Ensure websocket is running; retry with backoff.
         if (!g_ctx.ws && now >= next_ws_retry) {
+            ESP_LOGI(HA_TAG, "WS start attempt (base_url=%s)", g_ctx.base_url ? g_ctx.base_url : "");
             if (start_websocket() != ESP_OK) {
                 next_ws_retry = now + pdMS_TO_TICKS(2000);
             } else {
                 next_ws_retry = now + pdMS_TO_TICKS(5000);
+                next_sub_retry = now + pdMS_TO_TICKS(1000);
             }
         } else if (g_ctx.ws && !esp_websocket_client_is_connected(g_ctx.ws) && now >= next_ws_retry) {
             ESP_LOGW(HA_TAG, "WS disconnected; restarting");
@@ -696,6 +759,14 @@ static void ha_sync_task(void *arg)
             g_module_status.ha_status = DISCONNECT;
             g_module_status.need_update = true;
             next_ws_retry = now + pdMS_TO_TICKS(2000);
+        }
+
+        // Retry subscribe if auth succeeded but subscription not confirmed.
+        if (g_ctx.ws && g_ctx.ws_authed && !g_ctx.ws_subscribed &&
+            esp_websocket_client_is_connected(g_ctx.ws) && now >= next_sub_retry) {
+            ESP_LOGW(HA_TAG, "WS subscribe retry");
+            ws_send_subscribe();
+            next_sub_retry = now + pdMS_TO_TICKS(5000);
         }
 
         // Handle outbound updates
