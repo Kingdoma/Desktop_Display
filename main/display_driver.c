@@ -28,6 +28,7 @@ static lv_color_t s_buf1[EXAMPLE_LCD_H_RES * EXAMPLE_LCD_BUFFER_LINES];
 static lv_color_t s_buf2[EXAMPLE_LCD_H_RES * EXAMPLE_LCD_BUFFER_LINES];
 static bool s_initialized;
 static bool s_te_enabled;
+static bool s_te_wait_needed = true;
 
 static const st7796_lcd_init_cmd_t lcd_init_cmds[] = {
 // {cmd, { data }, data_size, delay_ms}
@@ -256,10 +257,18 @@ static void display_lvgl_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, l
     esp_lcd_panel_handle_t panel_handle = (esp_lcd_panel_handle_t)disp_drv->user_data;
 
 #if EXAMPLE_LCD_TE
+    const bool is_last_chunk = lv_disp_flush_is_last(disp_drv);
     if(s_te_enabled && s_te_ready) {
-        xSemaphoreTake(s_te_ready, 0);
-        if(xSemaphoreTake(s_te_ready, pdMS_TO_TICKS(50)) != pdTRUE) {
-            ESP_LOGW(TAG, "TE wait timeout");
+        if(s_te_wait_needed) {
+            xSemaphoreTake(s_te_ready, 0);
+            if(xSemaphoreTake(s_te_ready, pdMS_TO_TICKS(50)) != pdTRUE) {
+                ESP_LOGW(TAG, "TE wait timeout");
+            }
+            s_te_wait_needed = false;
+        }
+
+        if(is_last_chunk) {
+            s_te_wait_needed = true;
         }
     }
 #endif
